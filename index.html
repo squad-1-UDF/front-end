@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LABTECH - Front-end Squad 1</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .hub { max-width: 980px; margin: 40px auto; padding: 0 16px; }
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+    .hub .panel { display: flex; flex-direction: column; gap: 8px; text-decoration: none; }
+    .hub .panel .who { font-size: 13px; color: var(--muted); }
+    .hub .panel.light { opacity: .75; }
+    .hub .panel .st { margin-top: auto; }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <div class="brand">
+      <div class="flask"><i class="fa-solid fa-flask"></i></div>
+      <div><h1>LABTECH | LABORATÓRIOS</h1><p>Front-end do Squad 1 - índice das telas do MVP</p></div>
+    </div>
+    <p class="muted">Protótipos estáticos (HTML/CSS/JS) seguindo o padrão visual do Dashboard. Vão virar Django Templates na integração com o back.</p>
+    <div class="hub-grid">
+      <a class="panel" href="salas.html">
+        <h3><span class="gold-icon"><i class="fa-solid fa-flask"></i></span> Lista de salas/laboratórios</h3>
+        <span class="who">João Gabriel Leal</span>
+        <p>Filtros, cards/tabela, status e disponibilidade por data e hora.</p>
+        <span class="st"><span class="badge available">Pronta para revisão</span></span>
+      </a>
+      <a class="panel" href="sala-detalhes.html?id=1">
+        <h3><span class="gold-icon"><i class="fa-solid fa-circle-info"></i></span> Detalhes da sala</h3>
+        <span class="who">João Gabriel Leal</span>
+        <p>Recursos, grade semanal de disponibilidade, reservas, chaves e regras.</p>
+        <span class="st"><span class="badge available">Pronta para revisão</span></span>
+      </a>
+      <a class="panel light" href="https://luuapriiscila.github.io/labtech/" target="_blank" rel="noopener">
+        <h3><span class="gold-icon"><i class="fa-solid fa-house"></i></span> Dashboard</h3>
+        <span class="who">Luanna Priscila</span>
+        <p>Protótipo no GitHub Pages dela (referência do padrão visual).</p>
+        <span class="st"><span class="badge occupied">Externo</span></span>
+      </a>
+      <a class="panel light" href="#"><h3><span class="gold-icon"><i class="fa-solid fa-right-to-bracket"></i></span> Login</h3><span class="who">Luanna Priscila</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel light" href="#"><h3><span class="gold-icon"><i class="fa-regular fa-calendar-plus"></i></span> Nova reserva</h3><span class="who">Luiz Cláudio</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel light" href="#"><h3><span class="gold-icon"><i class="fa-regular fa-bookmark"></i></span> Minhas reservas</h3><span class="who">Luiz Cláudio</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel light" href="#"><h3><span class="gold-icon"><i class="fa-regular fa-calendar-check"></i></span> Agenda / disponibilidade</h3><span class="who">A definir</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel light" href="#"><h3><span class="gold-icon"><i class="fa-solid fa-gear"></i></span> Área de administração</h3><span class="who">A definir</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+    </div>
+  </div>
+</body>
+</html>
