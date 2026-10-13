@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Sala - LABTECH</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/sala-detalhes.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+
+    <aside class="sidebar">
+      <div class="brand-mark"><i class="fa-solid fa-flask"></i></div>
+      <nav>
+        <a class="nav-item" href="index.html"><span><i class="fa-solid fa-house"></i></span><small>Início</small></a>
+        <a class="nav-item active" href="salas.html"><span><i class="fa-solid fa-flask"></i></span><small>Laboratórios</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-regular fa-calendar-check"></i></span><small>Agendamentos</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-regular fa-bookmark"></i></span><small>Solicitações</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-desktop"></i></span><small>Retirada de<br> Chaves</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-chart-simple"></i></span><small>Devolução de<br> Chaves</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-gear"></i></span><small>Configurações</small></a>
+      </nav>
+      <img class="sidebar-cat" src="assets/gato2.png" alt="">
+    </aside>
+
+    <main class="main">
+
+      <header class="topbar">
+        <div class="brand">
+          <div class="flask"><i class="fa-solid fa-flask"></i></div>
+          <div>
+            <h1>LABTECH | LABORATÓRIOS</h1>
+            <p>Sistema de Gestão de Laboratório</p>
+          </div>
+        </div>
+        <div class="welcome">
+          <strong>Olá, seja bem-vindo(a)!</strong>
+          <span>Bons estudos:) 🐾</span>
+        </div>
+        <label class="search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input id="topSearch" placeholder="Buscar sala ou laboratório...">
+        </label>
+        <button class="bell" aria-label="Notificações">
+          <i class="fa-regular fa-bell"></i><span class="bell-dot"></span>
+        </button>
+        <div class="avatar"><img src="assets/gato2.png" alt="Usuário"></div>
+      </header>
+
+      <nav class="breadcrumb" aria-label="Navegação">
+        <a href="index.html">Início</a><i class="fa-solid fa-chevron-right"></i>
+        <a href="salas.html">Laboratórios e Salas</a><i class="fa-solid fa-chevron-right"></i>
+        <span id="bcAtual">Sala</span>
+      </nav>
+
+      <!-- Conteúdo é montado pelo JS a partir do ?id= -->
+      <div id="detail"></div>
+
+      <footer>
+        <div class="footer-left"><span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento</div>
+        <em>Pequenos passos, grandes descobertas 🐾</em>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="data/salas.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/sala-detalhes.js"></script>
+</body>
+</html>
