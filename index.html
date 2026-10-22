@@ -5,101 +5,268 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laboratório Livres — Painel</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Ícones Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-shell">
+    
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="brand-mark">⚗</div>
+      <div class="brand-mark"><i class="fa-solid fa-flask"></i></div>
       <nav>
-        <a class="nav-item active" href="#"><span>⌂</span><small>Início</small></a>
-        <a class="nav-item" href="#"><span>⚗</span><small>Laboratórios</small></a>
-        <a class="nav-item" href="#"><span>▦</span><small>Agendamentos</small></a>
-        <a class="nav-item" href="#"><span>▣</span><small>Reservas</small></a>
-        <a class="nav-item" href="#"><span>▱</span><small>Recursos</small></a>
-        <a class="nav-item" href="#"><span>▥</span><small>Relatórios</small></a>
-        <a class="nav-item" href="#"><span>⚙</span><small>Configurações</small></a>
+        <a class="nav-item active" href="#"><span><i class="fa-solid fa-house"></i></span><small>Início</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-flask"></i></span><small>Laboratórios</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-regular fa-calendar-check"></i></span><small>Agendamentos</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-regular fa-bookmark"></i></span><small>Solicitações</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-desktop"></i></span><small>Retirada de<br> Chaves</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-chart-simple"></i></span><small>Devolução de<br> Chaves</small></a>
+        <a class="nav-item" href="#"><span><i class="fa-solid fa-gear"></i></span><small>Configurações</small></a>
       </nav>
-      <img class="sidebar-cat" src="gato2.png" alt="Gatinho acenando">
+      <img class="sidebar-cat" src="assets/gato2.png" alt="Gatinho na sidebar">
     </aside>
 
+    <!-- ÁREA PRINCIPAL -->
     <main class="main">
+      
+      <!-- TOPBAR -->
       <header class="topbar">
         <div class="brand">
-          <div class="flask">⚗</div>
-          <div><h1>Laboratório Livres</h1><p>Sistema de Gestão de Laboratório</p></div>
+          <div class="flask"><i class="fa-solid fa-flask"></i></div>
+          <div>
+            <h1>LABTECH | LABORATÓRIOS</h1>
+            <p>Sistema de Gestão de Laboratório</p>
+          </div>
         </div>
-        <div class="welcome"><strong>Olá, seja bem-vindo(a)!</strong><span>Que hoje seja um ótimo dia 🐾</span></div>
-        <div class="bird" aria-hidden="true">🕊</div>
-        <label class="search"><span>⌕</span><input placeholder="Buscar..."></label>
-        <button class="bell" aria-label="Notificações">♧</button>
-        <div class="avatar"><img src="gato3.png" alt="Gatinho"></div>
+
+        <div class="welcome">
+          <strong>Olá, seja bem-vindo(a)!</strong>
+          <span>Bons estudos:) 🐾</span>
+        </div>
+
+        <label class="search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input placeholder="Buscar...">
+        </label>
+
+        <button class="bell" aria-label="Notificações">
+          <i class="fa-regular fa-bell"></i>
+          <span class="bell-dot"></span>
+        </button>
+
+        <div class="avatar">
+          <img src="assets/gato2.png" alt="Gatinho Usuário">
+        </div>
       </header>
 
+      <!-- DASHBOARD GRID -->
       <section class="dashboard">
+
+        <!-- CARD 1: LAB LIVRES (MAPA COM ROLAGEM DE 20 LABORATORIOS) -->
         <article class="panel lab-panel">
-          <h2><span class="gold-icon">⚗</span> Laboratório Livres</h2>
-          <div class="lab-stats"><div><strong>1/9</strong><span>laboratórios<br>disponíveis</span></div>
-            <div class="ring small-ring"><b>11%</b><span>⚗</span></div></div>
-          <img class="heron" src="gato4.png" alt="Ilustração decorativa">
+          <h2><span class="gold-icon"><i class="fa-solid fa-flask"></i></span> Laboratório Livres</h2>
+          
+          <div class="lab-stats-top">
+            <div class="lab-count-info">
+              <strong>4/20</strong>
+              <span>laboratórios disponíveis</span>
+            </div>
+            <div class="ring small-ring">
+              <b>20%</b>
+              <span><i class="fa-solid fa-flask"></i></span>
+            </div>
+          </div>
+
+          <!-- LEGENDA DE ESTADOS -->
+          <div class="lab-map-legend">
+            <span class="legend-item"><i class="dot available"></i> Livre</span>
+            <span class="legend-item"><i class="dot occupied"></i> Ocupado</span>
+            <span class="legend-item"><i class="dot maintenance"></i> Manutenção</span>
+          </div>
+
+          <!-- GRELHA DOS 20 LABORATÓRIOS (COM ROLAGEM) -->
+          <div class="labs-map-grid">
+            <div class="lab-seat available" title="Lab 01 — Livre"><i class="fa-solid fa-flask"></i><small>01</small></div>
+            <div class="lab-seat occupied" title="Lab 02 — Ocupado"><i class="fa-solid fa-flask"></i><small>02</small></div>
+            <div class="lab-seat occupied" title="Lab 03 — Ocupado"><i class="fa-solid fa-flask"></i><small>03</small></div>
+            <div class="lab-seat available" title="Lab 04 — Livre"><i class="fa-solid fa-flask"></i><small>04</small></div>
+            <div class="lab-seat occupied" title="Lab 05 — Ocupado"><i class="fa-solid fa-flask"></i><small>05</small></div>
+
+            <div class="lab-seat occupied" title="Lab 06 — Ocupado"><i class="fa-solid fa-flask"></i><small>06</small></div>
+            <div class="lab-seat maintenance" title="Lab 07 — Manutenção"><i class="fa-solid fa-flask"></i><small>07</small></div>
+            <div class="lab-seat occupied" title="Lab 08 — Ocupado"><i class="fa-solid fa-flask"></i><small>08</small></div>
+            <div class="lab-seat occupied" title="Lab 09 — Ocupado"><i class="fa-solid fa-flask"></i><small>09</small></div>
+            <div class="lab-seat occupied" title="Lab 10 — Ocupado"><i class="fa-solid fa-flask"></i><small>10</small></div>
+
+            <div class="lab-seat occupied" title="Lab 11 — Ocupado"><i class="fa-solid fa-flask"></i><small>11</small></div>
+            <div class="lab-seat available" title="Lab 12 — Livre"><i class="fa-solid fa-flask"></i><small>12</small></div>
+            <div class="lab-seat occupied" title="Lab 13 — Ocupado"><i class="fa-solid fa-flask"></i><small>13</small></div>
+            <div class="lab-seat occupied" title="Lab 14 — Ocupado"><i class="fa-solid fa-flask"></i><small>14</small></div>
+            <div class="lab-seat maintenance" title="Lab 15 — Manutenção"><i class="fa-solid fa-flask"></i><small>15</small></div>
+
+            <div class="lab-seat occupied" title="Lab 16 — Ocupado"><i class="fa-solid fa-flask"></i><small>16</small></div>
+            <div class="lab-seat occupied" title="Lab 17 — Ocupado"><i class="fa-solid fa-flask"></i><small>17</small></div>
+            <div class="lab-seat occupied" title="Lab 18 — Ocupado"><i class="fa-solid fa-flask"></i><small>18</small></div>
+            <div class="lab-seat available" title="Lab 19 — Livre"><i class="fa-solid fa-flask"></i><small>19</small></div>
+            <div class="lab-seat occupied" title="Lab 20 — Ocupado"><i class="fa-solid fa-flask"></i><small>20</small></div>
+          </div>
         </article>
 
+        <!-- CARD 2: RESERVAS ATIVAS -->
         <article class="panel reservation-panel">
-          <h2><span class="gold-icon">▦</span> Minhas reservas ativas <span class="chevron">›</span></h2>
-          <strong class="metric">3</strong><p>reservas em andamento</p>
-          <img class="cat-reserve" src="gato1.png" alt="Gatinho com caderninho">
+          <h2>
+            <span class="gold-icon"><i class="fa-regular fa-calendar-days"></i></span> 
+            Minhas reservas ativas 
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </h2>
+          <strong class="metric">3</strong>
+          <p>reservas em andamento</p>
+          <img class="cat-reserve" src="assets/gato3.png" alt="Gatinho">
         </article>
 
+        <!-- CARD 3: MINHA AGENDA (COM DATA E TO-DO LIST) -->
         <article class="panel agenda-panel">
-          <h2><span class="gold-icon">▦</span> Minha agenda <span class="chevron">›</span></h2>
-          <strong class="metric">5</strong><p>compromissos hoje</p>
-          <img class="cat-agenda" src="gato1.png" alt="Gatinho com caderninho">
+          <div class="agenda-header">
+            <h2>
+              <span class="gold-icon"><i class="fa-regular fa-calendar-check"></i></span> 
+              Minha agenda 
+            </h2>
+            <span class="agenda-date"><i class="fa-regular fa-calendar"></i> Hoje, 09 de Outubro</span>
+          </div>
+
+          <div class="agenda-body">
+            <ul class="agenda-todo-list">
+              <li>
+                <input type="checkbox" id="task1" checked>
+                <label for="task1"><i class="fa-solid fa-key"></i> Entregar chaves do Lab 02 ao Prof. Silva</label>
+              </li>
+              <li>
+                <input type="checkbox" id="task2">
+                <label for="task2"><i class="fa-solid fa-flask"></i> Laboratório 04 reservado (14:00 - 16:00)</label>
+              </li>
+              <li>
+                <input type="checkbox" id="task3">
+                <label for="task3"><i class="fa-solid fa-clock-rotate-left"></i> Receber devolução da chave do Lab 07</label>
+              </li>
+              <li>
+                <input type="checkbox" id="task4">
+                <label for="task4"><i class="fa-solid fa-vial"></i> Conferir kit de materiais pendente</label>
+              </li>
+            </ul>
+          </div>
+
+          <img class="cat-agenda" src="assets/gato1.png" alt="Gatinho Agenda">
         </article>
 
+        <!-- CARD 4: CHAVES PENDENTES -->
         <article class="panel keys-panel">
-          <h2><span class="gold-icon">⚿</span> Chaves pendentes <span class="chevron">›</span></h2>
-          <strong class="metric">4</strong><p>chaves aguardando retirada</p>
-          <div class="cat-row">
-            <img src="gato3.png" alt="Gatinho"><img src="gato3.png" alt="Gatinho">
-            <img src="gato3.png" alt="Gatinho"><img src="gato3.png" alt="Gatinho">
+          <h2>
+            <span class="gold-icon"><i class="fa-solid fa-key"></i></span> 
+            Chaves pendentes 
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </h2>
+          <strong class="metric">4</strong>
+          <p>chaves aguardando retirada</p>
+          <div class="keys-icon-group">
+            <img src="assets/gato4.png" alt="Chave 1">
+            <img src="assets/gato4.png" alt="Chave 2">
+            <img src="assets/gato4.png" alt="Chave 3">
+            <img src="assets/gato4.png" alt="Chave 4">
           </div>
         </article>
 
+        <!-- CARD 5: SOLICITAÇÕES PENDENTES -->
         <article class="panel requests-panel">
-          <h2><span class="gold-icon">▤</span> Solicitações pendentes <span class="chevron">›</span></h2>
-          <strong class="metric">2</strong><p>solicitações<br>em análise</p>
-          <img src="gato1.png" alt="Gatinho com caderninho">
+          <h2>
+            <span class="gold-icon"><i class="fa-regular fa-file-lines"></i></span> 
+            Solicitações pendentes 
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </h2>
+          <strong class="metric">2</strong>
+          <p>solicitações<br>em análise</p>
+          <img class="cat-requests" src="assets/gato2.png" alt="Gatinho Com Papel">
         </article>
 
-        <article class="panel occupancy-panel">
-          <h2><span class="gold-icon">▥</span> Ocupação das salas</h2>
-          <div class="occupancy-content">
-            <div class="ring occupancy-ring"><b>68%</b><span>ocupadas</span></div>
-            <div class="legend"><p><i class="dot occupied"></i>Ocupadas <b>6</b></p><p><i class="dot available"></i>Disponíveis <b>3</b></p><p><i class="dot maintenance"></i>Manutenção <b>0</b></p></div>
+        <!-- CARD 6: NOTIFICAÇÕES (PAINEL LARGO EXCLUSIVO) -->
+        <article class="panel notifications-full-panel">
+          <h2>
+            <span class="gold-icon"><i class="fa-regular fa-bell"></i></span> Notificações
+          </h2>
+
+          <div class="notice-grid">
+            <div class="notice">
+              <img class="avatar-mini" src="assets/gato2.png" alt="Gato">
+              <div><b>Nova reserva</b><small>Laboratório 2 · 10:25</small></div>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </div>
+            <div class="notice">
+              <span class="notice-icon"><i class="fa-solid fa-key"></i></span>
+              <div><b>Registro de retirada</b><small>Chave 03 · 09:47</small></div>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </div>
+            <div class="notice">
+              <span class="notice-icon"><i class="fa-regular fa-calendar"></i></span>
+              <div><b>Agenda completa</b><small>Hoje · 08:00</small></div>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </div>
+            <div class="notice">
+              <span class="notice-icon"><i class="fa-regular fa-file-lines"></i></span>
+              <div><b>Solicitação de material</b><small>Pipeta · 08:12</small></div>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </div>
+            <div class="notice">
+              <span class="notice-icon"><i class="fa-regular fa-bell"></i></span>
+              <div><b>Lembrete</b><small>Reunião de equipe · 07:50</small></div>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </div>
           </div>
-          <div class="chart"><svg viewBox="0 0 420 100" preserveAspectRatio="none" aria-label="Gráfico de ocupação"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5b95c" stop-opacity=".35"/><stop offset="1" stop-color="#f5b95c" stop-opacity="0"/></linearGradient></defs><path d="M0 72 L35 63 L70 73 L105 48 L140 61 L175 43 L210 69 L245 53 L280 70 L315 47 L350 61 L385 35 L420 18 L420 100 L0 100 Z" fill="url(#area)"/><polyline points="0,72 35,63 70,73 105,48 140,61 175,43 210,69 245,53 280,70 315,47 350,61 385,35 420,18" fill="none" stroke="#f4b958" stroke-width="2"/><g fill="#f8c66f"><circle cx="105" cy="48" r="2.5"/><circle cx="175" cy="43" r="2.5"/><circle cx="245" cy="53" r="2.5"/><circle cx="315" cy="47" r="2.5"/><circle cx="420" cy="18" r="2.5"/></g></svg><div class="hours"><span>08h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span></div></div>
-          <img class="occupancy-cat" src="gato4.png" alt="Ilustração decorativa">
+          
+          <a class="see-all" href="#">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
         </article>
 
-        <article class="panel notifications-panel">
-          <h2><span class="gold-icon">♧</span> Notificações</h2>
-          <img class="peek-cat" src="gato3.png" alt="Gatinho espiando">
-          <div class="notice-list">
-            <div class="notice"><span class="notice-icon">🐱</span><div><b>Nova reserva</b><small>Laboratório 2 · 10:25</small></div><span class="arrow">›</span></div>
-            <div class="notice"><span class="notice-icon">⚿</span><div><b>Registro de retirada</b><small>Chave 03 · 09:47</small></div><span class="arrow">›</span></div>
-            <div class="notice"><span class="notice-icon">▣</span><div><b>Agenda completa</b><small>Hoje · 08:00</small></div><span class="arrow">›</span></div>
-            <div class="notice"><span class="notice-icon">▤</span><div><b>Solicitação de material</b><small>Pipeta · 08:12</small></div><span class="arrow">›</span></div>
-            <div class="notice"><span class="notice-icon">♧</span><div><b>Lembrete</b><small>Reunião de equipe · 07:50</small></div><span class="arrow">›</span></div>
-            <a class="see-all" href="#">Ver todas <span>→</span></a>
+        <!-- CARD 7: OPÇÕES (PAINEL STANDALONE) -->
+        <article class="panel options-panel-standalone">
+          <h2><span class="gold-icon"><i class="fa-solid fa-cat"></i></span> Opções</h2>
+          
+          <div class="quick-actions-vertical">
+            <button class="action-btn-large">
+              <img src="assets/gato2.png" alt="Nova Reserva" class="btn-cat-img-large">
+              <span>Nova Reserva</span>
+            </button>
+            <button class="action-btn-large">
+              <img src="assets/gato3.png" alt="Retirada" class="btn-cat-img-large">
+              <span>Retirada</span>
+            </button>
+            <button class="action-btn-large">
+              <img src="assets/gato1.png" alt="Agenda Completa" class="btn-cat-img-large">
+              <span>Agenda Completa</span>
+            </button>
           </div>
         </article>
 
-        <article class="panel forest-panel" aria-label="Ilustração da floresta">
+        <!-- CARD 8: CARD FLORESTA COM BRASÃO DA UDF -->
+        <article class="panel forest-panel" aria-label="Painel UDF">
           <div class="forest-glow"></div>
-          <img src="gato2.png" alt="Gatinho acenando">
+          <div class="udf-container">
+            <a href="https://www.udf.edu.br/" target="_blank">
+            <img src="assets/Logo Dourado UDF em Metal Polido.png" alt="Logótipo UDF Centro Universitário" class="udf-logo-img">
+            </a>
+          </div>
         </article>
+
       </section>
 
-      <footer><span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento <em>Pequenos passos, grandes descobertas 🐾</em></footer>
+      <!-- RODAPÉ -->
+      <footer>
+        <div class="footer-left">
+          <span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento
+        </div>
+        <em>Pequenos passos, grandes descobertas 🐾</em>
+      </footer>
     </main>
   </div>
 </body>
