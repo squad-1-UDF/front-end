@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratório Livres — Painel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-mark">⚗</div>
+      <nav>
+        <a class="nav-item active" href="#"><span>⌂</span><small>Início</small></a>
+        <a class="nav-item" href="#"><span>⚗</span><small>Laboratórios</small></a>
+        <a class="nav-item" href="#"><span>▦</span><small>Agendamentos</small></a>
+        <a class="nav-item" href="#"><span>▣</span><small>Reservas</small></a>
+        <a class="nav-item" href="#"><span>▱</span><small>Recursos</small></a>
+        <a class="nav-item" href="#"><span>▥</span><small>Relatórios</small></a>
+        <a class="nav-item" href="#"><span>⚙</span><small>Configurações</small></a>
+      </nav>
+      <img class="sidebar-cat" src="gato2.png" alt="Gatinho acenando">
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="brand">
+          <div class="flask">⚗</div>
+          <div><h1>Laboratório Livres</h1><p>Sistema de Gestão de Laboratório</p></div>
+        </div>
+        <div class="welcome"><strong>Olá, seja bem-vindo(a)!</strong><span>Que hoje seja um ótimo dia 🐾</span></div>
+        <div class="bird" aria-hidden="true">🕊</div>
+        <label class="search"><span>⌕</span><input placeholder="Buscar..."></label>
+        <button class="bell" aria-label="Notificações">♧</button>
+        <div class="avatar"><img src="gato3.png" alt="Gatinho"></div>
+      </header>
+
+      <section class="dashboard">
+        <article class="panel lab-panel">
+          <h2><span class="gold-icon">⚗</span> Laboratório Livres</h2>
+          <div class="lab-stats"><div><strong>1/9</strong><span>laboratórios<br>disponíveis</span></div>
+            <div class="ring small-ring"><b>11%</b><span>⚗</span></div></div>
+          <img class="heron" src="gato4.png" alt="Ilustração decorativa">
+        </article>
+
+        <article class="panel reservation-panel">
+          <h2><span class="gold-icon">▦</span> Minhas reservas ativas <span class="chevron">›</span></h2>
+          <strong class="metric">3</strong><p>reservas em andamento</p>
+          <img class="cat-reserve" src="gato1.png" alt="Gatinho com caderninho">
+        </article>
+
+        <article class="panel agenda-panel">
+          <h2><span class="gold-icon">▦</span> Minha agenda <span class="chevron">›</span></h2>
+          <strong class="metric">5</strong><p>compromissos hoje</p>
+          <img class="cat-agenda" src="gato1.png" alt="Gatinho com caderninho">
+        </article>
+
+        <article class="panel keys-panel">
+          <h2><span class="gold-icon">⚿</span> Chaves pendentes <span class="chevron">›</span></h2>
+          <strong class="metric">4</strong><p>chaves aguardando retirada</p>
+          <div class="cat-row">
+            <img src="gato3.png" alt="Gatinho"><img src="gato3.png" alt="Gatinho">
+            <img src="gato3.png" alt="Gatinho"><img src="gato3.png" alt="Gatinho">
+          </div>
+        </article>
+
+        <article class="panel requests-panel">
+          <h2><span class="gold-icon">▤</span> Solicitações pendentes <span class="chevron">›</span></h2>
+          <strong class="metric">2</strong><p>solicitações<br>em análise</p>
+          <img src="gato1.png" alt="Gatinho com caderninho">
+        </article>
+
+        <article class="panel occupancy-panel">
+          <h2><span class="gold-icon">▥</span> Ocupação das salas</h2>
+          <div class="occupancy-content">
+            <div class="ring occupancy-ring"><b>68%</b><span>ocupadas</span></div>
+            <div class="legend"><p><i class="dot occupied"></i>Ocupadas <b>6</b></p><p><i class="dot available"></i>Disponíveis <b>3</b></p><p><i class="dot maintenance"></i>Manutenção <b>0</b></p></div>
+          </div>
+          <div class="chart"><svg viewBox="0 0 420 100" preserveAspectRatio="none" aria-label="Gráfico de ocupação"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5b95c" stop-opacity=".35"/><stop offset="1" stop-color="#f5b95c" stop-opacity="0"/></linearGradient></defs><path d="M0 72 L35 63 L70 73 L105 48 L140 61 L175 43 L210 69 L245 53 L280 70 L315 47 L350 61 L385 35 L420 18 L420 100 L0 100 Z" fill="url(#area)"/><polyline points="0,72 35,63 70,73 105,48 140,61 175,43 210,69 245,53 280,70 315,47 350,61 385,35 420,18" fill="none" stroke="#f4b958" stroke-width="2"/><g fill="#f8c66f"><circle cx="105" cy="48" r="2.5"/><circle cx="175" cy="43" r="2.5"/><circle cx="245" cy="53" r="2.5"/><circle cx="315" cy="47" r="2.5"/><circle cx="420" cy="18" r="2.5"/></g></svg><div class="hours"><span>08h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span></div></div>
+          <img class="occupancy-cat" src="gato4.png" alt="Ilustração decorativa">
+        </article>
+
+        <article class="panel notifications-panel">
+          <h2><span class="gold-icon">♧</span> Notificações</h2>
+          <img class="peek-cat" src="gato3.png" alt="Gatinho espiando">
+          <div class="notice-list">
+            <div class="notice"><span class="notice-icon">🐱</span><div><b>Nova reserva</b><small>Laboratório 2 · 10:25</small></div><span class="arrow">›</span></div>
+            <div class="notice"><span class="notice-icon">⚿</span><div><b>Registro de retirada</b><small>Chave 03 · 09:47</small></div><span class="arrow">›</span></div>
+            <div class="notice"><span class="notice-icon">▣</span><div><b>Agenda completa</b><small>Hoje · 08:00</small></div><span class="arrow">›</span></div>
+            <div class="notice"><span class="notice-icon">▤</span><div><b>Solicitação de material</b><small>Pipeta · 08:12</small></div><span class="arrow">›</span></div>
+            <div class="notice"><span class="notice-icon">♧</span><div><b>Lembrete</b><small>Reunião de equipe · 07:50</small></div><span class="arrow">›</span></div>
+            <a class="see-all" href="#">Ver todas <span>→</span></a>
+          </div>
+        </article>
+
+        <article class="panel forest-panel" aria-label="Ilustração da floresta">
+          <div class="forest-glow"></div>
+          <img src="gato2.png" alt="Gatinho acenando">
+        </article>
+      </section>
+
+      <footer><span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento <em>Pequenos passos, grandes descobertas 🐾</em></footer>
+    </main>
+  </div>
+</body>
+</html>

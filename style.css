@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --gold: #f5bd62;
+  --gold-light: #ffe0a0;
+  --cream: #f4e5c5;
+  --line: rgba(207, 213, 171, .72);
+  --panel: rgba(0, 28, 25, .83);
+  --muted: #c9d1c4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; color: var(--cream);
+  background: #001b18 url("Moldura Encantada da Floresta Esmeralda.png") center center / cover fixed no-repeat;
+  font-family: 'Patrick Hand', 'Nunito', sans-serif;
+  letter-spacing: .35px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1;
+  background: linear-gradient(110deg, rgba(0,17,15,.28), rgba(0,25,22,.50));
+}
+button, input { font: inherit; }
+.app-shell { min-height: 100vh; display: flex; background: rgba(0, 20, 18, .22); }
+.sidebar {
+  width: 116px; flex: 0 0 116px; min-height: 100vh; padding: 18px 10px 22px;
+  border-right: 1px solid rgba(219, 196, 121, .5); background: rgba(0, 23, 21, .82);
+  display: flex; align-items: center; flex-direction: column; position: relative;
+}
+.brand-mark { color: var(--gold); font-size: 36px; margin: 2px 0 24px; opacity: .9; }
+.sidebar nav { width: 100%; display: flex; flex-direction: column; gap: 19px; }
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; text-decoration:none; color:var(--cream); min-height:68px; }
+.nav-item span { font-family: sans-serif; font-size:30px; line-height:1; color:var(--gold); width:64px;height:54px;display:grid;place-items:center; }
+.nav-item small { font-size:14px; white-space:nowrap; }
+.nav-item.active span { background: radial-gradient(circle, #f8c36b 0%, #b77b32 46%, rgba(194,126,40,.05) 73%); color:#fff2d1; border:1px solid rgba(255,204,112,.7); border-radius:24px; box-shadow:0 0 20px #e99b3a55; }
+.sidebar-cat { width:70px; height:70px; object-fit:contain; margin-top:auto; }
+.main { min-width:0; flex:1; padding:30px 24px 18px 16px; }
+.topbar { height:108px; display:flex; align-items:center; gap:20px; position:relative; }
+.brand { display:flex; align-items:center; gap:15px; min-width:365px; }
+.flask { color:var(--gold); font-size:53px; line-height:1; }
+.brand h1 { font-size:32px; font-weight:500; margin:0; line-height:1.05; }
+.brand p { margin:3px 0 0; font-size:16px; }
+.welcome { border-left:1px solid #d7c18a66; padding-left:25px; display:flex; flex-direction:column; gap:2px; min-width:220px; }
+.welcome strong { font-size:20px; font-weight:500; }
+.welcome span { font-size:15px; color:#d8d8c6; }
+.bird { font-size:52px; margin:0 auto; filter:sepia(.5); transform:rotate(-15deg); }
+.search { height:43px; width: min(270px, 22vw); display:flex; align-items:center; gap:12px; padding:0 15px; border:1px solid var(--line); border-radius:30px; background:rgba(0,22,20,.8); box-shadow:inset 0 0 0 1px #0008; }
+.search span { font:32px sans-serif; color:var(--gold); transform:rotate(-25deg); }
+.search input { width:100%; min-width:0; color:var(--cream); background:transparent; border:0; outline:0; font-size:17px; }
+.search input::placeholder { color:#aebbb0; }
+.bell { border:1px solid #bca76d; border-radius:50%; width:45px;height:45px;background:#00231f;color:var(--gold);font-size:27px; }
+.avatar { width:56px;height:56px;border:2px solid var(--gold);border-radius:50%;overflow:hidden;background:#123b2c;display:grid;place-items:center; }
+.avatar img { width:100%;height:100%;object-fit:contain; }
+.dashboard { display:grid; grid-template-columns: 1.08fr 1.25fr 1.25fr .92fr; grid-template-rows: 190px 170px 392px; gap:16px; }
+.panel { min-width:0; position:relative; overflow:hidden; border:1px solid var(--line); border-radius:21px; padding:17px 22px; background:var(--panel); box-shadow:inset 0 0 20px rgba(0,0,0,.22), 0 5px 14px #0002; }
+.panel h2 { display:flex; align-items:center; gap:14px; margin:0; font-size:22px; line-height:1.15; font-weight:500; white-space:nowrap; position:relative; z-index:2; }
+.gold-icon { color:var(--gold); font-family:sans-serif; font-size:32px; line-height:1; min-width:28px; text-align:center; }
+.chevron { margin-left:auto; font:32px sans-serif; color:var(--gold-light); }
+.lab-panel { grid-column:1; grid-row:1 / span 2; background:linear-gradient(180deg,rgba(0,27,24,.92),rgba(0,28,23,.62)),url("Moldura Encantada da Floresta Esmeralda.png") center/cover; }
+.lab-stats { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:30px; position:relative; z-index:1; }
+.lab-stats strong { display:block; font:48px 'Patrick Hand',cursive; line-height:1; }
+.lab-stats span { display:block; font-size:16px; margin-top:4px; }
+.ring { border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
+.ring::before { content:"";position:absolute;inset:0;border-radius:50%;border:12px solid rgba(130,157,119,.45); }
+.small-ring { width:158px;height:158px; margin-right:25px; background:conic-gradient(var(--gold) 0 11%, #254a3a 11% 100%); }
+.small-ring::before { inset:12px; background:#00251f; border:0; }
+.ring b,.ring span { position:relative; z-index:1; }
+.small-ring b { font:29px 'Patrick Hand'; }
+.small-ring span { color:var(--gold); font-size:27px; }
+.heron { position:absolute; width:102px; height:122px; object-fit:contain; right:4px; bottom:10px; }
+.reservation-panel { grid-column:2 / span 1; grid-row:1; }
+.agenda-panel { grid-column:3 / span 2; grid-row:1; }
+.metric { display:block; font:50px 'Patrick Hand',cursive; line-height:1; margin-top:19px; position:relative; z-index:1; }
+.panel p { font-size:16px; margin:3px 0; position:relative; z-index:1; }
+.cat-reserve,.cat-agenda { position:absolute; width:122px;height:115px;object-fit:contain;right:10px;bottom:0; }
+.cat-agenda { width:140px;height:120px; }
+.keys-panel { grid-column:2 / span 2; grid-row:2; }
+.keys-panel .metric { margin-top:20px; }
+.cat-row { position:absolute; right:24px; bottom:9px; display:flex; gap:4px; align-items:end; }
+.cat-row img { width:68px;height:67px;object-fit:contain; }
+.requests-panel { grid-column:4; grid-row:2; }
+.requests-panel h2 { font-size:18px; gap:9px; }
+.requests-panel .metric { margin-top:16px; }
+.requests-panel img { position:absolute; width:95px;height:105px;object-fit:contain;right:4px;bottom:0; }
+.occupancy-panel { grid-column:1 / span 2; grid-row:3; }
+.occupancy-content { display:flex; align-items:center; gap:30px; margin-top:18px; position:relative; z-index:1; }
+.occupancy-ring { width:164px;height:164px;background:conic-gradient(var(--gold) 0 68%, #284a3d 68% 100%); }
+.occupancy-ring::before { inset:12px; background:#00251f; border:0; }
+.occupancy-ring b { font:38px 'Patrick Hand'; }
+.occupancy-ring span { font-size:16px; margin-top:0; }
+.legend { display:flex;flex-direction:column;gap:12px; }
+.legend p { display:flex;align-items:center;gap:9px;min-width:190px; }
+.legend b { margin-left:auto; font-weight:400; }
+.dot { display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #e4d8a0; }
+.occupied { background:var(--gold); }.available { background:#8ba78b; }.maintenance { background:#747d61; }
+.chart { position:absolute; left:22px;right:22px;bottom:22px;height:108px;border-top:1px solid #d1d7b32b;padding-top:8px; }
+.chart svg { width:100%;height:78px;overflow:visible; }
+.hours { display:flex;justify-content:space-between;font:14px 'Nunito',sans-serif;color:#cbd2c5;padding:0 4px; }
+.occupancy-cat { position:absolute; right:0; bottom:90px; width:88px;height:92px;object-fit:contain; }
+.notifications-panel { grid-column:3 / span 1; grid-row:3; padding:17px 18px; }
+.notifications-panel h2 { font-size:21px; }
+.peek-cat { position:absolute; width:90px;height:74px;object-fit:contain;right:22px;top:3px; }
+.notice-list { margin-top:14px; border:1px solid #a9b59a66; border-radius:18px; padding:4px 10px; background:rgba(0,21,19,.76); position:relative; z-index:1; }
+.notice { min-height:59px; display:flex;align-items:center;gap:11px;border-bottom:1px solid #d2d6ba30; }
+.notice:last-of-type { border-bottom:0; }
+.notice-icon { display:grid;place-items:center;flex:0 0 43px;height:43px;border:1px solid #c5a65d;border-radius:50%;color:var(--gold);font-size:22px; }
+.notice div { display:flex;flex-direction:column;min-width:0; }
+.notice b { font-size:15px;font-weight:500;white-space:nowrap; }
+.notice small { font-size:13px;color:#bfc9bd;white-space:nowrap; }
+.arrow { margin-left:auto;font:27px sans-serif;color:var(--cream); }
+.see-all { display:block;text-align:right;color:var(--gold);font-size:15px;text-decoration:none;padding:4px 8px 1px; }
+.see-all span { font:20px sans-serif;margin-left:8px; }
+.forest-panel { grid-column:4;grid-row:3;background:linear-gradient(180deg,rgba(0,30,25,.1),rgba(0,30,25,.2)),url("Moldura Encantada da Floresta Esmeralda.png") 72% center/cover; }
+.forest-panel img { position:absolute;right:18px;bottom:25px;width:90px;height:100px;object-fit:contain; }
+.forest-glow { position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(0,20,17,.15) 100%); }
+footer { display:flex;align-items:center;gap:13px;padding:22px 10px 0;font-size:13px;color:#9eac9d; }
+footer span { color:var(--gold);font-size:22px; }
+footer i { font-style:normal;color:#8c9b89; }
+footer em { margin-left:auto;font-size:16px;color:#c7b99c; }
+
+@media (max-width: 1200px) {
+  .main { padding:20px 16px; }
+  .topbar { gap:12px; }
+  .brand { min-width:280px; }
+  .brand h1 { font-size:27px; }
+  .welcome { min-width:180px;padding-left:15px; }
+  .bird { display:none; }
+  .dashboard { grid-template-columns:1fr 1fr 1fr; grid-template-rows:190px 170px 340px 360px; }
+  .lab-panel { grid-column:1;grid-row:1 / span 2; }
+  .reservation-panel { grid-column:2;grid-row:1; }
+  .agenda-panel { grid-column:3;grid-row:1; }
+  .keys-panel { grid-column:2 / span 2;grid-row:2; }
+  .requests-panel { grid-column:3;grid-row:3; }
+  .occupancy-panel { grid-column:1 / span 2;grid-row:3; }
+  .notifications-panel { grid-column:1 / span 2;grid-row:4; }
+  .forest-panel { grid-column:3;grid-row:4; }
+}
+@media (max-width: 760px) {
+  .app-shell { display:block; }
+  .sidebar { width:100%;min-height:auto;height:auto;flex-direction:row;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto; }
+  .brand-mark,.sidebar-cat { display:none; }
+  .sidebar nav { flex-direction:row;gap:12px;justify-content:space-between; }
+  .nav-item { min-width:64px;min-height:56px; }
+  .nav-item span { width:40px;height:35px;font-size:24px; }
+  .nav-item small { font-size:11px; }
+  .main { padding:14px 12px; }
+  .topbar { height:auto;min-height:100px;flex-wrap:wrap;padding-bottom:16px; }
+  .brand { min-width:0;flex:1 1 100%; }
+  .flask { font-size:42px; }
+  .brand h1 { font-size:26px; }
+  .brand p { font-size:13px; }
+  .welcome { display:none; }
+  .search { width:auto;flex:1; }
+  .dashboard { display:flex;flex-direction:column; }
+  .panel { min-height:175px; }
+  .lab-panel { min-height:350px; }
+  .keys-panel { min-height:175px; }
+  .occupancy-panel { min-height:365px; }
+  .notifications-panel { min-height:380px; }
+  .forest-panel { min-height:220px; }
+  .small-ring { width:130px;height:130px;margin-right:4px; }
+  .occupancy-content { gap:18px; }
+  .occupancy-ring { width:140px;height:140px; }
+  .legend p { min-width:0;gap:6px;font-size:14px; }
+  .cat-row { right:8px;gap:0; }
+  .cat-row img { width:55px;height:60px; }
+  .agenda-panel h2,.reservation-panel h2 { font-size:19px; }
+  footer { flex-wrap:wrap; }
+  footer em { flex-basis:100%;margin:8px 0 0; }
+}

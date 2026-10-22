@@ -1,0 +1,14 @@
+LABORATÓRIO LIVRES — painel HTML/CSS
+
+Como usar:
+1. Extraia o ZIP.
+2. Coloque na mesma pasta destes arquivos as imagens:
+   - Moldura Encantada da Floresta Esmeralda.png
+   - gato1.png
+   - gato2.png
+   - gato3.png
+   - gato4.png
+3. Abra index.html no navegador.
+
+Os nomes precisam ser exatamente iguais aos acima (inclusive espaços e acentos).
+O layout é responsivo e usa a moldura como fundo decorativo, com os gatos posicionados em cada painel.
