@@ -14,7 +14,7 @@ O **LabTech** é uma solução digital voltada para a otimização dos processos
 
 A interface do Dashboard foi projetada focando em clareza visual, legibilidade e acessibilidade. A estrutura utiliza o tema claro (*Light Mode*) na página para suavizar o visual, mantendo blocos destacados na cor uniforme *Deep Ocean* (`#12284B`) com elementos em tons azuis para facilitar a identificação das informações essenciais.
 
-![Preview do Dashboard](assets/dashboard-preview.png)
+![Preview do Dashboard](assets/dashboard.png)
 
 ### 🚀 Principais Funcionalidades da Interface:
 - **Mapa Interativo de Laboratórios (20 Labs):** Grade dinâmica com indicação visual de status (Livre, Ocupado e Manutenção) e scroll interno.
@@ -40,7 +40,7 @@ A interface do Dashboard foi projetada focando em clareza visual, legibilidade e
 labtech-dashboard/
 │
 ├── assets/
-│   ├── dashboard-preview.png
+│   ├── dashboard.png
 │   ├── gato1.png
 │   ├── gato2.png
 │   ├── gato3.png
