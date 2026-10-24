@@ -10,7 +10,7 @@ A interface foi projetada em duas colunas: a área de autenticação funcional �
 
 | Visão Geral da Tela de Login | Seleção de Perfis de Acesso |
 | :---: | :---: |
-| ![Visão Geral do Login](assets/Captura_de_tela_2026-10-24_202142.jpg) | ![Seleção de Perfil](assets/Captura_de_tela_2026-10-24_202234.jpg) |
+| ![Visão Geral do Login](assets/telapri.jpg) | ![Seleção de Perfil](assets/telasec.jpg) |
 
 ---
 
