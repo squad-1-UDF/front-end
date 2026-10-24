@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabReserva — Login</title>
+  <link rel="stylesheet" href="login.css">
+  <!-- Ícones Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    
+    <!-- LADO ESQUERDO: FORMULÁRIO DE AUTENTICAÇÃO -->
+    <div class="login-form-wrapper">
+      <div class="brand-header">
+        <div class="brand-logo-icon">
+          <i class="fa-solid fa-flask"></i>
+        </div>
+        <span class="brand-name">LabReserva</span>
+      </div>
+
+      <div class="form-intro">
+        <h1>Autenticação Restrita</h1>
+        <p>Insira as suas credenciais institucionais para aceder ao sistema.</p>
+      </div>
+
+      <form action="index.html" class="auth-form">
+        
+        <!-- SELEÇÃO DE PERFIL CONFORME AS REGRAS DE NEGÓCIO -->
+        <div class="input-group">
+          <label for="profile">Nível de Acesso (Perfil)</label>
+          <div class="select-wrapper">
+            <select id="profile" required>
+              <option value="" disabled selected>Selecione o seu perfil</option>
+              <option value="student">Estudante / Usuário Autorizado</option>
+              <option value="employee">Funcionário (Controle de Chaves)</option>
+              <option value="admin">Administrador (Gestão de Cadastros)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="email">E-mail Institucional</label>
+          <div class="input-field">
+            <i class="fa-regular fa-envelope"></i>
+            <input type="email" id="email" placeholder="nome.sobrenome@udf.edu.br" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Palavra-passe</label>
+          <div class="input-field">
+            <i class="fa-regular fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••" required>
+            <i class="fa-regular fa-eye-slash toggle-pass"></i>
+          </div>
+        </div>
+
+        <div class="form-actions-row">
+          <label class="remember-checkbox">
+            <input type="checkbox">
+            <span>Lembrar-me</span>
+          </label>
+          <a href="#" class="forgot-link">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit" class="btn-primary-action">
+          Entrar no Sistema
+        </button>
+
+      </form>
+
+      <div class="login-footer-info">
+        <p>Acesso restrito a utilizadores previamente cadastrados pelo Administrador.</p>
+      </div>
+    </div>
+
+    <!-- LADO DIREITO: PAINEL COM A LOGO NO CANTO E A ILUSTRAÇÃO -->
+    <div class="login-visual-wrapper">
+      
+      <!-- LOGO DA UDF FIXADA NO CANTO SUPERIOR DIREITO -->
+      <div class="top-right-logo">
+        <img src="assets/udf-logo.webp" alt="Logo UDF Centro Universitário" class="udf-corner-logo">
+      </div>
+
+      <div class="visual-content">
+        <h2>Sua próxima ideia merece o lugar certo.</h2>
+        <p>Consulte a disponibilidade de salas, faça reservas em tempo real e gira o empréstimo de chaves com total integridade e segurança.</p>
+        
+        <!-- Ilustração do Laboratório de Código -->
+        <div class="illustration-container">
+          <img src="assets/laboratorio-codigo.png" alt="Ilustração do Laboratório de Código" class="login-hero-img">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

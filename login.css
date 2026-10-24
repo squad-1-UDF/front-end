@@ -1,0 +1,292 @@
+:root {
+  --navy-primary: #12284B;
+  --navy-deep: #0A172C;
+  --udf-blue: #0055A0;
+  --light-blue: #8CC1E9;
+  --mist-blue: #E8F1FA;
+  --gold-udf: #F2B705;
+  
+  --bg-page: #F6F8FB;
+  --card-bg: #FFFFFF;
+  --border-color: #E3E8F0;
+  --text-main: #12284B;
+  --text-muted: #5B6B7F;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body.login-body {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 1150px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(18, 40, 75, 0.05);
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  overflow: hidden;
+}
+
+/* FORMULÁRIO */
+.login-form-wrapper {
+  padding: 40px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.brand-logo-icon {
+  width: 38px;
+  height: 38px;
+  background: var(--mist-blue);
+  color: var(--udf-blue);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy-primary);
+  letter-spacing: -0.5px;
+}
+
+.form-intro h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy-primary);
+  margin-bottom: 6px;
+}
+
+.form-intro p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy-primary);
+}
+
+.input-field, .select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-field i:first-child {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.input-field input, .select-wrapper select {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px 0 40px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #FFFFFF;
+  font-size: 13px;
+  color: var(--navy-primary);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.select-wrapper select {
+  padding-right: 35px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 14px;
+  color: var(--text-muted);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.input-field input:focus, .select-wrapper select:focus {
+  border-color: var(--udf-blue);
+  box-shadow: 0 0 0 3px rgba(0, 85, 160, 0.1);
+}
+
+.toggle-pass {
+  position: absolute;
+  right: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.form-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.remember-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.remember-checkbox input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--udf-blue);
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: var(--udf-blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.btn-primary-action {
+  height: 42px;
+  background: var(--navy-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.2s ease;
+}
+
+.btn-primary-action:hover {
+  background: var(--navy-deep);
+}
+
+.login-footer-info {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* LADO DIREITO (PAINEL VISUAL) */
+.login-visual-wrapper {
+  background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-primary) 100%);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #FFFFFF;
+  position: relative; /* Necessário para fixar a logo no canto */
+}
+
+/* ESTILIZAÇÃO E POSICIONAMENTO DA LOGO NO CANTO SUPERIOR DIREITO */
+.top-right-logo {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+
+.udf-corner-logo {
+  height: 38px; /* Ajusta a altura da logo para ficar proporcional */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); /* Destaca levemente a logo no fundo escuro */
+}
+
+.visual-content {
+  max-width: 480px;
+  margin: 0 auto;
+  margin-top: 20px; /* Dá espaço para a logo no topo */
+}
+
+.visual-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.visual-content p {
+  font-size: 13px;
+  color: #C5D3E0;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.illustration-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+}
+
+.login-hero-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 900px) {
+  .login-container {
+    grid-template-columns: 1fr;
+  }
+  .login-visual-wrapper {
+    display: none;
+  }
+  .login-form-wrapper {
+    padding: 30px 20px;
+  }
+}
