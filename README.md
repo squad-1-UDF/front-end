@@ -1,53 +1,72 @@
-# 🧪 LabTech | Sistema de Gestão de Laboratórios
+# LabTech — Sistema de Gestão de Laboratório
 
-> Proposta de interface Front-end para gerenciamento inteligente de salas, agendamentos e controle de chaves acadêmicas. Desenvolvido para a disciplina de Projeto Integrador do Centro Universitário do Distrito Federal (UDF) — Squad 1.
+<div align="center">
 
----
+![LabTech Banner](assets/dash2.png)
 
-## 📌 Visão Geral do Projeto
+*Plataforma corporativa e académica de alta performance desenvolvida para o controlo em tempo real de laboratórios, reservas de espaços e gestão de empréstimo de chaves do UDF.*
 
-O **LabTech** é uma solução digital voltada para a otimização dos processos operacionais e administrativos de laboratórios de ensino. O objetivo principal do projeto é centralizar o agendamento de espaços, a consulta de disponibilidade em tempo real, o controle de chaves pendentes e as solicitações de insumos, reduzindo gargalos na rotina da comunidade acadêmica.
-
----
-
-## 🎨 Interface e Experiência do Usuário (UI/UX)
-
-A interface do Dashboard foi projetada focando em clareza visual, legibilidade e acessibilidade. A estrutura utiliza o tema claro (*Light Mode*) na página para suavizar o visual, mantendo blocos destacados na cor uniforme *Deep Ocean* (`#12284B`) com elementos em tons azuis para facilitar a identificação das informações essenciais.
-
-![Preview do Dashboard](assets/dashboard.png)
-
-### 🚀 Principais Funcionalidades da Interface:
-- **Mapa Interativo de Laboratórios (20 Labs):** Grade dinâmica com indicação visual de status (Livre, Ocupado e Manutenção) e scroll interno.
-- **Minha Agenda & Check-list:** Painel interativo com tarefas diárias para controle da rotina do usuário.
-- **Gestão de Chaves e Reservas:** Contadores de métricas em tempo real para reservas ativas, devoluções e pendências.
-- **Painel de Notificações e Atalhos:** Área dedicada para avisos recentes e navegação rápida.
-- **Design Responsivo:** Adaptação completa para dispositivos móveis e tablets.
+</div>
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 📋 Sobre o Projeto
 
-- **HTML5:** Estruturação semântica do projeto.
-- **CSS3:** Estilização com CSS Grid, Flexbox, variáveis globais e Media Queries.
-- **Font Awesome Free (v6.4):** Iconografia aberta e gratuita.
-- **Google Fonts:** Tipografias *Plus Jakarta Sans* e *Patrick Hand*.
+O **LabTech** é um sistema moderno de gestão de laboratórios projetado para otimizar a rotina académica e administrativa do Centro Universitário (UDF). A aplicação oferece uma visão centralizada e intuitiva da disponibilidade dos espaços, controlo de agendas, acompanhamento de chaves e notificações em tempo real.
 
 ---
 
-## 📁 Estrutura de Pastas
+## 🎨 Identidade Visual & Design System
 
-```text
-labtech-dashboard/
-│
-├── assets/
-│   ├── dashboard.png
-│   ├── gato1.png
-│   ├── gato2.png
-│   ├── gato3.png
-│   ├── gato4.png
-│   ├── Logo Dourado UDF em Metal Polido.png
-│   └── Moldura Encantada da Floresta Esmeralda.png
-│
-├── index.html
-├── style.css
-└── README.md
+O projeto segue rigorosamente o guia visual corporativo institucional:
+* **Tipografia:** Tipografia limpa e moderna **Inter** em todos os pesos, garantindo legibilidade e harmonia visual[cite: 7].
+* **Paleta de Cores:** Fundo principal refinado em tons limpos, com cartões corporativos em azul-marinho profundo (`#12284B`) e acentuados com detalhes em azul claro (`#8CC1E9`).
+* **Sem Mascotes:** Interface 100% profissional, focada em produtividade, utilidade e design corporativo limpo.
+
+---
+
+## 🌓 Modos de Visualização (Tema Claro & Escuro)
+
+O sistema conta com suporte nativo a **Dark Mode** funcional com persistência de preferência via `localStorage`, proporcionando conforto visual em qualquer ambiente de trabalho.
+
+### ☀️ Modo Claro (Light Mode)
+O modo claro destaca a interface com fundos limpos, ideal para ambientes diurnos e escritórios iluminados.
+
+<div align="center">
+  <img src="assets/dash2.png" alt="LabTech Light Mode" width="100%" style="border-radius: 12px; border: 1px solid #E3E8F0;">
+</div>
+
+### 🌙 Modo Escuro (Dark Mode)
+O modo escuro utiliza tons profundos adaptados (`#070d19` e `#0d1b32`) para reduzir o cansaço visual e otimizar o uso noturno.
+
+<div align="center">
+  <img src="assets/dash1.png" alt="LabTech Dark Mode" width="100%" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+</div>
+
+---
+
+## 🚀 Funcionalidades Principais
+
+* **🗺️ Mapa de Laboratórios em Tempo Real:** Monitorização interativa de 20 laboratórios com indicação de estados (*Livre*, *Ocupado* e *Manutenção*).
+* **📅 Gestão de Agenda & To-Do:** Controlo diário de tarefas, entregas e horários reservados.
+* **🔑 Controlo de Chaves & Solicitações:** Acompanhamento rápido de chaves pendentes de retirada e solicitações de materiais em análise.
+* **🔔 Central de Notificações:** Alertas instantâneos integrados na barra superior para manter a equipa sincronizada.
+* **🌙 Toggle de Tema Dinâmico:** Alternância instantânea entre modo claro e escuro diretamente na barra de navegação superior.
+
+---
+
+## 💻 Tecnologias Utilizadas
+
+* **HTML5** (Marcação semântica e estruturada)
+* **CSS3** (Variáveis nativas, Grid Layout, Flexbox e suporte a Dark Mode)
+* **JavaScript Puro (Vanilla)** (Gestão de estados, interatividade e persistência no `localStorage`)
+* **Font Awesome 6** (Biblioteca de ícones vetoriais)
+* **Google Fonts (Inter)**
+
+---
+
+## ⚙️ Como Executar o Projeto
+
+1. Clona este repositório para a tua máquina local:
+   ```bash
+   git clone [https://github.com/teu-utilizador/labtech.git](https://github.com/teu-utilizador/labtech.git)
