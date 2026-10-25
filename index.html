@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="style.css">
   <!-- Ícones Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Fontes do Google -->
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-shell">
@@ -27,7 +27,6 @@
         <a class="nav-item" href="#"><span><i class="fa-solid fa-chart-simple"></i></span><small>Devolução de<br> Chaves</small></a>
         <a class="nav-item" href="#"><span><i class="fa-solid fa-gear"></i></span><small>Configurações</small></a>
       </nav>
-      <img class="sidebar-cat" src="assets/gato2.png" alt="Gatinho na sidebar">
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
@@ -45,28 +44,36 @@
 
         <div class="welcome">
           <strong>Olá, seja bem-vindo(a)!</strong>
-          <span>Bons estudos:) 🐾</span>
+          <span>Bons estudos :)</span>
         </div>
 
-        <label class="search">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input placeholder="Buscar...">
-        </label>
+        <!-- GRUPO DIREITO HARMÓNICO COM BOTÃO DE DARK MODE -->
+        <div class="topbar-right">
+          <label class="search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input placeholder="Buscar...">
+          </label>
 
-        <button class="bell" aria-label="Notificações">
-          <i class="fa-regular fa-bell"></i>
-          <span class="bell-dot"></span>
-        </button>
+          <!-- BOTÃO MUDANÇA DE TEMA -->
+          <button class="theme-toggle-btn" id="themeToggle" title="Alternar Modo Escuro" aria-label="Alternar Tema">
+            <i class="fa-solid fa-moon"></i>
+          </button>
 
-        <div class="avatar">
-          <img src="assets/gato2.png" alt="Gatinho Usuário">
+          <button class="bell" aria-label="Notificações">
+            <i class="fa-regular fa-bell"></i>
+            <span class="bell-dot"></span>
+          </button>
+
+          <div class="avatar">
+            <div class="avatar-fallback">US</div>
+          </div>
         </div>
       </header>
 
       <!-- DASHBOARD GRID -->
       <section class="dashboard">
 
-        <!-- CARD 1: LAB LIVRES (MAPA COM ROLAGEM DE 20 LABORATORIOS) -->
+        <!-- CARD 1: LAB LIVRES -->
         <article class="panel lab-panel">
           <h2><span class="gold-icon"><i class="fa-solid fa-flask"></i></span> Laboratório Livres</h2>
           
@@ -81,14 +88,12 @@
             </div>
           </div>
 
-          <!-- LEGENDA DE ESTADOS -->
           <div class="lab-map-legend">
             <span class="legend-item"><i class="dot available"></i> Livre</span>
             <span class="legend-item"><i class="dot occupied"></i> Ocupado</span>
             <span class="legend-item"><i class="dot maintenance"></i> Manutenção</span>
           </div>
 
-          <!-- GRELHA DOS 20 LABORATÓRIOS (COM ROLAGEM) -->
           <div class="labs-map-grid">
             <div class="lab-seat available" title="Lab 01 — Livre"><i class="fa-solid fa-flask"></i><small>01</small></div>
             <div class="lab-seat occupied" title="Lab 02 — Ocupado"><i class="fa-solid fa-flask"></i><small>02</small></div>
@@ -125,10 +130,9 @@
           </h2>
           <strong class="metric">3</strong>
           <p>reservas em andamento</p>
-          <img class="cat-reserve" src="assets/gato3.png" alt="Gatinho">
         </article>
 
-        <!-- CARD 3: MINHA AGENDA (COM DATA E TO-DO LIST) -->
+        <!-- CARD 3: MINHA AGENDA -->
         <article class="panel agenda-panel">
           <div class="agenda-header">
             <h2>
@@ -158,8 +162,6 @@
               </li>
             </ul>
           </div>
-
-          <img class="cat-agenda" src="assets/gato1.png" alt="Gatinho Agenda">
         </article>
 
         <!-- CARD 4: CHAVES PENDENTES -->
@@ -172,10 +174,10 @@
           <strong class="metric">4</strong>
           <p>chaves aguardando retirada</p>
           <div class="keys-icon-group">
-            <img src="assets/gato4.png" alt="Chave 1">
-            <img src="assets/gato4.png" alt="Chave 2">
-            <img src="assets/gato4.png" alt="Chave 3">
-            <img src="assets/gato4.png" alt="Chave 4">
+            <i class="fa-solid fa-key key-icon-item"></i>
+            <i class="fa-solid fa-key key-icon-item"></i>
+            <i class="fa-solid fa-key key-icon-item"></i>
+            <i class="fa-solid fa-key key-icon-item"></i>
           </div>
         </article>
 
@@ -188,10 +190,9 @@
           </h2>
           <strong class="metric">2</strong>
           <p>solicitações<br>em análise</p>
-          <img class="cat-requests" src="assets/gato2.png" alt="Gatinho Com Papel">
         </article>
 
-        <!-- CARD 6: NOTIFICAÇÕES (PAINEL LARGO EXCLUSIVO) -->
+        <!-- CARD 6: NOTIFICAÇÕES -->
         <article class="panel notifications-full-panel">
           <h2>
             <span class="gold-icon"><i class="fa-regular fa-bell"></i></span> Notificações
@@ -199,7 +200,7 @@
 
           <div class="notice-grid">
             <div class="notice">
-              <img class="avatar-mini" src="assets/gato2.png" alt="Gato">
+              <span class="notice-icon"><i class="fa-solid fa-flask"></i></span>
               <div><b>Nova reserva</b><small>Laboratório 2 · 10:25</small></div>
               <i class="fa-solid fa-chevron-right arrow"></i>
             </div>
@@ -228,32 +229,31 @@
           <a class="see-all" href="#">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
         </article>
 
-        <!-- CARD 7: OPÇÕES (PAINEL STANDALONE) -->
+        <!-- CARD 7: OPÇÕES -->
         <article class="panel options-panel-standalone">
-          <h2><span class="gold-icon"><i class="fa-solid fa-cat"></i></span> Opções</h2>
+          <h2><span class="gold-icon"><i class="fa-solid fa-sliders"></i></span> Opções</h2>
           
           <div class="quick-actions-vertical">
             <button class="action-btn-large">
-              <img src="assets/gato2.png" alt="Nova Reserva" class="btn-cat-img-large">
+              <i class="fa-regular fa-calendar-plus"></i>
               <span>Nova Reserva</span>
             </button>
             <button class="action-btn-large">
-              <img src="assets/gato3.png" alt="Retirada" class="btn-cat-img-large">
+              <i class="fa-solid fa-key"></i>
               <span>Retirada</span>
             </button>
             <button class="action-btn-large">
-              <img src="assets/gato1.png" alt="Agenda Completa" class="btn-cat-img-large">
+              <i class="fa-regular fa-calendar-days"></i>
               <span>Agenda Completa</span>
             </button>
           </div>
         </article>
 
-        <!-- CARD 8: CARD FLORESTA COM BRASÃO DA UDF -->
+        <!-- CARD 8: BRASÃO DA UDF -->
         <article class="panel forest-panel" aria-label="Painel UDF">
-          <div class="forest-glow"></div>
           <div class="udf-container">
             <a href="https://www.udf.edu.br/" target="_blank">
-            <img src="assets/Logo Dourado UDF em Metal Polido.png" alt="Logótipo UDF Centro Universitário" class="udf-logo-img">
+              <img src="assets/udf-logo.png" alt="Logótipo UDF Centro Universitário" class="udf-logo-img">
             </a>
           </div>
         </article>
@@ -263,12 +263,39 @@
       <!-- RODAPÉ -->
       <footer>
         <div class="footer-left">
-          <span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento
+          <span>UDF</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento
         </div>
-        <em>Pequenos passos, grandes descobertas 🐾</em>
+        <em>Pequenos passos, grandes descobertas</em>
       </footer>
     </main>
   </div>
+
+  <!-- SCRIPT PARA INTERAÇÃO DO DARK MODE -->
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+
+    const savedTheme = localStorage.getItem('labtech_theme');
+    if (savedTheme === 'dark') {
+      body.classList.add('dark-mode');
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      
+      if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('labtech_theme', 'dark');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        localStorage.setItem('labtech_theme', 'light');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    });
+  </script>
 </body>
 </html>
-
