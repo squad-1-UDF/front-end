@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratórios e Salas - LabReserva UDF</title>
+  <script>/* aplica o tema salvo antes de pintar, evita "flash" */(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/salas.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR (padrão do guia visual: 260px, com texto e seções) -->
+    <aside class="sidebar">
+      <a class="logo" href="index.html">
+        <div class="logo-mark">L</div>
+        <div><b>LabReserva<span>.</span></b><small>UDF Centro Universitário</small></div>
+      </a>
+      <div class="nav-section">Principal</div>
+      <nav>
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i><span class="label">Início</span></a>
+        <a class="nav-item active" href="salas.html"><i class="fa-solid fa-flask"></i><span class="label">Laboratórios</span></a>
+        <a class="nav-item" href="#" data-action="nova-reserva"><i class="fa-solid fa-table-cells"></i><span class="label">Reservar sala</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-regular fa-rectangle-list"></i><span class="label">Minhas reservas</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-regular fa-calendar-check"></i><span class="label">Agenda</span></a>
+      </nav>
+      <div class="nav-section">Gestão</div>
+      <nav>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-key"></i><span class="label">Retirada de chaves</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-rotate-left"></i><span class="label">Devolução</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-gear"></i><span class="label">Configurações</span></a>
+      </nav>
+      <div class="sidebar-promo"><i class="fa-regular fa-star"></i><b>Um espaço para suas ideias</b>Encontre o ambiente ideal para aprender e colaborar.</div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><i class="fa-regular fa-moon"></i><span class="label">Tema escuro</span><span class="switch"></span></button>
+      <div class="sidebar-user"><div class="avatar">ES</div><div><b>Estudante</b><span>Comunidade acadêmica</span></div></div>
+    </aside>
+
+    <main class="main">
+
+      <!-- TOPBAR (64px: breadcrumb + data) -->
+      <header class="topbar">
+        <nav class="breadcrumb" aria-label="Navegação">
+          <a href="index.html">Portal acadêmico</a><i class="fa-solid fa-chevron-right"></i>
+          <span class="current">Laboratórios e Salas</span>
+        </nav>
+        <div class="topbar-right">
+          <span class="topbar-date" id="topDate"></span>
+          <label class="search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input id="topSearch" placeholder="Buscar sala ou laboratório...">
+          </label>
+          <button class="bell" aria-label="Notificações"><i class="fa-regular fa-bell"></i><span class="bell-dot"></span></button>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <!-- CABEÇALHO DA PÁGINA -->
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Seu campus, mais conectado</span>
+            <h1>Laboratórios e Salas</h1>
+            <p class="subtitle">Consulte disponibilidade, recursos e faça sua reserva.</p>
+          </div>
+          <div class="page-actions">
+            <a class="btn btn-secondary" href="#" id="btnMapa"><i class="fa-solid fa-map"></i> Ver mapa</a>
+            <a class="btn btn-gold" href="#" data-action="nova-reserva"><i class="fa-solid fa-plus"></i> Nova reserva</a>
+          </div>
+        </div>
+
+        <!-- HERO (azul névoa) com resumo -->
+        <section class="hero" aria-label="Resumo">
+          <div>
+            <span class="pill">ESPAÇOS QUE INSPIRAM</span>
+            <h2>Sua próxima ideia<br>merece o lugar certo<span>.</span></h2>
+            <p>Veja em tempo real quais espaços estão livres, compare recursos e reserve em poucos cliques.</p>
+            <div class="stats">
+              <div class="stat"><div class="ico total"><i class="fa-solid fa-building"></i></div><div><strong id="statTotal">0</strong><span>espaços</span></div></div>
+              <div class="stat"><div class="ico available"><i class="fa-solid fa-door-open"></i></div><div><strong id="statLivres">0</strong><span>livres agora</span></div></div>
+              <div class="stat"><div class="ico occupied"><i class="fa-solid fa-users"></i></div><div><strong id="statOcupados">0</strong><span>em uso</span></div></div>
+              <div class="stat"><div class="ico maintenance"><i class="fa-solid fa-screwdriver-wrench"></i></div><div><strong id="statManut">0</strong><span>manutenção</span></div></div>
+            </div>
+          </div>
+          <div class="illus" aria-hidden="true"><i class="fa-solid fa-star star"></i><span class="win"></span><b></b><b></b></div>
+        </section>
+
+        <!-- FILTROS -->
+        <section class="panel filters" aria-label="Filtros">
+          <form id="filtersForm" onsubmit="return false;">
+            <div class="filters-grid">
+              <div class="field search-field">
+                <label for="fBusca">Buscar</label>
+                <div class="control"><i class="fa-solid fa-magnifying-glass"></i><input id="fBusca" type="search" placeholder="Nome, código ou software (ex.: LAB-04, Python)"></div>
+              </div>
+              <div class="field">
+                <label for="fTipo">Tipo de espaço</label>
+                <div class="control"><i class="fa-solid fa-layer-group"></i>
+                  <select id="fTipo">
+                    <option value="">Todos os espaços</option>
+                    <option value="laboratorio">Laboratório</option>
+                    <option value="sala">Sala de aula</option>
+                    <option value="auditorio">Auditório</option>
+                    <option value="reuniao">Sala de reunião</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fBloco">Bloco</label>
+                <div class="control"><i class="fa-solid fa-building"></i>
+                  <select id="fBloco"><option value="">Todos</option></select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fStatus">Status</label>
+                <div class="control"><i class="fa-solid fa-circle-half-stroke"></i>
+                  <select id="fStatus">
+                    <option value="">Todos</option>
+                    <option value="available">Livre</option>
+                    <option value="occupied">Ocupado</option>
+                    <option value="maintenance">Manutenção</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fCap">Capacidade mínima</label>
+                <div class="control"><i class="fa-solid fa-user-group"></i><input id="fCap" type="number" min="0" step="1" placeholder="Qualquer"></div>
+              </div>
+            </div>
+
+            <div class="filters-grid second">
+              <div class="field">
+                <label for="fData">Data desejada</label>
+                <div class="control"><i class="fa-regular fa-calendar"></i><input id="fData" type="date"></div>
+              </div>
+              <div class="field">
+                <label for="fIni">Início</label>
+                <div class="control"><i class="fa-regular fa-clock"></i><input id="fIni" type="time" step="1800"></div>
+              </div>
+              <div class="field">
+                <label for="fFim">Fim</label>
+                <div class="control"><i class="fa-regular fa-clock"></i><input id="fFim" type="time" step="1800"></div>
+              </div>
+              <div class="btn-wrap">
+                <button type="button" class="btn btn-primary" id="btnAplicar"><i class="fa-solid fa-filter"></i> Aplicar</button>
+                <button type="button" class="btn btn-ghost" id="btnLimpar"><i class="fa-solid fa-eraser"></i> Limpar</button>
+              </div>
+            </div>
+            <p class="hint"><i class="fa-solid fa-circle-info"></i> Data e horário filtram pela disponibilidade na agenda da sala (dados de demonstração).</p>
+          </form>
+        </section>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+          <span class="count" id="countLabel">Mostrando <b>0</b> espaços</span>
+          <div class="legend">
+            <span class="legend-item"><i class="dot available"></i> Livre</span>
+            <span class="legend-item"><i class="dot occupied"></i> Ocupado</span>
+            <span class="legend-item"><i class="dot maintenance"></i> Manutenção</span>
+          </div>
+          <span class="spacer"></span>
+          <label class="sort">Ordenar
+            <select id="sort" class="field-select">
+              <option value="status">Disponibilidade</option>
+              <option value="codigo">Código</option>
+              <option value="nome">Nome</option>
+              <option value="capacidade">Capacidade</option>
+            </select>
+          </label>
+          <div class="view-toggle" role="group" aria-label="Modo de visualização">
+            <button class="icon-btn active" id="viewCards" title="Cards" aria-pressed="true"><i class="fa-solid fa-table-cells-large"></i></button>
+            <button class="icon-btn" id="viewTable" title="Tabela" aria-pressed="false"><i class="fa-solid fa-list"></i></button>
+          </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <section id="results" aria-live="polite"></section>
+        <nav class="pagination" id="pagination" aria-label="Paginação"></nav>
+      </div>
+
+      <footer class="page-footer">
+        <span><b>LabReserva</b> · Sistema de Gestão de Laboratórios e Salas · UDF</span>
+        <span>LabTech 2026/2 · Squad 1</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="data/salas.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/salas.js"></script>
+</body>
+</html>

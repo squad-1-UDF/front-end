@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabReserva UDF - Front-end Squad 1</title>
+  <script>/* aplica o tema salvo antes de pintar, evita "flash" */(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <style>
+    .hub { max-width: 1100px; margin: 0 auto; padding: 48px 24px 64px; }
+    .hub-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+    .hub-head .logo { padding: 0; }
+    .hub-head .theme-toggle { width: auto; margin: 0; }
+    .hub h1 { font-size: 30px; font-weight: 700; margin-top: 6px; }
+    .hub .lead { color: var(--ink-soft); margin: 6px 0 0; max-width: 70ch; }
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 28px; }
+    .hub .panel { display: flex; flex-direction: column; gap: 8px; text-decoration: none; }
+    .hub .panel h3 { font-size: 17px; }
+    .hub .panel .who { font-size: 13px; color: var(--ink-soft); }
+    .hub .panel.light { opacity: .7; }
+    .hub .panel.light:hover { opacity: 1; }
+    .hub .panel .st { margin-top: auto; padding-top: 6px; }
+    .hub .note { margin-top: 32px; background: var(--udf-gold-soft); border-left: 4px solid var(--udf-gold); border-radius: 12px; padding: 14px 18px; font-size: 14px; }
+    .hub .note a { color: var(--udf-blue); }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <div class="hub-head">
+      <div class="logo">
+        <div class="logo-mark">L</div>
+        <div><b>LabReserva<span>.</span></b><small>UDF Centro Universitário · Squad 1</small></div>
+      </div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><i class="fa-regular fa-moon"></i><span class="label">Tema escuro</span><span class="switch"></span></button>
+    </div>
+
+    <span class="eyebrow">Front-end · telas do MVP</span>
+    <h1>Índice das telas</h1>
+    <p class="lead">Protótipos estáticos (HTML/CSS/JS) no padrão do guia visual (cores UDF, fonte Inter, cards brancos). Vão virar Django Templates na integração com o back-end.</p>
+
+    <div class="hub-grid">
+      <a class="panel hover" href="salas.html">
+        <h3><span class="panel-icon"><i class="fa-solid fa-flask"></i></span> Lista de salas/laboratórios</h3>
+        <span class="who">João Gabriel Leal</span>
+        <p>Filtros, cards/tabela, status e disponibilidade por data e hora.</p>
+        <span class="st"><span class="badge available">Pronta para revisão</span></span>
+      </a>
+      <a class="panel hover" href="sala-detalhes.html?id=1">
+        <h3><span class="panel-icon"><i class="fa-solid fa-circle-info"></i></span> Detalhes da sala</h3>
+        <span class="who">João Gabriel Leal</span>
+        <p>Recursos, grade semanal de disponibilidade, reservas, chaves e regras.</p>
+        <span class="st"><span class="badge available">Pronta para revisão</span></span>
+      </a>
+      <a class="panel hover light" href="https://github.com/squad-1-UDF/front-end/tree/tela_login" target="_blank" rel="noopener">
+        <h3><span class="panel-icon"><i class="fa-solid fa-right-to-bracket"></i></span> Login</h3>
+        <span class="who">Luanna Priscila</span>
+        <p>Branch <code>tela_login</code> do repositório.</p>
+        <span class="st"><span class="badge occupied">Em outra branch</span></span>
+      </a>
+      <a class="panel hover light" href="https://github.com/squad-1-UDF/front-end/tree/dashboard" target="_blank" rel="noopener">
+        <h3><span class="panel-icon"><i class="fa-solid fa-house"></i></span> Dashboard</h3>
+        <span class="who">Luanna Priscila</span>
+        <p>Branch <code>dashboard</code> do repositório.</p>
+        <span class="st"><span class="badge occupied">Em outra branch</span></span>
+      </a>
+      <a class="panel hover light" href="#" data-action="em-breve"><h3><span class="panel-icon"><i class="fa-solid fa-table-cells"></i></span> Reservar sala</h3><span class="who">Luiz Cláudio</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel hover light" href="#" data-action="em-breve"><h3><span class="panel-icon"><i class="fa-regular fa-rectangle-list"></i></span> Minhas reservas</h3><span class="who">Luiz Cláudio</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel hover light" href="#" data-action="em-breve"><h3><span class="panel-icon"><i class="fa-solid fa-user-shield"></i></span> Área administrativa</h3><span class="who">Raiane</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+      <a class="panel hover light" href="#" data-action="em-breve"><h3><span class="panel-icon"><i class="fa-regular fa-calendar-check"></i></span> Agenda / disponibilidade</h3><span class="who">A definir</span><p>Em construção.</p><span class="st"><span class="badge neutral">Pendente</span></span></a>
+    </div>
+
+    <div class="note"><b>Padrão visual:</b> definido na reunião de 24/10/2026 (cores UDF azul-marinho + dourado, fonte Inter, sem mascotes). Os tokens ficam em <code>css/base.css</code>; mudou a cor lá, muda em todas as telas.</div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="js/common.js"></script>
+</body>
+</html>
