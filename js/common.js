@@ -13,6 +13,18 @@
     const r = L.RECURSOS && L.RECURSOS[key];
     return r ? `<i class="${r.icon}" title="${L.esc(r.label)}" aria-label="${L.esc(r.label)}"></i>` : "";
   };
+  L.recursoChip = (key) => {
+    const r = L.RECURSOS && L.RECURSOS[key];
+    return r ? `<span class="chip"><i class="${r.icon}"></i>${L.esc(r.label)}</span>` : "";
+  };
+
+  // Capa do card por tipo de espaço (guia visual: lab azul névoa, estudo dourado, reunião cinza, auditório verde)
+  L.tipoCover = (tipo) => ({
+    laboratorio: { cls: "cover-lab",     icon: "fa-solid fa-flask" },
+    sala:        { cls: "cover-study",   icon: "fa-solid fa-book-open" },
+    reuniao:     { cls: "cover-meeting", icon: "fa-solid fa-users" },
+    auditorio:   { cls: "cover-aud",     icon: "fa-solid fa-people-roof" }
+  }[tipo] || { cls: "cover-meeting", icon: "fa-solid fa-door-open" });
 
   L.andarLabel = (andar) => (andar === 0 ? "Térreo" : `${andar}º andar`);
 
@@ -32,6 +44,32 @@
     const [y, m, d] = iso.split("-");
     return `${d}/${m}/${y}`;
   };
+
+  /* ---------- tema claro/escuro (mesma chave do Dashboard da Luanna: labtech_theme) ---------- */
+  const THEME_KEY = "labtech_theme";
+  L.applyTheme = (t) => {
+    document.documentElement.dataset.theme = t === "dark" ? "dark" : "";
+    document.querySelectorAll("[data-theme-toggle]").forEach((b) => {
+      const i = b.querySelector("i");
+      if (i) i.className = t === "dark" ? "fa-regular fa-sun" : "fa-regular fa-moon";
+      const lbl = b.querySelector(".label");
+      if (lbl) lbl.textContent = t === "dark" ? "Tema claro" : "Tema escuro";
+      b.setAttribute("aria-pressed", t === "dark");
+    });
+  };
+  L.toggleTheme = () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, next);
+    L.applyTheme(next);
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+    L.applyTheme(localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light");
+    document.querySelectorAll("[data-theme-toggle]").forEach((b) => b.addEventListener("click", L.toggleTheme));
+
+    // data de hoje na topbar
+    const d = document.getElementById("topDate");
+    if (d) d.textContent = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
+  });
 
   // Ações que ainda não têm tela/back-end: avisa e não navega.
   document.addEventListener("click", (e) => {

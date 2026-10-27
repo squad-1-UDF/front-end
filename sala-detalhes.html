@@ -3,67 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes da Sala - LABTECH</title>
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/sala-detalhes.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Detalhes da Sala - LabReserva UDF</title>
+  <script>/* aplica o tema salvo antes de pintar, evita "flash" */(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/sala-detalhes.css">
 </head>
 <body>
   <div class="app-shell">
 
+    <!-- SIDEBAR (padrão do guia visual: 260px, com texto e seções) -->
     <aside class="sidebar">
-      <div class="brand-mark"><i class="fa-solid fa-flask"></i></div>
+      <a class="logo" href="index.html">
+        <div class="logo-mark">L</div>
+        <div><b>LabReserva<span>.</span></b><small>UDF Centro Universitário</small></div>
+      </a>
+      <div class="nav-section">Principal</div>
       <nav>
-        <a class="nav-item" href="index.html"><span><i class="fa-solid fa-house"></i></span><small>Início</small></a>
-        <a class="nav-item active" href="salas.html"><span><i class="fa-solid fa-flask"></i></span><small>Laboratórios</small></a>
-        <a class="nav-item" href="#"><span><i class="fa-regular fa-calendar-check"></i></span><small>Agendamentos</small></a>
-        <a class="nav-item" href="#"><span><i class="fa-regular fa-bookmark"></i></span><small>Solicitações</small></a>
-        <a class="nav-item" href="#"><span><i class="fa-solid fa-desktop"></i></span><small>Retirada de<br> Chaves</small></a>
-        <a class="nav-item" href="#"><span><i class="fa-solid fa-chart-simple"></i></span><small>Devolução de<br> Chaves</small></a>
-        <a class="nav-item" href="#"><span><i class="fa-solid fa-gear"></i></span><small>Configurações</small></a>
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i><span class="label">Início</span></a>
+        <a class="nav-item active" href="salas.html"><i class="fa-solid fa-flask"></i><span class="label">Laboratórios</span></a>
+        <a class="nav-item" href="#" data-action="nova-reserva"><i class="fa-solid fa-table-cells"></i><span class="label">Reservar sala</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-regular fa-rectangle-list"></i><span class="label">Minhas reservas</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-regular fa-calendar-check"></i><span class="label">Agenda</span></a>
       </nav>
-      <img class="sidebar-cat" src="assets/gato2.png" alt="">
+      <div class="nav-section">Gestão</div>
+      <nav>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-key"></i><span class="label">Retirada de chaves</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-rotate-left"></i><span class="label">Devolução</span></a>
+        <a class="nav-item" href="#" data-action="em-breve"><i class="fa-solid fa-gear"></i><span class="label">Configurações</span></a>
+      </nav>
+      <div class="sidebar-promo"><i class="fa-regular fa-star"></i><b>Um espaço para suas ideias</b>Encontre o ambiente ideal para aprender e colaborar.</div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><i class="fa-regular fa-moon"></i><span class="label">Tema escuro</span><span class="switch"></span></button>
+      <div class="sidebar-user"><div class="avatar">ES</div><div><b>Estudante</b><span>Comunidade acadêmica</span></div></div>
     </aside>
 
     <main class="main">
 
+      <!-- TOPBAR (64px: breadcrumb + data) -->
       <header class="topbar">
-        <div class="brand">
-          <div class="flask"><i class="fa-solid fa-flask"></i></div>
-          <div>
-            <h1>LABTECH | LABORATÓRIOS</h1>
-            <p>Sistema de Gestão de Laboratório</p>
-          </div>
+        <nav class="breadcrumb" aria-label="Navegação">
+          <a href="index.html">Portal acadêmico</a><i class="fa-solid fa-chevron-right"></i>
+          <a href="salas.html">Laboratórios e Salas</a><i class="fa-solid fa-chevron-right"></i>
+          <span class="current" id="bcAtual">Sala</span>
+        </nav>
+        <div class="topbar-right">
+          <span class="topbar-date" id="topDate"></span>
+          <label class="search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input id="topSearch" placeholder="Buscar sala ou laboratório...">
+          </label>
+          <button class="bell" aria-label="Notificações"><i class="fa-regular fa-bell"></i><span class="bell-dot"></span></button>
         </div>
-        <div class="welcome">
-          <strong>Olá, seja bem-vindo(a)!</strong>
-          <span>Bons estudos:) 🐾</span>
-        </div>
-        <label class="search">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input id="topSearch" placeholder="Buscar sala ou laboratório...">
-        </label>
-        <button class="bell" aria-label="Notificações">
-          <i class="fa-regular fa-bell"></i><span class="bell-dot"></span>
-        </button>
-        <div class="avatar"><img src="assets/gato2.png" alt="Usuário"></div>
       </header>
 
-      <nav class="breadcrumb" aria-label="Navegação">
-        <a href="index.html">Início</a><i class="fa-solid fa-chevron-right"></i>
-        <a href="salas.html">Laboratórios e Salas</a><i class="fa-solid fa-chevron-right"></i>
-        <span id="bcAtual">Sala</span>
-      </nav>
+      <div class="content">
+        <!-- Conteúdo é montado pelo JS a partir do ?id= -->
+        <div id="detail"></div>
+      </div>
 
-      <!-- Conteúdo é montado pelo JS a partir do ?id= -->
-      <div id="detail"></div>
-
-      <footer>
-        <div class="footer-left"><span>🐾</span> Organização <i>•</i> Pesquisa <i>•</i> Conhecimento</div>
-        <em>Pequenos passos, grandes descobertas 🐾</em>
+      <footer class="page-footer">
+        <span><b>LabReserva</b> · Sistema de Gestão de Laboratórios e Salas · UDF</span>
+        <span>LabTech 2026/2 · Squad 1</span>
       </footer>
     </main>
   </div>

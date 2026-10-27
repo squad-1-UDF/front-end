@@ -77,27 +77,29 @@
   function cardHTML(s) {
     const link = `sala-detalhes.html?id=${s.id}`;
     const podeReservar = s.status !== "maintenance";
+    const cover = L.tipoCover(s.tipo);
+    const recursos = s.recursos || [];
     return `
-      <article class="panel room-card ${s.status}">
-        <div class="top">
-          <div>
-            <div class="code">${L.esc(s.codigo)}</div>
-            <h3>${L.esc(s.nome)}</h3>
-            <div class="type"><i class="fa-solid fa-layer-group"></i> ${L.esc(L.tipoLabel(s.tipo))}</div>
-          </div>
+      <article class="panel hover room-card ${s.status}">
+        <div class="cover ${cover.cls}">
           ${L.badge(s.status)}
+          <i class="${cover.icon}"></i>
+          <small>${L.esc(s.codigo)}</small>
         </div>
-        <div class="meta">
-          <span><i class="fa-solid fa-building"></i> Bloco ${L.esc(s.bloco)} · ${L.esc(L.andarLabel(s.andar))}</span>
-          <span><i class="fa-solid fa-user-group"></i> ${s.capacidade} lugares</span>
+        <div class="body">
+          <div class="ey" style="color:var(--${cover.cls}-text)">${L.esc(L.tipoLabel(s.tipo))}</div>
+          <h3>${L.esc(s.nome)}</h3>
+          <div class="meta">
+            <span><i class="fa-solid fa-location-dot"></i> Bloco ${L.esc(s.bloco)} · ${L.esc(L.andarLabel(s.andar))}</span>
+            <span><i class="fa-solid fa-user"></i> Até ${s.capacidade}</span>
+          </div>
+          <div class="chips">${recursos.slice(0, 3).map(L.recursoChip).join("")}${recursos.length > 3 ? `<span class="chip">+${recursos.length - 3}</span>` : ""}</div>
+          <div class="next"><i class="fa-regular fa-clock"></i> Próximo horário livre: <b>${L.esc(s.proximoLivre)}</b></div>
+          <div class="actions">
+            <a class="btn btn-secondary btn-sm" href="${link}"><i class="fa-solid fa-circle-info"></i> Ver detalhes</a>
+            <a class="btn btn-primary btn-sm ${podeReservar ? "" : "is-disabled"}" href="#" data-action="nova-reserva" data-sala="${L.esc(s.codigo)}"><i class="fa-regular fa-calendar-plus"></i> Reservar</a>
+          </div>
         </div>
-        <div class="resources">${(s.recursos || []).map(L.recursoIcon).join("")}</div>
-        <div class="next"><i class="fa-regular fa-clock"></i> Próximo horário livre: <b>${L.esc(s.proximoLivre)}</b></div>
-        <div class="actions">
-          <a class="btn btn-outline btn-sm" href="${link}"><i class="fa-solid fa-circle-info"></i> Ver detalhes</a>
-          <a class="btn btn-primary btn-sm ${podeReservar ? "" : "is-disabled"}" href="#" data-action="nova-reserva" data-sala="${L.esc(s.codigo)}"><i class="fa-regular fa-calendar-plus"></i> Reservar</a>
-        </div>
-        <img class="cat-peek" src="assets/gato${(s.id % 4) + 1}.png" alt="">
       </article>`;
   }
 
@@ -105,7 +107,7 @@
     const rows = lista.map((s) => `
       <tr>
         <td class="code">${L.esc(s.codigo)}</td>
-        <td class="name"><a href="sala-detalhes.html?id=${s.id}" style="text-decoration:none;color:inherit">${L.esc(s.nome)}</a></td>
+        <td class="name"><a href="sala-detalhes.html?id=${s.id}">${L.esc(s.nome)}</a></td>
         <td>${L.esc(L.tipoLabel(s.tipo))}</td>
         <td>Bloco ${L.esc(s.bloco)} · ${L.esc(L.andarLabel(s.andar))}</td>
         <td>${s.capacidade}</td>
@@ -113,7 +115,7 @@
         <td>${L.badge(s.status)}</td>
         <td>${L.esc(s.proximoLivre)}</td>
         <td class="actions">
-          <a class="btn btn-outline btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a>
+          <a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a>
           <a class="btn btn-primary btn-sm ${s.status === "maintenance" ? "is-disabled" : ""}" href="#" data-action="nova-reserva" data-sala="${L.esc(s.codigo)}">Reservar</a>
         </td>
       </tr>`).join("");
@@ -136,7 +138,7 @@
     el.count.innerHTML = `Mostrando <b>${pagina.length}</b> de <b>${lista.length}</b> espaços`;
 
     if (!lista.length) {
-      el.results.innerHTML = `<div class="empty-state"><img src="assets/gato3.png" alt=""><i class="fa-solid fa-magnifying-glass"></i>Nenhuma sala encontrada com esses filtros.<br><small>Tente limpar os filtros ou mudar a data/horário.</small></div>`;
+      el.results.innerHTML = `<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><b>Nenhuma sala encontrada com esses filtros.</b><br><small>Tente limpar os filtros ou mudar a data/horário.</small></div>`;
       el.pagination.innerHTML = "";
       return;
     }
