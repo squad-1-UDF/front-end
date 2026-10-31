@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Reservar sala · LabReserva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="scripts/app.js" defer></script>
+    <script src="scripts/reservar.js" defer></script>
+</head>
+
+<body data-page="reserve"><a class="skip" href="#conteudo">Pular para o conteúdo</a>
+    <aside class="sidebar"><a class="brand" href="reservar-sala.html" aria-label="LabReserva UDF — Reservar sala"><span class="brand-icon"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></span><span class="brand-name">LabReserva<small>UDF · PORTAL ACADÊMICO</small></span><span class="brand-star"><i class="fa-solid fa-star" aria-hidden="true"></i></span></a>
+        <div class="workspace"><span class="workspace-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
+            <div>Portal acadêmico<small>Gestão de espaços · UDF</small></div>
+        </div>
+        <p class="nav-label">PRINCIPAL</p>
+        <nav aria-label="Menu principal"><a href="reservar-sala.html" aria-current="page"><span><i class="fa-solid fa-table-cells" aria-hidden="true"></i></span> Reservar sala</a><a
+                href="minhas-reservas.html"><span><i class="fa-solid fa-rectangle-list" aria-hidden="true"></i></span> Minhas reservas</a></nav>
+        <div class="sidebar-bottom">
+            <div class="help-card"><span><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span><strong>Um espaço para suas ideias</strong>
+                <p>Encontre o ambiente ideal para aprender, criar e colaborar.</p>
+            </div><button class="theme-button" id="theme-toggle" type="button" aria-pressed="false"><span
+                    id="theme-icon"><i class="fa-solid fa-moon" aria-hidden="true"></i></span><span id="theme-label">Ativar tema escuro</span><span
+                    class="toggle-track"></span></button>
+            <div class="profile">
+                <div class="avatar">ES</div>
+                <div>Estudante<small>Comunidade acadêmica</small></div><span class="online" title="Perfil local"></span>
+            </div>
+        </div>
+    </aside>
+    <div class="app">
+        <header class="topbar">
+            <div>Portal acadêmico <span>/</span> <strong>Reservar sala</strong></div><span class="semester"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i> <span
+                    id="today-label"></span></span>
+        </header>
+        <main id="conteudo">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">SEU CAMPUS, MAIS CONECTADO</p>
+                    <h1>Reservar sala</h1>
+                    <p>Encontre o espaço ideal para o seu próximo encontro.</p>
+                </div><span class="heading-icon"><i class="fa-solid fa-table-cells" aria-hidden="true"></i></span>
+            </div>
+            <section class="hero">
+                <div><span class="pill">ESPAÇOS QUE INSPIRAM</span>
+                    <h2>Sua próxima ideia<br>merece o lugar certo<span>.</span></h2>
+                    <p>Reserve uma sala e transforme planos em possibilidades.</p><a href="#salas"
+                        class="hero-link highlight-button">Explorar espaços <span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span></a>
+                </div>
+                <div class="room-art" aria-hidden="true">
+                    <div class="art-window"></div>
+                    <div class="art-board"><i></i><i></i><i></i></div>
+                    <div class="art-desk"></div>
+                    <div class="art-seat seat-one"></div>
+                    <div class="art-seat seat-two"></div>
+                    <div class="art-plant"><i class="fa-solid fa-seedling" aria-hidden="true"></i></div><span class="art-caption">Um lugar para fazer acontecer.</span>
+                </div>
+            </section>
+            <section class="filter-panel" aria-label="Filtrar salas"><label class="search-label"><span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span><input
+                        id="search" type="search" placeholder="Busque pelo nome da sala ou bloco"
+                        aria-label="Buscar sala"></label><label>Tipo de espaço<select id="type-filter">
+                        <option value="all">Todos os espaços</option>
+                        <option value="Laboratório">Laboratórios</option>
+                        <option value="Sala de estudo">Salas de estudo</option>
+                        <option value="Sala de reunião">Salas de reunião</option>
+                    </select></label><label>Capacidade<select id="capacity-filter">
+                        <option value="0">Qualquer capacidade</option>
+                        <option value="10">10 pessoas ou mais</option>
+                        <option value="20">20 pessoas ou mais</option>
+                        <option value="30">30 pessoas ou mais</option>
+                    </select></label></section>
+            <section id="salas">
+                <div class="section-heading">
+                    <div>
+                        <h2>Encontre seu espaço</h2>
+                        <p id="room-count"></p>
+                    </div><span class="small-note"><span class="status-dot"></span> Reserve com antecedência</span>
+                </div>
+                <div class="room-grid" id="room-grid"></div>
+            </section>
+            <dialog id="booking-dialog">
+                <form id="booking-form">
+                    <div class="dialog-heading">
+                        <div>
+                            <p class="eyebrow">NOVA RESERVA</p>
+                            <h2 id="booking-title">Reservar sala</h2>
+                        </div><button type="button" class="icon-button" id="close-dialog" aria-label="Fechar">×</button>
+                    </div>
+                    <p class="dialog-description" id="booking-description"></p><label>Finalidade<input id="purpose"
+                            required maxlength="100" placeholder="Ex.: estudo em grupo para a prova"></label>
+                    <div class="form-row"><label>Data<input type="date" id="booking-date"
+                                required></label><label>Participantes<input type="number" id="participants" min="1"
+                                value="1" required></label></div>
+                    <div class="form-row"><label>Início<input type="time" id="start-time" min="07:00" max="22:00"
+                                value="09:00" required></label><label>Término<input type="time" id="end-time"
+                                min="07:00" max="22:00" value="10:00" required></label></div>
+                    <p class="form-hint">Horário de funcionamento: 7h às 22h. As reservas não podem se sobrepor.</p>
+                    <p class="form-error" id="booking-error" role="alert"></p><button class="primary-button"
+                        type="submit">Confirmar reserva <span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span></button>
+                </form>
+            </dialog>
+        </main>
+        <footer>LabReserva <span>Feito para conectar pessoas e espaços.</span><span>Projeto acadêmico · Dados salvos
+                neste navegador</span></footer>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+
+</html>

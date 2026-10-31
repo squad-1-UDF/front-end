@@ -1,0 +1,22 @@
+/* Tokens do Guia Visual LabReserva UDF. */
+:root {
+  --udf-navy: #12284b; --udf-navy-deep: #0a172c;
+  --udf-blue: #0055a0; --udf-sky: #8cc1e9; --udf-mist: #e8f1fa;
+  --udf-gold: #f2b705; --udf-gold-deep: #c99700;
+  --bg: #f6f8fb; --surface: #ffffff; --surface-2: #eef2f7;
+  --border: #e3e8f0; --ink: #12284b; --ink-soft: #5b6b7f; --ink-faint: #8a98aa;
+  --ok: #34d399; --busy: #8cc1e9; --warn: #f59e0b; --danger: #ef4444;
+  --radius-lg: 20px; --radius-md: 12px; --radius-sm: 8px;
+  --shadow: 0 8px 24px rgba(18,40,75,.08);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --text: var(--ink); --muted: var(--ink-soft);
+  --accent: var(--udf-blue); --soft: var(--udf-mist);
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --bg: #0a172c; --surface: #12284b; --surface-2: #183459;
+  --border: #244268; --ink: #f2f6fb; --ink-soft: #a3c4dc;
+  --ink-faint: #9eb0c7; --udf-mist: #183459; --udf-blue: #8cc1e9;
+  --shadow: 0 8px 24px rgba(0,0,0,.14);
+  color-scheme: dark;
+}
