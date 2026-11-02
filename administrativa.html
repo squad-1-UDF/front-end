@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Administrativa | LABTECH</title>
+
+    <link rel="stylesheet" href="administrativa.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body class="dark">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-labtech">
+    <div class="brand-mark"><i class="fa-solid fa-flask"></i></div>
+    
+        <nav>
+            <a class="nav-item active" href="#"><span><i class="fa-solid fa-house"></i></span><small>Início</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-solid fa-flask"></i></span><small>Laboratórios</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-regular fa-calendar-check"></i></span><small>Agendamentos</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-regular fa-bookmark"></i></span><small>Solicitações</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-solid fa-desktop"></i></span><small>Retirada de<br> Chaves</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-solid fa-chart-simple"></i></span><small>Devolução de<br> Chaves</small></a>
+            <a class="nav-item" href="#"><span><i class="fa-solid fa-gear"></i></span><small>Configurações</small></a>
+        </nav>
+    </aside>
+    <div class="page-content">
+        <main>
+            <header class="header">
+                <label id="search">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" placeholder="Buscar usuários, salas ou chaves..."
+                       aria-label="Buscar usuários, salas ou chaves">
+                </label>
+                <ul>
+                    <li><a href="#tema" id="botao-tema" class="link"><i class="fa-solid fa-moon"></i></a></li>
+                </ul>
+                <div class="header-actions">
+                    <button id="notifications" type="button" aria-label="Notificações: 3 não lidas">
+                        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+                        <span class="notification-dot">3</span>
+                    </button>
+                    <button id="user" type="button" aria-label="Abrir menu do perfil">
+                        <img src="assets/perfil.png" alt="Foto de perfil">
+                    </button>
+                </div>
+            </header>
+
+       
+            <section id="title" class="banner-boas-vindas" aria-labelledby="page-title">
+                <h1 id="page-title">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    Painel Administrativo
+                </h1>
+                <h5>Bom dia, Ana!</h5>
+                <p>Acompanhe a movimentações de chaves e espaços da faculdade.</p>
+            </section>
+
+            <section class="dashboard-cards" aria-label="Indicadores do sistema">
+                <article class="cards">
+                    <p class="card-label"><i class="fa-solid fa-users" aria-hidden="true"></i>Usuários cadastrados</p>
+                    <span class="card-number">150</span>
+                    <a class="card-link" href="#">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cards">
+                    <p class="card-label"><i class="fa-solid fa-flask" aria-hidden="true"></i>Salas e laboratórios</p>
+                    <span class="card-number">25</span>
+                    <a class="card-link" href="#">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cards">
+                    <p class="card-label"><i class="fa-solid fa-file-lines" aria-hidden="true"></i>Solicitações pendentes</p>
+                    <span class="card-number">10</span>
+                    <a class="card-link" href="#">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cards">
+                    <p class="card-label"><i class="fa-solid fa-key" aria-hidden="true"></i>Chaves emprestadas</p>
+                    <span class="card-number">5</span>
+                    <a class="card-link" href="#">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cardD">
+                    <div class="cardD-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
+                    <h2>Gestão eficiente</h2>
+                    <p>Acompanhe o uso das salas, dos laboratórios e o controle das chaves, garantindo organização e segurança.</p>
+                </article>
+            </section>
+
+            <section class="summary" aria-label="Resumo administrativo">
+                <article class="cards requests-card">
+                    <div class="section-heading">
+                        <h2><i class="fa-solid fa-file-lines" aria-hidden="true"></i>Solicitações recentes</h2>
+                        <a class="activities-link" href="#">Ver tudo</a>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Solicitante</th>
+                                    <th scope="col">Espaço</th>
+                                    <th scope="col">Data e horário</th>
+                                    <th scope="col">Tipo</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><img src="assets/perfil.png" alt="">João Silva</td>
+                                    <td>Laboratório de Química</td>
+                                    <td>15/03/2023 · 14:00</td>
+                                    <td>Reserva</td>
+                                    <td><span class="status status-analise">Em análise</span></td>
+                                    <td><a class="view-link" href="#" aria-label="Ver solicitação de João Silva"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver</a></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/perfil.png" alt="">Maria Oliveira</td>
+                                    <td>Laboratório de Física</td>
+                                    <td>16/03/2023 · 10:00</td>
+                                    <td>Reserva</td>
+                                    <td><span class="status status-aprovado">Aprovado</span></td>
+                                    <td><a class="view-link" href="#" aria-label="Ver solicitação de Maria Oliveira"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver</a></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/perfil.png" alt="">Carlos Souza</td>
+                                    <td>Laboratório de Biologia</td>
+                                    <td>17/03/2023 · 09:00</td>
+                                    <td>Retirada de chave</td>
+                                    <td><span class="status status-pendente">Pendente</span></td>
+                                    <td><a class="view-link" href="#" aria-label="Ver solicitação de Carlos Souza"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver</a></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/perfil.png" alt="">Ana Costa</td>
+                                    <td>Laboratório de Informática</td>
+                                    <td>18/03/2023 · 11:00</td>
+                                    <td>Reserva</td>
+                                    <td><span class="status status-aprovado">Aprovado</span></td>
+                                    <td><a class="view-link" href="#" aria-label="Ver solicitação de Ana Costa"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver</a></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="assets/perfil.png" alt="">Pedro Lima</td>
+                                    <td>Laboratório de Química</td>
+                                    <td>19/03/2023 · 15:00</td>
+                                    <td>Devolução de chave</td>
+                                    <td><span class="status status-pendente">Pendente</span></td>
+                                    <td><a class="view-link" href="#" aria-label="Ver solicitação de Pedro Lima"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="cards quick-card">
+                    <div class="section-heading">
+                        <h2><i class="fa-solid fa-bolt" aria-hidden="true"></i>Ações rápidas</h2>
+                    </div>
+
+                    <ul class="acoes-rapidas">
+                        <li><a href="#"><i class="fa-solid fa-user-plus" aria-hidden="true"></i>Cadastrar usuário</a><i class="fa-solid fa-arrow-right-long arrow" aria-hidden="true"></i></li>
+                        <li><a href="#"><i class="fa-solid fa-flask" aria-hidden="true"></i>Cadastrar nova sala/laboratório</a><i class="fa-solid fa-arrow-right-long arrow" aria-hidden="true"></i></li>
+                        <li><a href="#"><i class="fa-solid fa-key" aria-hidden="true"></i>Gerenciar chaves</a><i class="fa-solid fa-arrow-right-long arrow" aria-hidden="true"></i></li>
+                        <li><a href="#"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>Ver relatórios</a><i class="fa-solid fa-arrow-right-long arrow" aria-hidden="true"></i></li>
+                    </ul>
+
+                    <aside class="dica">
+                        <h3><i class="fa-regular fa-lightbulb" aria-hidden="true"></i>Dica</h3>
+                        <p>Você pode acessar as funcionalidades administrativas pelo menu do sistema.</p>
+                    </aside>
+                </article>
+
+                <article class="cards activities-card">
+
+                    <div class="activities-header">
+                        <h2>
+                            <i class="fa-solid fa-clipboard-check"></i>
+                            Atividades recentes
+                        </h2>
+
+                        <a href="#" class="activities-link">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+
+                    <ul class="activities-list">
+
+                        <li class="activity-item">
+                            <div class="activity-icon icon-purple">
+                                <i class="fa-solid fa-file-circle-plus"></i>
+                            </div>
+
+                            <div class="activity-content">
+                                <p>Nova solicitação de reserva</p>
+                                <span>Lab. Informática 02 <b>·</b> Hoje, 14:32</span>
+                            </div>
+                        </li>
+
+                        <li class="activity-item">
+                            <div class="activity-icon icon-green">
+                                <i class="fa-solid fa-key"></i>
+                            </div>
+
+                            <div class="activity-content">
+                                <p>Chave K003 retirada</p>
+                                <span>Pedro Lima <b>·</b> Hoje, 13:50</span>
+                            </div>
+                        </li>
+
+                        <li class="activity-item">
+                            <div class="activity-icon icon-red">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+
+                            <div class="activity-content">
+                                <p>Nova ocorrência registrada</p>
+                                <span>Sala 12 (Ar-condicionado) <b>·</b> Hoje, 11:20</span>
+                            </div>
+                        </li>
+
+                        <li class="activity-item">
+                            <div class="activity-icon icon-blue">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+
+                            <div class="activity-content">
+                                <p>Usuário cadastrado</p>
+                                <span>Mariana Souza <b>·</b> Hoje, 10:15</span>
+                            </div>
+                        </li>
+
+                        <li class="activity-item">
+                            <div class="activity-icon icon-teal">
+                                <i class="fa-solid fa-key"></i>
+                            </div>
+
+                            <div class="activity-content">
+                                <p>Devolução de chave realizada</p>
+                                <span>Lab. Química 01 <b>·</b> Hoje, 09:40</span>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </article>
+
+            </section>
+        </main>
+    </div>
+    <script src="administrativo.js"></script>
+</body>
+</html>
