@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- Tela: Login. Autoria original: Luanna Priscila (branch tela_login). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-body">
+
+  <!-- Alternar tema (canto superior) -->
+  <button class="icon-btn login-theme" type="button" id="btnTema" aria-label="Ativar tema escuro" aria-pressed="false" title="Alternar tema">
+    <i class="fa-regular fa-moon"></i>
+  </button>
+
+  <main class="login-container">
+
+    <!-- LADO ESQUERDO: formulário de autenticação -->
+    <section class="login-form-wrapper" aria-labelledby="login-titulo">
+      <a class="logo" href="login.html" aria-label="LabReserva UDF">
+        <div class="logo-mark">L</div>
+        <div><b>LabReserva<span>.</span></b><small>UDF Centro Universitário</small></div>
+      </a>
+
+      <div class="form-intro">
+        <span class="eyebrow">Portal acadêmico</span>
+        <h1 id="login-titulo">Autenticação restrita</h1>
+        <p>Insira suas credenciais institucionais para acessar o sistema.</p>
+      </div>
+
+      <form id="formLogin" class="auth-form" novalidate>
+        <!-- Perfil conforme as regras de negócio -->
+        <div class="field">
+          <label for="perfil">Nível de acesso (perfil)</label>
+          <div class="control">
+            <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+            <select id="perfil" name="perfil" required>
+              <option value="" disabled selected>Selecione o seu perfil</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="identifier">E-mail institucional ou matrícula</label>
+          <div class="control">
+            <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+            <input type="text" id="identifier" name="identifier" placeholder="nome.sobrenome@udf.edu.br" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Senha</label>
+          <div class="control">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="toggle-pass" id="btnSenha" aria-label="Mostrar senha" aria-pressed="false" aria-controls="password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions-row">
+          <label class="remember-checkbox" for="lembrar">
+            <input type="checkbox" id="lembrar">
+            <span>Lembrar-me</span>
+          </label>
+          <button type="button" class="btn btn-link" id="btnEsqueci">Esqueceu a senha?</button>
+        </div>
+
+        <p class="form-error" id="loginErro" role="alert"></p>
+
+        <button type="submit" class="btn btn-primary btn-entrar" id="btnEntrar">
+          <span class="label">Entrar no sistema</span>
+        </button>
+      </form>
+
+      <!-- Só aparece no modo de demonstração (sem back-end) -->
+      <section class="demo-box" id="demoBox" hidden aria-labelledby="demo-titulo">
+        <h2 id="demo-titulo"><i class="fa-solid fa-flask-vial" aria-hidden="true"></i> Acesso de demonstração</h2>
+        <p>Clique em um perfil para preencher os dados. Senha de todos: <b id="demoSenha"></b></p>
+        <div class="demo-list" id="demoLista"></div>
+      </section>
+
+      <div class="login-footer-info">
+        <p>Acesso restrito a usuários previamente cadastrados pelo Administrador.</p>
+      </div>
+    </section>
+
+    <!-- LADO DIREITO: painel com a logo no canto e a ilustração -->
+    <section class="login-visual-wrapper" aria-label="Apresentação do LabReserva">
+      <div class="top-right-logo">
+        <img src="assets/logo-udf.png" alt="Logo UDF Centro Universitário" class="udf-corner-logo">
+      </div>
+
+      <div class="visual-content">
+        <h2>Sua próxima ideia merece o lugar certo.</h2>
+        <p>Consulte a disponibilidade de salas, faça reservas em tempo real e gerencie o empréstimo de chaves com total integridade e segurança.</p>
+        <div class="illustration-container">
+          <img src="assets/laboratorio-codigo.png" alt="Ilustração de um laboratório de programação" class="login-hero-img">
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Recuperação de senha: ainda não existe no back-end -->
+  <dialog class="modal" id="modalSenha" aria-labelledby="modal-senha-titulo">
+    <div class="modal-form">
+      <div class="modal-head">
+        <div><span class="eyebrow">Recuperação de acesso</span><h2 id="modal-senha-titulo">Esqueceu a senha?</h2></div>
+        <button type="button" class="icon-btn" data-fechar aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="muted">A redefinição de senha pelo próprio sistema ainda não está disponível.</p>
+        <p class="muted">Procure a <b>secretaria</b> ou o <b>administrador do LabReserva</b> com seu documento e matrícula para receber uma nova senha.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" data-fechar>Entendi</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

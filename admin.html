@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!-- Tela: Painel administrativo. Autoria original: Raiane (branch Raiane). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel administrativo - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="admin" data-title="Painel administrativo" data-roles="admin">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <!-- Banner de boas-vindas -->
+        <section class="page-head admin-banner" aria-labelledby="saudacao">
+          <div>
+            <span class="eyebrow"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Painel administrativo</span>
+            <h1 id="saudacao">Olá!</h1>
+            <p class="subtitle">Acompanhe as movimentações de chaves e espaços da faculdade.</p>
+          </div>
+          <div class="page-actions no-print" id="acoesDemo" hidden>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnResetDemo"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restaurar dados de demonstração</button>
+          </div>
+        </section>
+
+        <!-- Indicadores -->
+        <section class="admin-cards" aria-label="Indicadores do sistema">
+          <a class="stat" href="admin-usuarios.html">
+            <span class="stat-label"><i class="fa-solid fa-users" aria-hidden="true"></i> Usuários cadastrados</span>
+            <span class="stat-value" id="qtdUsuarios">–</span>
+            <span class="stat-foot" id="footUsuarios">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </a>
+          <a class="stat" href="admin-salas.html">
+            <span class="stat-label"><i class="fa-solid fa-flask" aria-hidden="true"></i> Salas e laboratórios</span>
+            <span class="stat-value" id="qtdSalas">–</span>
+            <span class="stat-foot" id="footSalas">Ver todos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </a>
+          <a class="stat" href="agenda.html">
+            <span class="stat-label"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Reservas de hoje</span>
+            <span class="stat-value" id="qtdHoje">–</span>
+            <span class="stat-foot" id="footHoje">Ver agenda <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </a>
+          <a class="stat" href="chaves.html">
+            <span class="stat-label"><i class="fa-solid fa-key" aria-hidden="true"></i> Chaves emprestadas</span>
+            <span class="stat-value" id="qtdChaves">–</span>
+            <span class="stat-foot" id="footChaves">Ver todas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </a>
+          <article class="panel card-gestao">
+            <div class="panel-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
+            <h2>Gestão eficiente</h2>
+            <p>Acompanhe o uso das salas, dos laboratórios e o controle das chaves, garantindo organização e segurança.</p>
+          </article>
+        </section>
+
+        <!-- Resumo: reservas recentes, ações rápidas e atividades -->
+        <section class="admin-summary" aria-label="Resumo administrativo">
+
+          <article class="panel admin-reservas">
+            <div class="panel-head">
+              <h2><span class="panel-icon"><i class="fa-regular fa-rectangle-list" aria-hidden="true"></i></span> Reservas recentes</h2>
+              <a class="btn btn-link" href="agenda.html">Ver tudo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div id="reservasConteudo"><div class="loading">Carregando reservas...</div></div>
+          </article>
+
+          <article class="panel admin-acoes">
+            <div class="panel-head">
+              <h2><span class="panel-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span> Ações rápidas</h2>
+            </div>
+            <nav class="acoes-rapidas" aria-label="Ações rápidas">
+              <a href="admin-usuarios.html?novo=1"><i class="fa-solid fa-user-plus" aria-hidden="true"></i><span>Cadastrar usuário</span><i class="fa-solid fa-arrow-right-long seta" aria-hidden="true"></i></a>
+              <a href="admin-salas.html?nova=1"><i class="fa-solid fa-flask" aria-hidden="true"></i><span>Cadastrar nova sala/laboratório</span><i class="fa-solid fa-arrow-right-long seta" aria-hidden="true"></i></a>
+              <a href="chaves.html"><i class="fa-solid fa-key" aria-hidden="true"></i><span>Gerenciar chaves</span><i class="fa-solid fa-arrow-right-long seta" aria-hidden="true"></i></a>
+              <a href="chave-historico.html"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Ver relatórios de chaves</span><i class="fa-solid fa-arrow-right-long seta" aria-hidden="true"></i></a>
+            </nav>
+            <aside class="dica">
+              <h3><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> Dica</h3>
+              <p>Você pode acessar as funcionalidades administrativas pelo menu do sistema, na seção Administração.</p>
+            </aside>
+          </article>
+
+          <article class="panel admin-atividades">
+            <div class="panel-head">
+              <h2><span class="panel-icon"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></span> Atividades recentes</h2>
+              <a class="btn btn-link" href="chave-historico.html">Ver todas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div id="atividadesConteudo"><div class="loading">Carregando...</div></div>
+          </article>
+
+        </section>
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

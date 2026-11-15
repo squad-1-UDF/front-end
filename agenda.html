@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- Tela: Agenda (disponibilidade). Tela nova criada na integração (requisito do MVP: agenda/disponibilidade), no padrão das telas de reserva de Luiz Cláudio (branch feat/reservar-sala-minhas-reservas). -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/reservas.css">
+</head>
+<body data-page="agenda" data-title="Agenda" data-roles="">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Agenda e disponibilidade</span>
+            <h1>Agenda</h1>
+            <p class="subtitle">Veja a ocupação das salas na semana ou no dia e clique num horário livre para reservar.</p>
+          </div>
+          <div class="page-actions">
+            <a class="btn btn-gold" href="reservar-sala.html"><i class="fa-regular fa-calendar-plus"></i> Reservar sala</a>
+          </div>
+        </div>
+
+        <!-- Controles -->
+        <section class="panel" aria-label="Opções da agenda">
+          <div class="tabs" role="tablist" aria-label="Modo de visualização">
+            <button type="button" class="tab active" role="tab" aria-selected="true" aria-controls="gradeAgenda" data-modo="semana"><i class="fa-regular fa-calendar-days"></i> Semana de uma sala</button>
+            <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="gradeAgenda" data-modo="dia"><i class="fa-solid fa-table-list"></i> Todas as salas do dia</button>
+          </div>
+          <div class="agenda-controles">
+            <div class="field" id="campoSala">
+              <label for="aSala">Sala</label>
+              <div class="control"><i class="fa-solid fa-door-open"></i><select id="aSala"></select></div>
+            </div>
+            <div class="field" id="campoTipo" hidden>
+              <label for="aTipo">Tipo de espaço</label>
+              <div class="control"><i class="fa-solid fa-layer-group"></i><select id="aTipo"><option value="">Todos os tipos</option></select></div>
+            </div>
+            <div class="field">
+              <label for="aData">Data</label>
+              <div class="control"><i class="fa-regular fa-calendar"></i><input type="date" id="aData"></div>
+            </div>
+            <div class="agenda-nav">
+              <button type="button" class="icon-btn" id="btnAnterior" aria-label="Semana anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnHoje">Hoje</button>
+              <button type="button" class="icon-btn" id="btnProximo" aria-label="Próxima semana"><i class="fa-solid fa-chevron-right"></i></button>
+              <span class="agenda-periodo" id="periodo" aria-live="polite"></span>
+            </div>
+          </div>
+        </section>
+
+        <div class="agenda-topo">
+          <div class="agenda-sala-info" id="salaInfo"></div>
+          <div class="legend" aria-label="Legenda">
+            <span class="legend-item"><i class="swatch livre"></i> Livre</span>
+            <span class="legend-item"><i class="swatch ocupado"></i> Ocupado</span>
+            <span class="legend-item"><i class="swatch minha"></i> Sua reserva</span>
+            <span class="legend-item"><i class="swatch manutencao"></i> Manutenção</span>
+            <span class="legend-item"><i class="swatch passado"></i> Encerrado</span>
+            <span class="legend-item"><i class="fa-solid fa-ban"></i> Domingo fechado</span>
+          </div>
+        </div>
+
+        <div class="table-wrap" id="gradeAgenda" role="tabpanel"><div class="loading">Carregando agenda...</div></div>
+        <p class="form-hint agenda-nota">Funcionamento: 7h às 22h, de segunda a sábado. Clique numa célula livre para reservar 1 hora; no formulário você ajusta o horário.</p>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/agenda.js"></script>
+</body>
+</html>

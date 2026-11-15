@@ -1,0 +1,115 @@
+/* ============================================================
+   Tela de login (autoria original: Luanna Priscila, branch tela_login)
+   Duas colunas: formulário à esquerda e painel azul-marinho à direita.
+   Única tela sem o shell (sidebar/topbar).
+   ============================================================ */
+
+body.login-body {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+/* botão de tema no canto */
+.login-theme { position: fixed; top: 16px; right: 16px; z-index: 10; }
+
+.login-container {
+  width: 100%; max-width: 1150px;
+  background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  display: grid; grid-template-columns: 1fr 1.1fr;
+  overflow: hidden;
+}
+
+/* ---------- FORMULÁRIO ---------- */
+.login-form-wrapper { padding: 40px 50px; display: flex; flex-direction: column; gap: 20px; }
+.login-form-wrapper .logo { padding: 0; }
+
+.form-intro h1 { font-size: 26px; font-weight: 700; margin: 4px 0 6px; }
+.form-intro p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.field select { cursor: pointer; }
+.field select option { background: var(--surface); color: var(--ink); }
+
+/* botão mostrar/ocultar senha dentro do campo */
+.toggle-pass {
+  border: 0; background: transparent; padding: 6px; margin-right: -6px;
+  color: var(--ink-faint); cursor: pointer; border-radius: var(--radius-sm);
+  display: grid; place-items: center;
+}
+.field .control .toggle-pass i { color: inherit; }
+.toggle-pass:hover { color: var(--ink); }
+.toggle-pass:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 1px; }
+
+.form-actions-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+.remember-checkbox { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); cursor: pointer; }
+.remember-checkbox input { width: 16px; height: 16px; accent-color: var(--udf-blue); cursor: pointer; }
+.form-actions-row .btn-link { font-size: 14px; font-weight: 600; }
+[data-theme="dark"] .form-actions-row .btn-link { color: var(--udf-sky); }
+
+.btn-entrar { height: 44px; width: 100%; margin-top: 4px; }
+/* estado carregando do botão */
+.btn-entrar.carregando { pointer-events: none; opacity: .85; }
+.btn-entrar.carregando::before {
+  content: ""; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .4); border-top-color: currentColor;
+  animation: girar .8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .btn-entrar.carregando::before { animation: none; } }
+
+/* ---------- QUADRO DE DEMONSTRAÇÃO ---------- */
+.demo-box {
+  border: 1px dashed var(--border-strong); border-radius: var(--radius-md);
+  background: var(--surface-2); padding: 14px 16px;
+}
+.demo-box h2 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.demo-box h2 i { color: var(--udf-blue); }
+[data-theme="dark"] .demo-box h2 i { color: var(--udf-gold); }
+.demo-box p { margin: 4px 0 10px; font-size: 13px; color: var(--ink-soft); }
+.demo-list { display: flex; flex-direction: column; gap: 6px; }
+.demo-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface); cursor: pointer;
+}
+.demo-item:hover { border-color: var(--udf-blue); }
+.demo-item:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 1px; }
+.demo-item .avatar { width: 32px; height: 32px; font-size: 12px; }
+.demo-item b { display: block; font-size: 13px; }
+.demo-item span { display: block; font-size: 12px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; }
+.demo-item > div { min-width: 0; }
+
+.login-footer-info { margin-top: auto; font-size: 12.5px; color: var(--ink-soft); text-align: center; }
+.login-footer-info p { margin: 0; }
+
+/* ---------- PAINEL VISUAL (direita) ---------- */
+.login-visual-wrapper {
+  position: relative;
+  background: linear-gradient(135deg, var(--udf-navy-deep) 0%, var(--udf-navy) 100%);
+  padding: 40px;
+  display: flex; flex-direction: column; justify-content: center;
+  color: #fff;
+}
+.top-right-logo { position: absolute; top: 24px; right: 24px; }
+.udf-corner-logo { height: 56px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2)); }
+
+.visual-content { max-width: 480px; margin: 40px auto 0; }
+.visual-content h2 { font-size: 26px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+.visual-content p { font-size: 14px; color: rgba(255, 255, 255, .78); line-height: 1.55; margin: 0 0 20px; }
+
+.illustration-container {
+  border-radius: var(--radius-md); overflow: hidden; padding: 10px;
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1);
+}
+.login-hero-img { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); }
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 900px) {
+  body.login-body { padding: 64px 16px 24px; align-items: flex-start; }
+  .login-container { grid-template-columns: 1fr; }
+  .login-visual-wrapper { display: none; }
+  .login-form-wrapper { padding: 28px 20px; }
+  .form-intro h1 { font-size: 22px; }
+}

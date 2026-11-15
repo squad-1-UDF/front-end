@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- Tela: Minhas reservas. Autoria original: Luiz Cláudio (branch feat/reservar-sala-minhas-reservas). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas reservas - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/reservas.css">
+</head>
+<body data-page="minhas-reservas" data-title="Minhas reservas" data-roles="">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Seu campus, mais conectado</span>
+            <h1>Minhas reservas</h1>
+            <p class="subtitle">Organize seus encontros e acompanhe suas reservas em um só lugar.</p>
+          </div>
+          <div class="page-actions">
+            <a class="btn btn-secondary" href="agenda.html"><i class="fa-regular fa-calendar-check"></i> Ver agenda</a>
+            <a class="btn btn-gold" href="reservar-sala.html"><i class="fa-solid fa-plus"></i> Nova reserva</a>
+          </div>
+        </div>
+
+        <!-- Resumo -->
+        <section class="stats" aria-label="Resumo de reservas">
+          <div class="stat">
+            <span class="stat-label"><i class="fa-regular fa-rectangle-list"></i> Próximas reservas</span>
+            <span class="stat-value" id="stProximas">–</span>
+            <span class="stat-foot" id="stProxima">&nbsp;</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label"><i class="fa-regular fa-clock"></i> Horas reservadas no mês</span>
+            <span class="stat-value" id="stHoras">–</span>
+            <span class="stat-foot" id="stMes">&nbsp;</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label"><i class="fa-solid fa-door-open"></i> Salas diferentes usadas</span>
+            <span class="stat-value" id="stSalas">–</span>
+            <span class="stat-foot" id="stConcluidas">&nbsp;</span>
+          </div>
+        </section>
+
+        <!-- Lista com abas -->
+        <section class="panel">
+          <div class="secao-head">
+            <div>
+              <h2>Seus espaços, seus planos</h2>
+              <p>Acompanhe os detalhes de cada reserva.</p>
+            </div>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Filtrar reservas">
+            <button type="button" class="tab active" role="tab" aria-selected="true" aria-controls="listaReservas" data-aba="proximas">Próximas <span class="count" id="cProximas">0</span></button>
+            <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="listaReservas" data-aba="historico">Histórico <span class="count" id="cHistorico">0</span></button>
+            <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="listaReservas" data-aba="canceladas">Canceladas <span class="count" id="cCanceladas">0</span></button>
+          </div>
+          <div id="listaReservas" class="reservas-lista" role="tabpanel"><div class="loading">Carregando suas reservas...</div></div>
+          <div class="info-banner"><i class="fa-solid fa-circle-info"></i><span>Planos mudaram? Cancele sua reserva para liberar o espaço para outras pessoas.</span></div>
+        </section>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/minhas-reservas.js"></script>
+</body>
+</html>

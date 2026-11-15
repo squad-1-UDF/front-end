@@ -1,0 +1,87 @@
+/* ============================================================
+   Painel administrativo (autoria original: Raiane, branch Raiane)
+   Banner de boas-vindas, indicadores, reservas recentes,
+   ações rápidas e atividades recentes.
+   ============================================================ */
+
+/* banner de boas-vindas */
+.admin-banner {
+  background: var(--udf-mist); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px 30px; min-height: 140px;
+}
+.admin-banner .eyebrow { display: inline-flex; align-items: center; gap: 8px; }
+
+/* indicadores: 4 números + card "Gestão eficiente" mais largo */
+.admin-cards {
+  display: grid; gap: 16px; margin-bottom: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(200px, 1.35fr);
+}
+.admin-cards .stat-foot { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; }
+.admin-cards a.stat:hover .stat-foot { color: var(--udf-blue); }
+[data-theme="dark"] .admin-cards a.stat:hover .stat-foot { color: var(--udf-sky); }
+.admin-cards a.stat:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 2px; }
+.card-gestao { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; }
+.card-gestao h2 { font-size: 16px; }
+
+/* resumo em três colunas (tabela maior) */
+.admin-summary {
+  display: grid; gap: 20px; align-items: start;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, .95fr) minmax(240px, 1fr);
+}
+
+/* tabela de reservas recentes */
+.solicitante { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.solicitante .avatar { width: 30px; height: 30px; font-size: 11px; }
+.espaco b { display: block; font-weight: 600; }
+.espaco small { color: var(--ink-soft); }
+.admin-reservas td { white-space: nowrap; }
+.admin-reservas td.espaco { white-space: normal; min-width: 160px; }
+.btn-cancelar { color: var(--danger-text); }
+.btn-cancelar:hover { background: var(--danger-soft); color: var(--danger-text); }
+
+/* ações rápidas */
+.acoes-rapidas { display: flex; flex-direction: column; }
+.acoes-rapidas a {
+  display: flex; align-items: center; gap: 12px; padding: 12px 4px;
+  border-bottom: 1px solid var(--border); text-decoration: none; color: var(--ink);
+  font-size: 14px; font-weight: 500; border-radius: var(--radius-sm);
+}
+.acoes-rapidas a:last-child { border-bottom: 0; }
+.acoes-rapidas a > i:first-child { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--udf-mist); color: var(--udf-blue); flex-shrink: 0; }
+[data-theme="dark"] .acoes-rapidas a > i:first-child { color: var(--udf-sky); }
+.acoes-rapidas a span { flex: 1; }
+.acoes-rapidas .seta { color: var(--ink-faint); transition: transform .15s; }
+.acoes-rapidas a:hover { background: var(--surface-2); }
+.acoes-rapidas a:hover .seta { transform: translateX(3px); color: var(--udf-blue); }
+.acoes-rapidas a:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 1px; }
+
+.dica { margin-top: 14px; padding: 14px; border-radius: var(--radius-md); background: var(--udf-gold-soft); }
+.dica h3 { font-size: 14px !important; color: var(--cover-study-text); }
+.dica p { font-size: 13px !important; margin-top: 4px !important; }
+
+/* atividades recentes */
+.list-quando { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+.admin-atividades .empty-state, .admin-reservas .empty-state { padding: 28px 16px; }
+
+/* demonstração */
+#btnResetDemo { font-size: 12.5px; }
+
+/* ---------- responsivo ---------- */
+/* notebooks: tabela em linha própria e "Gestão eficiente" abaixo dos números */
+@media (max-width: 1440px) {
+  .admin-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .card-gestao { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 12px; }
+  .card-gestao p { flex: 1 1 320px; }
+  .admin-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-reservas { grid-column: 1 / -1; }
+}
+@media (max-width: 1100px) {
+  .admin-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .admin-banner { padding: 20px; min-height: 0; }
+  .admin-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .admin-cards { grid-template-columns: 1fr; }
+}

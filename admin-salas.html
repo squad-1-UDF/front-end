@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- Tela: Salas e chaves (UC003 - manter salas/laboratórios, UC004 - manter chaves). Autoria original: tela nova da integração (sem branch de origem; inspirada no painel administrativo de Raiane). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salas e chaves - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin-cadastros.css">
+</head>
+<body data-page="admin-salas" data-title="Salas e chaves" data-roles="admin" data-parent="Painel administrativo" data-parent-href="admin.html">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <!-- Cabeçalho -->
+        <section class="page-head">
+          <div>
+            <span class="eyebrow">Administração</span>
+            <h1>Salas e chaves</h1>
+            <p class="subtitle">Cadastre salas e laboratórios e as chaves de cada uma. Nada é excluído: desative o que saiu de uso e o histórico fica preservado.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-gold" type="button" id="btnNovaSala"><i class="fa-solid fa-plus"></i> Nova sala</button>
+          </div>
+        </section>
+
+        <!-- Indicadores -->
+        <section class="stats" aria-label="Resumo do cadastro">
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-building"></i> Salas ativas</span><span class="stat-value" id="stSalas">-</span><span class="stat-foot" id="stSalasFoot">cadastradas</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-screwdriver-wrench"></i> Em manutenção</span><span class="stat-value" id="stManut">-</span><span class="stat-foot">sem reservas novas</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-key"></i> Chaves ativas</span><span class="stat-value" id="stChaves">-</span><span class="stat-foot" id="stChavesFoot">cadastradas</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-hand-holding"></i> Emprestadas agora</span><span class="stat-value" id="stEmp">-</span><span class="stat-foot"><a class="btn-link" href="chaves.html">ver retiradas</a></span></div>
+        </section>
+
+        <!-- Abas -->
+        <div class="tabs" role="tablist" aria-label="Cadastros">
+          <button class="tab active" type="button" role="tab" id="tabSalas" aria-selected="true" aria-controls="painelSalas" data-aba="salas">Salas e laboratórios <span class="count" id="cntSalas">0</span></button>
+          <button class="tab" type="button" role="tab" id="tabChaves" aria-selected="false" aria-controls="painelChaves" data-aba="chaves">Chaves <span class="count" id="cntChaves">0</span></button>
+        </div>
+
+        <!-- Aba: salas (UC003) -->
+        <section class="panel" id="painelSalas" role="tabpanel" aria-labelledby="tabSalas">
+          <div class="toolbar">
+            <div class="form-field grow">
+              <label for="buscaSala">Buscar</label>
+              <input id="buscaSala" type="search" placeholder="Código, nome ou bloco">
+            </div>
+            <div class="form-field">
+              <label for="filtroTipo">Tipo</label>
+              <select id="filtroTipo"><option value="">Todos os tipos</option></select>
+            </div>
+            <div class="form-field">
+              <label for="filtroSituacaoSala">Situação</label>
+              <select id="filtroSituacaoSala">
+                <option value="">Todas</option>
+                <option value="ativa">Ativas</option>
+                <option value="manutencao">Em manutenção</option>
+                <option value="inativa">Inativas</option>
+              </select>
+            </div>
+          </div>
+          <div id="listaSalas"><div class="loading">Carregando salas...</div></div>
+        </section>
+
+        <!-- Aba: chaves (UC004) -->
+        <section class="panel" id="painelChaves" role="tabpanel" aria-labelledby="tabChaves" hidden>
+          <div class="toolbar">
+            <div class="form-field grow">
+              <label for="buscaChave">Buscar</label>
+              <input id="buscaChave" type="search" placeholder="Código da chave ou sala">
+            </div>
+            <div class="form-field">
+              <label for="filtroSituacaoChave">Situação</label>
+              <select id="filtroSituacaoChave">
+                <option value="">Todas</option>
+                <option value="disponivel">Disponível</option>
+                <option value="emprestada">Emprestada</option>
+                <option value="inativa">Inativa</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" type="button" id="btnNovaChave"><i class="fa-solid fa-plus"></i> Nova chave</button>
+          </div>
+          <div id="listaChaves"><div class="loading">Carregando chaves...</div></div>
+        </section>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/admin-salas.js"></script>
+</body>
+</html>

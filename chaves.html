@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!-- Tela: Retirada e devolução de chaves (UC005, UC006, UC007). Autoria original: tela nova da integração (sem branch de origem). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retirada e devolução - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/chaves.css">
+</head>
+<body data-page="chaves" data-title="Retirada e devolução" data-roles="employee,admin">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <!-- Cabeçalho -->
+        <section class="page-head">
+          <div>
+            <span class="eyebrow">Controle de chaves</span>
+            <h1>Retirada e devolução</h1>
+            <p class="subtitle">Registre quem retirou cada chave e quando ela voltou. Só é possível entregar chaves disponíveis.</p>
+          </div>
+          <div class="page-actions">
+            <a class="btn btn-secondary" href="chave-historico.html"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</a>
+            <button class="btn btn-gold" type="button" id="btnRetirada"><i class="fa-solid fa-key"></i> Registrar retirada</button>
+          </div>
+        </section>
+
+        <!-- Indicadores -->
+        <section class="stats" id="stats" aria-label="Resumo das chaves">
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-circle-check"></i> Disponíveis</span><span class="stat-value" id="stDisp">-</span><span class="stat-foot">prontas para entrega</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-key"></i> Emprestadas</span><span class="stat-value" id="stEmp">-</span><span class="stat-foot">com empréstimo ativo</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-ban"></i> Inativas</span><span class="stat-value" id="stInat">-</span><span class="stat-foot">fora de circulação</span></div>
+          <div class="stat stat-atencao"><span class="stat-label"><i class="fa-solid fa-triangle-exclamation"></i> Atenção</span><span class="stat-value" id="stAtencao">-</span><span class="stat-foot">empréstimos há mais de 4h</span></div>
+        </section>
+
+        <!-- Abas -->
+        <div class="tabs" role="tablist" aria-label="Visões das chaves">
+          <button class="tab active" type="button" role="tab" id="tabEmprestadas" aria-selected="true" aria-controls="painelEmprestadas" data-aba="emprestadas">Emprestadas agora <span class="count" id="cntEmp">0</span></button>
+          <button class="tab" type="button" role="tab" id="tabTodas" aria-selected="false" aria-controls="painelTodas" data-aba="todas">Todas as chaves <span class="count" id="cntTodas">0</span></button>
+        </div>
+
+        <!-- Aba: emprestadas agora (UC006) -->
+        <section class="panel" id="painelEmprestadas" role="tabpanel" aria-labelledby="tabEmprestadas">
+          <div class="panel-head">
+            <h2><span class="panel-icon"><i class="fa-solid fa-key"></i></span> Chaves fora do balcão</h2>
+            <p class="muted">Empréstimos há mais de 4 horas aparecem destacados.</p>
+          </div>
+          <div id="listaEmprestadas"><div class="loading">Carregando empréstimos...</div></div>
+        </section>
+
+        <!-- Aba: todas as chaves (UC007) -->
+        <section class="panel" id="painelTodas" role="tabpanel" aria-labelledby="tabTodas" hidden>
+          <div class="toolbar">
+            <div class="form-field grow">
+              <label for="buscaChave">Buscar</label>
+              <input id="buscaChave" type="search" placeholder="Código da chave, sala ou bloco">
+            </div>
+            <div class="form-field">
+              <label for="filtroStatus">Situação</label>
+              <select id="filtroStatus">
+                <option value="">Todas</option>
+                <option value="disponivel">Disponível</option>
+                <option value="emprestada">Emprestada</option>
+                <option value="inativa">Inativa</option>
+              </select>
+            </div>
+          </div>
+          <div id="listaTodas"><div class="loading">Carregando chaves...</div></div>
+        </section>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/chaves.js"></script>
+</body>
+</html>

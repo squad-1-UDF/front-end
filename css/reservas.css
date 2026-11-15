@@ -1,0 +1,190 @@
+/* ============================================================
+   Reservas e agenda (reservar-sala.html, minhas-reservas.html, agenda.html)
+   Autoria original das telas de reserva: Luiz Cláudio
+   (branch feat/reservar-sala-minhas-reservas). Padronizado na integração.
+   Usa só tokens do css/base.css.
+   ============================================================ */
+
+/* ---------- HERO (reservar-sala) ---------- */
+.reserva-hero {
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px;
+  min-height: 300px; padding: 32px; margin-bottom: 24px;
+  border-radius: var(--radius-lg); background: var(--udf-mist); color: var(--ink);
+  overflow: hidden; position: relative;
+}
+.hero-pill {
+  display: inline-block; padding: 6px 10px; border: 1px solid var(--udf-sky); border-radius: 999px;
+  font-size: 12px; font-weight: 600; letter-spacing: .08em; color: var(--udf-blue);
+}
+[data-theme="dark"] .hero-pill { color: var(--udf-sky); }
+.reserva-hero h2 { font-size: 36px; line-height: 1.25; font-weight: 700; letter-spacing: -.03em; margin: 18px 0 12px; }
+.reserva-hero h2 span { color: var(--udf-gold-deep); }
+[data-theme="dark"] .reserva-hero h2 span { color: var(--udf-gold); }
+.reserva-hero p { margin: 0 0 18px; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
+
+/* arte da sala desenhada em CSS (janela, quadro, mesa, cadeiras, planta) */
+.room-art {
+  position: relative; min-height: 220px; margin: 0 5% 20px 9%;
+  background: linear-gradient(150deg, var(--surface), var(--udf-sky));
+  border-radius: 100px 100px 12px 12px;
+  box-shadow: 14px 12px 0 var(--border-strong);
+  transform: perspective(700px) rotateY(-8deg);
+}
+[data-theme="dark"] .room-art { background: linear-gradient(150deg, var(--border), var(--udf-blue)); box-shadow: 14px 12px 0 var(--border); }
+.art-window {
+  position: absolute; left: 15%; top: 13%; width: 37%; height: 49%;
+  border: 7px solid var(--udf-sky); border-radius: 40px 40px 0 0;
+  background:
+    linear-gradient(90deg, transparent 47%, var(--udf-sky) 47%, var(--udf-sky) 53%, transparent 53%),
+    linear-gradient(0deg, transparent 47%, var(--udf-sky) 47%, var(--udf-sky) 53%, transparent 53%),
+    var(--bg);
+}
+.art-board { position: absolute; right: 9%; top: 23%; width: 26%; height: 27%; padding: 12px; background: var(--udf-navy); border: 5px solid var(--bg); transform: rotate(-4deg); }
+.art-board i { display: block; height: 3px; margin: 5px 0; background: var(--udf-sky); }
+.art-desk { position: absolute; left: 10%; bottom: 20%; width: 80%; height: 23%; border-radius: 9px; background: var(--border-strong); box-shadow: 0 8px 0 var(--ink-faint); transform: skewY(-5deg); }
+.art-desk::after { content: ""; position: absolute; left: 10%; right: 10%; top: 100%; height: 40px; border-left: 7px solid var(--ink-soft); border-right: 7px solid var(--ink-soft); }
+.art-seat { position: absolute; bottom: 7%; width: 41px; height: 55px; border: 5px solid var(--udf-sky); border-radius: 12px; background: var(--udf-blue); box-shadow: 0 5px 0 var(--udf-navy); }
+.art-seat.seat-one { left: 23%; }
+.art-seat.seat-two { right: 20%; }
+.art-plant { position: absolute; right: -18px; bottom: 29%; font-size: 65px; color: var(--udf-blue); }
+.art-caption { position: absolute; right: 0; bottom: -28px; font-size: 10px; letter-spacing: .1em; color: var(--ink-soft); }
+
+/* ---------- FILTROS ---------- */
+.filtros-panel { margin-bottom: 28px; padding: 20px; }
+.filtros-panel .toolbar { margin-bottom: 0; }
+
+/* cabeçalho de seção */
+.secao-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.secao-head h2 { font-size: 20px; font-weight: 600; }
+.secao-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; }
+.nota { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.nota::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--udf-gold); }
+
+/* aviso após criar reserva */
+.aviso-ok { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; margin-bottom: 18px; border-radius: var(--radius-md); background: var(--ok-soft); color: var(--ok-text); font-size: 14px; font-weight: 500; }
+.aviso-ok a { color: inherit; font-weight: 700; }
+.aviso-ok[hidden] { display: none; }
+
+/* ---------- GRADE DE SALAS ---------- */
+.sala-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
+.sala-grid > .empty-state, .sala-grid > .loading { grid-column: 1 / -1; }
+.sala-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+.sala-capa { position: relative; height: 150px; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; }
+.sala-capa::before, .sala-capa::after { content: ""; position: absolute; border: 1px solid currentColor; border-radius: 50%; opacity: .12; }
+.sala-capa::before { width: 150px; height: 150px; right: -20px; top: -50px; }
+.sala-capa::after { width: 95px; height: 95px; left: -20px; bottom: -60px; }
+.sala-capa > i { font-size: 52px; opacity: .8; }
+.sala-capa .badge { position: absolute; left: 14px; top: 13px; }
+.sala-codigo { position: absolute; right: 13px; bottom: 12px; font-size: 11px; font-weight: 600; letter-spacing: .1em; opacity: .7; }
+/* capas por tipo (L.tipoCover) */
+.sala-capa.cover-lab     { background: var(--cover-lab);     color: var(--cover-lab-text); }
+.sala-capa.cover-study   { background: var(--cover-study);   color: var(--cover-study-text); }
+.sala-capa.cover-meeting { background: var(--cover-meeting); color: var(--cover-meeting-text); }
+.sala-capa.cover-aud     { background: var(--cover-aud);     color: var(--cover-aud-text); }
+.sala-corpo { display: flex; flex-direction: column; gap: 10px; flex: 1; padding: 18px 20px 20px; }
+.sala-tipo { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--udf-blue); }
+[data-theme="dark"] .sala-tipo { color: var(--udf-sky); }
+.sala-corpo h3 { font-size: 17px; font-weight: 600; line-height: 1.35; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-soft); }
+.meta i { margin-right: 4px; color: var(--udf-blue); }
+[data-theme="dark"] .meta i { color: var(--udf-sky); }
+.sala-corpo .chips { min-height: 26px; }
+.sala-aviso { font-size: 12.5px; color: var(--danger-text); margin: 0; }
+.sala-acoes { display: flex; gap: 8px; margin-top: auto; padding-top: 6px; }
+.sala-acoes .btn-primary { flex: 1; }
+
+/* ---------- DIALOG DE RESERVA ---------- */
+.reserva-modal { width: min(600px, calc(100vw - 32px)); }
+.reserva-modal .modal-head p { margin: 4px 0 0; }
+.disp-status { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 14px; border-radius: var(--radius-md); background: var(--surface-2); color: var(--ink-soft); font-size: 14px; font-weight: 600; }
+.disp-status.livre { background: var(--ok-soft); color: var(--ok-text); }
+.disp-status.ocupado { background: var(--danger-soft); color: var(--danger-text); }
+.ocupados { display: flex; flex-direction: column; gap: 8px; }
+.ocupados-titulo { font-size: 12px; font-weight: 600; color: var(--ink); }
+.chip.ocupado { background: var(--busy-soft); color: var(--busy-text); border-color: transparent; }
+
+/* ---------- MINHAS RESERVAS ---------- */
+.reservas-lista { display: flex; flex-direction: column; }
+.reserva-item { display: flex; align-items: center; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+.reserva-item:last-child { border-bottom: 0; }
+.date-box { flex-shrink: 0; min-width: 62px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--udf-mist); color: var(--udf-blue); text-align: center; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+[data-theme="dark"] .date-box { color: var(--udf-sky); }
+.date-box strong { display: block; font-size: 25px; line-height: 1.1; }
+.reserva-detalhe { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.reserva-detalhe h3 { font-size: 16px; font-weight: 600; }
+.reserva-detalhe p { margin: 0; color: var(--ink-soft); font-size: 14px; overflow-wrap: anywhere; }
+.reserva-acoes { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+.reserva-item.cancelada .reserva-detalhe h3, .reserva-item.cancelada .date-box { opacity: .6; }
+.info-banner { display: flex; align-items: center; gap: 12px; padding: 18px 4px 0; color: var(--ink-soft); font-size: 13px; }
+.info-banner i { font-size: 18px; color: var(--udf-blue); }
+[data-theme="dark"] .info-banner i { color: var(--udf-sky); }
+
+/* ---------- AGENDA ---------- */
+.agenda-controles { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.agenda-controles .field { flex: 1 1 220px; }
+.agenda-controles .field[hidden] { display: none; }
+.agenda-nota { margin-top: 10px; }
+.agenda-nav { display: flex; align-items: center; gap: 6px; }
+.agenda-periodo { font-size: 15px; font-weight: 600; margin: 0 6px; white-space: nowrap; }
+.agenda-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 18px 0 12px; }
+.agenda-sala-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--ink-soft); }
+.agenda-sala-info b { color: var(--ink); font-size: 16px; }
+
+/* legenda com quadradinhos nas cores das células */
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border); }
+.swatch.livre { background: var(--ok-soft); }
+.swatch.ocupado { background: var(--busy-soft); }
+.swatch.manutencao { background: var(--danger-soft); }
+.swatch.minha { background: var(--busy-soft); box-shadow: inset 3px 0 0 var(--udf-gold); }
+.swatch.passado { background: var(--surface-2); }
+
+#gradeAgenda { position: relative; } /* contém os textos .sr-only das células */
+table.agenda-grid { width: 100%; border-collapse: separate; border-spacing: 3px; font-size: 12.5px; table-layout: fixed; }
+.agenda-grid.semana { min-width: 760px; }
+.agenda-grid.dia { min-width: 1180px; }
+.agenda-grid th { padding: 8px 6px; font-size: 12px; font-weight: 600; color: var(--ink-soft); text-align: center; background: var(--surface-2); border-radius: var(--radius-sm); white-space: nowrap; }
+.agenda-grid th.hoje { background: var(--udf-navy); color: #fff; }
+[data-theme="dark"] .agenda-grid th.hoje { background: var(--udf-blue); }
+.agenda-grid th small { display: block; font-weight: 500; opacity: .8; }
+.agenda-grid .col-hora { width: 64px; }
+.agenda-grid .col-sala { width: 190px; }
+.agenda-grid th.hora { font-variant-numeric: tabular-nums; }
+.agenda-grid th.sala-nome { text-align: left; position: sticky; left: 0; z-index: 1; background: var(--surface); border: 1px solid var(--border); }
+.agenda-grid th.sala-nome a { color: var(--ink); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; }
+.agenda-grid th.sala-nome a:hover { color: var(--udf-blue); text-decoration: underline; }
+.agenda-grid th.sala-nome small { color: var(--ink-faint); }
+.agenda-grid td { height: 44px; padding: 0; border-radius: var(--radius-sm); vertical-align: top; }
+
+/* célula: link (livre futura) ou bloco (demais estados) */
+.slot { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; min-height: 44px; padding: 4px 8px; border-radius: var(--radius-sm); text-decoration: none; overflow: hidden; line-height: 1.25; }
+.slot.livre { background: var(--ok-soft); color: var(--ok-text); }
+a.slot.livre:hover { outline: 2px solid var(--ok); outline-offset: -2px; }
+a.slot.livre:hover::after { content: "+ Reservar"; font-weight: 600; font-size: 11.5px; }
+a.slot:focus-visible { outline: 3px solid var(--udf-blue); outline-offset: 1px; }
+.slot.ocupado { background: var(--busy-soft); color: var(--busy-text); }
+.slot.ocupado.cont { opacity: .85; }
+.slot.minha { box-shadow: inset 3px 0 0 var(--udf-gold); }
+.slot.manutencao { background: var(--danger-soft); color: var(--danger-text); }
+.slot.passado { background: var(--surface-2); color: var(--ink-faint); }
+.slot.passado.ocupado { background: var(--busy-soft); color: var(--busy-text); opacity: .5; }
+.slot b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot span { font-size: 11px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.agenda-grid .vazio-dia td { padding: 24px; text-align: center; color: var(--ink-soft); }
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 1100px) {
+  .reserva-hero { grid-template-columns: 1.3fr 1fr; padding: 28px; }
+  .reserva-hero h2 { font-size: 32px; }
+}
+@media (max-width: 900px) {
+  .reserva-hero { grid-template-columns: 1fr; padding: 24px; }
+  .reserva-hero h2 { font-size: 28px; }
+  .room-art { min-height: 180px; margin: 10px 15% 30px; }
+  .art-plant { font-size: 44px; }
+  .reserva-item { flex-wrap: wrap; }
+  .reserva-acoes { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+  .agenda-nav { width: 100%; flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .room-art { transform: none; }
+}
