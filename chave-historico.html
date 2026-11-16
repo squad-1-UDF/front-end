@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!-- Tela: Histórico de chaves (UC008, UC009). Autoria original: tela nova da integração (sem branch de origem). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de chaves - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/chaves.css">
+</head>
+<body data-page="chave-historico" data-title="Histórico de chaves" data-roles="employee,admin" data-parent="Retirada e devolução" data-parent-href="chaves.html">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <!-- Cabeçalho que só aparece na impressão (UC009) -->
+        <section class="print-head" aria-hidden="true">
+          <img src="assets/logo-udf.png" alt="UDF Centro Universitário">
+          <div>
+            <h1>Histórico de movimentação de chaves</h1>
+            <p id="prChave"></p>
+            <p id="prPeriodo"></p>
+            <p id="prEmissao"></p>
+          </div>
+        </section>
+
+        <!-- Cabeçalho da tela -->
+        <section class="page-head no-print">
+          <div>
+            <span class="eyebrow">Controle de chaves</span>
+            <h1>Histórico de chaves</h1>
+            <p class="subtitle">Todas as retiradas e devoluções ficam guardadas. Filtre por chave, período ou responsável e emita o relatório.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" type="button" id="btnCsv"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+            <button class="btn btn-gold" type="button" id="btnEmitir"><i class="fa-solid fa-print"></i> Emitir histórico</button>
+          </div>
+        </section>
+
+        <!-- Filtros (UC008) -->
+        <section class="panel no-print filtros-historico" aria-label="Filtros do histórico">
+          <div class="toolbar">
+            <div class="form-field grow">
+              <label for="fChave">Chave</label>
+              <select id="fChave"><option value="">Todas as chaves</option></select>
+            </div>
+            <div class="form-field">
+              <label for="fDe">De</label>
+              <input id="fDe" type="date">
+            </div>
+            <div class="form-field">
+              <label for="fAte">Até</label>
+              <input id="fAte" type="date">
+            </div>
+            <div class="form-field grow">
+              <label for="fResp">Responsável</label>
+              <select id="fResp"><option value="">Todos os responsáveis</option></select>
+            </div>
+            <button class="btn btn-ghost" type="button" id="btnLimpar"><i class="fa-solid fa-eraser"></i> Limpar</button>
+          </div>
+          <p class="form-error" id="fErro" role="alert"></p>
+        </section>
+
+        <!-- Resumo do recorte -->
+        <section class="stats" aria-label="Resumo do histórico">
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-arrow-right-from-bracket"></i> Retiradas</span><span class="stat-value" id="stRet">-</span><span class="stat-foot">no recorte filtrado</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-arrow-right-to-bracket"></i> Devoluções</span><span class="stat-value" id="stDev">-</span><span class="stat-foot">no recorte filtrado</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-hourglass-half"></i> Em aberto</span><span class="stat-value" id="stAberto">-</span><span class="stat-foot">retiradas sem devolução</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-regular fa-clock"></i> Duração média</span><span class="stat-value" id="stMedia">-</span><span class="stat-foot">dos empréstimos encerrados</span></div>
+        </section>
+
+        <!-- Movimentações -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2><span class="panel-icon"><i class="fa-solid fa-clock-rotate-left"></i></span> Movimentações</h2>
+            <span class="muted" id="resumoFiltro"></span>
+          </div>
+          <div id="listaMov"><div class="loading">Carregando histórico...</div></div>
+        </section>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/chave-historico.js"></script>
+</body>
+</html>

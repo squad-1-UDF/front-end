@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- Tela: detalhes da sala. Autoria original: João Gabriel Leal (branch joao/lista-salas-detalhes). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Sala - LabReserva UDF</title>
+  <script>/* aplica o tema salvo antes de pintar, evita "flash" */(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/sala-detalhes.css">
+</head>
+<body data-page="sala-detalhes" data-title="Sala" data-parent="Laboratórios e salas" data-parent-href="salas.html" data-search="Buscar sala ou laboratório...">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+
+      <div class="content">
+        <!-- Conteúdo é montado pelo JS a partir do ?id= -->
+        <div id="detail"></div>
+      </div>
+
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/sala-detalhes.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+/* ============================================================
+   Início / dashboard (autoria original: Luanna Priscila, branch dashboard)
+   Grade de cards: laboratórios livres, reservas, chaves, agenda,
+   atividade recente, ações rápidas e brasão da UDF.
+   ============================================================ */
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* posições no desktop (mesma ideia do layout original, em 3 colunas
+   para caber ao lado da sidebar de 260px) */
+.dash-labs { grid-column: 1; grid-row: 1 / span 2; }
+.dash-reservas { grid-column: 2; grid-row: 1; }
+.dash-chaves { grid-column: 3; grid-row: 1; }
+.dash-agenda { grid-column: 2 / span 2; grid-row: 2; }
+.dash-notificacoes { grid-column: 1 / span 2; grid-row: 3 / span 2; }
+.dash-acoes { grid-column: 3; grid-row: 3; }
+.dash-udf { grid-column: 3; grid-row: 4; }
+
+a.panel { text-decoration: none; color: var(--ink); }
+.chevron { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+a.panel:hover .chevron { color: var(--udf-blue); }
+
+/* ---------- cards de número ---------- */
+.dash-metric { display: flex; flex-direction: column; gap: 4px; }
+.metric { display: block; font-size: 40px; font-weight: 800; line-height: 1; margin-top: 14px; color: var(--ink); }
+.dash-metric p { margin: 0; }
+.dash-metric .btn { margin-top: auto; align-self: flex-start; }
+.key-icons { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 6px; }
+.key-icons i { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: 12px; background: var(--warn-soft); color: var(--warn-text); }
+.proxima-sala { font-size: 16px; font-weight: 700; color: var(--ink); margin-top: 12px; }
+.proxima-quando { font-size: 14px; color: var(--ink-soft); }
+
+/* ---------- laboratórios livres ---------- */
+.dash-labs { display: flex; flex-direction: column; gap: 14px; }
+.lab-stats-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.lab-count-info strong { display: block; font-size: 32px; font-weight: 800; line-height: 1.1; }
+.lab-count-info span { font-size: 13px; color: var(--ink-soft); }
+
+/* anel de porcentagem (--pct definido no HTML) */
+.ring {
+  --pct: 0%;
+  position: relative; width: 84px; height: 84px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(var(--ok) 0 var(--pct), var(--surface-2) var(--pct) 100%);
+  display: grid; place-items: center; text-align: center;
+}
+.ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--surface); }
+.ring b, .ring span { position: relative; z-index: 1; line-height: 1.1; }
+.ring b { font-size: 17px; font-weight: 800; color: var(--ok-text); display: block; }
+.ring span { font-size: 11px; color: var(--ink-soft); display: block; }
+
+/* mapa de quadradinhos */
+.labs-map-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px;
+  max-height: 480px; overflow-y: auto; padding: 2px;
+}
+.lab-seat {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  height: 56px; border-radius: 10px; border: 1px solid; text-decoration: none;
+  transition: transform .15s, box-shadow .15s;
+}
+.lab-seat:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.lab-seat:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 2px; }
+.lab-seat i { font-size: 13px; }
+.lab-seat small { font-size: 11px; font-weight: 700; }
+.lab-seat.available   { border-color: var(--ok);     background: var(--ok-soft);     color: var(--ok-text); }
+.lab-seat.occupied    { border-color: var(--busy);   background: var(--busy-soft);   color: var(--busy-text); }
+.lab-seat.maintenance { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-text); }
+
+/* ---------- agenda ---------- */
+.agenda-date { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); }
+.agenda-dia { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 10px 0 0; }
+.agenda-dia:first-child { margin-top: 0; }
+.dash-agenda .list-item, .dash-notificacoes .list-item { text-decoration: none; color: inherit; }
+.dash-agenda a.list-item:hover .list-main b, .dash-notificacoes a.list-item:hover .list-main b { color: var(--udf-blue); }
+[data-theme="dark"] .dash-agenda a.list-item:hover .list-main b,
+[data-theme="dark"] .dash-notificacoes a.list-item:hover .list-main b { color: var(--udf-sky); }
+.list-hora { font-size: 13px; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+.dash-agenda .empty-state, .dash-notificacoes .empty-state { padding: 28px 16px; }
+
+/* notificações em duas colunas quando há espaço */
+.notice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+.notice-grid .list-item:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+
+/* ---------- ações rápidas ---------- */
+.dash-acoes { display: flex; flex-direction: column; gap: 14px; }
+.quick-actions { display: flex; flex-direction: column; gap: 10px; }
+.quick-actions .btn { height: 52px; justify-content: flex-start; width: 100%; font-size: 14.5px; }
+.quick-actions .btn i { width: 20px; text-align: center; }
+
+/* ---------- brasão UDF (fundo azul-marinho nos dois temas) ---------- */
+.dash-udf {
+  display: grid; place-items: center; padding: 18px; min-height: 150px;
+  background: linear-gradient(135deg, var(--udf-navy-deep), var(--udf-navy));
+  border-color: var(--udf-navy);
+}
+.dash-udf img { max-width: 100%; max-height: 110px; object-fit: contain; }
+.dash-udf:hover { box-shadow: var(--shadow); }
+.dash-udf:focus-visible { outline: 3px solid rgba(0, 85, 160, .35); outline-offset: 2px; }
+
+/* ---------- responsivo ---------- */
+@media (max-width: 1200px) {
+  .dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-grid > * { grid-column: auto; grid-row: auto; }
+  .dash-labs, .dash-agenda, .dash-notificacoes { grid-column: 1 / -1; }
+}
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr; gap: 16px; }
+  .notice-grid { grid-template-columns: 1fr; }
+  .notice-grid .list-item:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid var(--border); }
+}
+.lab-legend { margin: 0; }
+.proxima-vazia { margin-top: 12px !important; }

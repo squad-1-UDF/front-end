@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- Tela: Início (dashboard). Autoria original: Luanna Priscila (branch dashboard). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Início - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body data-page="inicio" data-title="Início" data-roles="">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">LabTech | Laboratórios</span>
+            <h1 id="saudacao">Olá!</h1>
+            <p class="subtitle">Seja bem-vindo(a)! Acompanhe laboratórios, reservas e chaves em um só lugar. Bons estudos :)</p>
+          </div>
+        </div>
+
+        <section class="dash-grid" aria-label="Resumo">
+
+          <!-- CARD 1: laboratórios livres (mapa de salas) -->
+          <article class="panel dash-labs">
+            <h2><span class="panel-icon"><i class="fa-solid fa-flask"></i></span> Laboratórios livres</h2>
+            <div id="labsConteudo"><div class="loading">Carregando salas...</div></div>
+          </article>
+
+          <!-- CARD 2: minhas reservas ativas -->
+          <a class="panel hover dash-metric dash-reservas" href="minhas-reservas.html">
+            <h2><span class="panel-icon"><i class="fa-regular fa-calendar-days"></i></span> Minhas reservas ativas <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i></h2>
+            <strong class="metric" id="qtdReservas">–</strong>
+            <p id="qtdReservasTxt">carregando...</p>
+          </a>
+
+          <!-- CARD 3: chaves emprestadas (gestão) ou próxima reserva (estudante) -->
+          <article class="panel dash-metric dash-chaves" id="cardChaves">
+            <div class="loading">Carregando...</div>
+          </article>
+
+          <!-- CARD 4: ações rápidas -->
+          <article class="panel dash-acoes">
+            <h2><span class="panel-icon"><i class="fa-solid fa-bolt"></i></span> Ações rápidas</h2>
+            <div class="quick-actions" id="acoesRapidas"></div>
+          </article>
+
+          <!-- CARD 5: minha agenda -->
+          <article class="panel dash-agenda">
+            <div class="panel-head">
+              <h2><span class="panel-icon"><i class="fa-regular fa-calendar-check"></i></span> Minha agenda</h2>
+              <span class="agenda-date"><i class="fa-regular fa-calendar"></i> <span id="agendaHoje"></span></span>
+            </div>
+            <div id="agendaConteudo"><div class="loading">Carregando agenda...</div></div>
+          </article>
+
+          <!-- CARD 6: notificações / atividade recente -->
+          <article class="panel dash-notificacoes">
+            <div class="panel-head">
+              <h2><span class="panel-icon"><i class="fa-regular fa-bell"></i></span> Atividade recente</h2>
+              <a class="btn btn-link" id="verTodas" href="minhas-reservas.html">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div id="notificacoesConteudo"><div class="loading">Carregando...</div></div>
+          </article>
+
+          <!-- CARD 7: brasão da UDF -->
+          <a class="panel dash-udf" href="https://www.udf.edu.br/" target="_blank" rel="noopener" aria-label="Site da UDF Centro Universitário (abre em nova aba)">
+            <img src="assets/logo-udf.png" alt="UDF Centro Universitário">
+          </a>
+
+        </section>
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

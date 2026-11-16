@@ -1,0 +1,44 @@
+/* ============================================================
+   Telas de cadastro do administrador:
+   admin-usuarios.html (UC002) e admin-salas.html (UC003/UC004).
+   Só complementa o base.css; cores sempre por variáveis.
+   ============================================================ */
+
+/* o texto .sr-only (absoluto) do cabeçalho "Ações" não pode escapar da rolagem da tabela */
+.table-wrap { position: relative; }
+
+/* células da tabela */
+.cel-dupla { display: flex; flex-direction: column; min-width: 0; }
+.cel-dupla b { font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.cel-dupla small, .cel-obs { color: var(--ink-soft); font-size: 12.5px; }
+.cel-obs { display: block; margin-top: 2px; }
+.cel-acoes { text-align: right; white-space: nowrap; }
+.cel-acoes .btn + .btn, .cel-acoes .btn + a, .cel-acoes a + .btn { margin-left: 6px; }
+.cel-dupla .chip { height: 20px; font-size: 11px; padding: 0 6px; }
+
+/* avatar + nome/e-mail do usuário */
+.cel-usuario { display: flex; align-items: center; gap: 12px; min-width: 220px; }
+.cel-usuario .avatar { width: 36px; height: 36px; font-size: 12.5px; }
+
+/* registros desativados ficam esmaecidos, mas continuam na lista */
+.table tbody tr.linha-inativa td { color: var(--ink-faint); }
+.table tbody tr.linha-inativa .avatar { background: var(--surface-2); color: var(--ink-faint); }
+
+/* perfil do usuário */
+.perfil-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--surface-2); color: var(--ink-soft); }
+.perfil-tag.perfil-admin { background: var(--udf-gold-soft); color: var(--cover-study-text); }
+.perfil-tag.perfil-employee { background: var(--busy-soft); color: var(--busy-text); }
+
+/* grupo de checkboxes (recursos) dentro do formulário */
+fieldset.grupo-campos { border: 0; margin: 0; padding: 0; min-width: 0; }
+fieldset.grupo-campos legend { padding: 0; margin-bottom: 6px; }
+.check-list label i { color: var(--ink-faint); width: 14px; text-align: center; }
+.check-list label:has(input:checked) { background: var(--udf-mist); border-color: var(--udf-sky); }
+
+/* botão de ação da aba fica alinhado à direita da barra de filtros */
+#painelChaves .toolbar > .btn { margin-left: auto; }
+
+@media (max-width: 900px) {
+  .cel-acoes { text-align: left; }
+  #painelChaves .toolbar > .btn { margin-left: 0; width: 100%; }
+}

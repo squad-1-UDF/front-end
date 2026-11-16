@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!-- Tela: Reservar sala. Autoria original: Luiz Cláudio (branch feat/reservar-sala-minhas-reservas). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar sala - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/reservas.css">
+</head>
+<body data-page="reservar" data-title="Reservar sala" data-roles="" data-search="Buscar sala, código ou bloco">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Seu campus, mais conectado</span>
+            <h1>Reservar sala</h1>
+            <p class="subtitle">Encontre o espaço ideal para o seu próximo encontro.</p>
+          </div>
+          <div class="page-actions">
+            <a class="btn btn-secondary" href="agenda.html"><i class="fa-regular fa-calendar-check"></i> Ver agenda</a>
+            <a class="btn btn-secondary" href="minhas-reservas.html"><i class="fa-regular fa-rectangle-list"></i> Minhas reservas</a>
+          </div>
+        </div>
+
+        <!-- Destaque com a arte da sala -->
+        <section class="reserva-hero">
+          <div>
+            <span class="hero-pill">ESPAÇOS QUE INSPIRAM</span>
+            <h2>Sua próxima ideia<br>merece o lugar certo<span>.</span></h2>
+            <p>Reserve uma sala e transforme planos em possibilidades.</p>
+            <a href="#salas" class="btn btn-gold">Explorar espaços <i class="fa-solid fa-arrow-down"></i></a>
+          </div>
+          <div class="room-art" aria-hidden="true">
+            <div class="art-window"></div>
+            <div class="art-board"><i></i><i></i><i></i></div>
+            <div class="art-desk"></div>
+            <div class="art-seat seat-one"></div>
+            <div class="art-seat seat-two"></div>
+            <div class="art-plant"><i class="fa-solid fa-seedling"></i></div>
+            <span class="art-caption">Um lugar para fazer acontecer.</span>
+          </div>
+        </section>
+
+        <!-- Filtros -->
+        <section class="panel filtros-panel" aria-label="Filtrar salas">
+          <div class="toolbar">
+            <div class="field grow">
+              <label for="fBusca">Buscar</label>
+              <div class="control"><i class="fa-solid fa-magnifying-glass"></i><input id="fBusca" type="search" placeholder="Nome, código ou bloco da sala"></div>
+            </div>
+            <div class="field">
+              <label for="fTipo">Tipo de espaço</label>
+              <div class="control"><i class="fa-solid fa-layer-group"></i><select id="fTipo"><option value="">Todos os espaços</option></select></div>
+            </div>
+            <div class="field">
+              <label for="fCapacidade">Capacidade</label>
+              <div class="control"><i class="fa-solid fa-users"></i>
+                <select id="fCapacidade">
+                  <option value="0">Qualquer capacidade</option>
+                  <option value="10">10 pessoas ou mais</option>
+                  <option value="20">20 pessoas ou mais</option>
+                  <option value="30">30 pessoas ou mais</option>
+                  <option value="50">50 pessoas ou mais</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Lista de salas -->
+        <section id="salas">
+          <div class="aviso-ok" id="avisoReserva" role="status" hidden></div>
+          <div class="secao-head">
+            <div>
+              <h2>Encontre seu espaço</h2>
+              <p id="contagem">Carregando espaços...</p>
+            </div>
+            <span class="nota">Reserve com antecedência</span>
+          </div>
+          <div class="sala-grid" id="gradeSalas"><div class="loading">Carregando salas...</div></div>
+        </section>
+
+        <!-- Dialog de reserva -->
+        <dialog class="modal reserva-modal" id="dlgReserva" aria-labelledby="dlgTitulo">
+          <form class="modal-form" id="formReserva" novalidate>
+            <div class="modal-head">
+              <div>
+                <span class="eyebrow">Nova reserva</span>
+                <h2 id="dlgTitulo">Reservar sala</h2>
+                <p class="form-hint" id="dlgDescricao"></p>
+              </div>
+              <button type="button" class="icon-btn" data-fechar aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="rFinalidade">Finalidade</label>
+                  <input id="rFinalidade" name="finalidade" required maxlength="100" placeholder="Ex.: estudo em grupo para a prova">
+                </div>
+                <div class="form-field">
+                  <label for="rData">Data</label>
+                  <input type="date" id="rData" name="data" required>
+                </div>
+                <div class="form-field">
+                  <label for="rParticipantes">Participantes</label>
+                  <input type="number" id="rParticipantes" name="participantes" min="1" value="1" required>
+                </div>
+                <div class="form-field">
+                  <label for="rInicio">Início</label>
+                  <select id="rInicio" name="inicio"></select>
+                </div>
+                <div class="form-field">
+                  <label for="rFim">Término</label>
+                  <select id="rFim" name="fim"></select>
+                </div>
+              </div>
+              <p class="form-hint">Horário de funcionamento: 7h às 22h, de segunda a sábado. As reservas não podem se sobrepor.</p>
+              <div class="disp-status" id="dispStatus" aria-live="polite"></div>
+              <div class="ocupados">
+                <span class="ocupados-titulo" id="ocupadosTitulo">Horários já ocupados neste dia</span>
+                <div class="chips" id="ocupadosLista" aria-labelledby="ocupadosTitulo"></div>
+              </div>
+            </div>
+            <p class="form-error" id="rErro" role="alert"></p>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" data-fechar>Cancelar</button>
+              <button type="submit" class="btn btn-primary" id="rConfirmar"><i class="fa-regular fa-calendar-check"></i> Confirmar reserva</button>
+            </div>
+          </form>
+        </dialog>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/reservar.js"></script>
+</body>
+</html>

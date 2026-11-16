@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- Tela: Usuários (UC002 - manter usuários). Autoria original: tela nova da integração (sem branch de origem; inspirada no painel administrativo de Raiane). Padronizada na integração. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuários - LabReserva UDF</title>
+  <script>(function(){try{if(localStorage.getItem('labtech_theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin-cadastros.css">
+</head>
+<body data-page="admin-usuarios" data-title="Usuários" data-roles="admin" data-parent="Painel administrativo" data-parent-href="admin.html">
+  <div class="app-shell">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <main class="main">
+      <header class="topbar" id="app-topbar"></header>
+      <div class="content">
+
+        <!-- Cabeçalho -->
+        <section class="page-head">
+          <div>
+            <span class="eyebrow">Administração</span>
+            <h1>Usuários</h1>
+            <p class="subtitle">Cadastre estudantes, funcionários e administradores. Usuários não são excluídos: são desativados, e o histórico fica preservado.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-gold" type="button" id="btnNovo"><i class="fa-solid fa-user-plus"></i> Novo usuário</button>
+          </div>
+        </section>
+
+        <!-- Indicadores -->
+        <section class="stats" aria-label="Resumo dos usuários">
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-users"></i> Cadastrados</span><span class="stat-value" id="stTotal">-</span><span class="stat-foot" id="stTotalFoot">no sistema</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-user-graduate"></i> Estudantes</span><span class="stat-value" id="stStudent">-</span><span class="stat-foot">e usuários autorizados</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-key"></i> Funcionários</span><span class="stat-value" id="stEmployee">-</span><span class="stat-foot">controle de chaves</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-shield-halved"></i> Administradores</span><span class="stat-value" id="stAdmin">-</span><span class="stat-foot">gestão de cadastros</span></div>
+        </section>
+
+        <!-- Lista -->
+        <section class="panel">
+          <div class="toolbar">
+            <div class="form-field grow">
+              <label for="busca">Buscar</label>
+              <input id="busca" type="search" placeholder="Nome, e-mail ou matrícula">
+            </div>
+            <div class="form-field">
+              <label for="filtroPerfil">Perfil</label>
+              <select id="filtroPerfil"><option value="">Todos os perfis</option></select>
+            </div>
+            <div class="form-field">
+              <label for="filtroSituacao">Situação</label>
+              <select id="filtroSituacao">
+                <option value="">Todas</option>
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Inativos</option>
+              </select>
+            </div>
+          </div>
+          <div id="lista"><div class="loading">Carregando usuários...</div></div>
+        </section>
+
+      </div>
+      <footer class="page-footer" id="app-footer"></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data/seed.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/admin-usuarios.js"></script>
+</body>
+</html>
