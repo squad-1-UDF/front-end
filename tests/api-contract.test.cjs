@@ -4,6 +4,9 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
 
+// A UI exibe horários no fuso do navegador; fixe o fuso do teste em qualquer runner.
+process.env.TZ = "America/Sao_Paulo";
+
 const source = fs.readFileSync(path.join(__dirname, "../js/api.js"), "utf8");
 const seedSource = fs.readFileSync(path.join(__dirname, "../data/seed.js"), "utf8");
 
