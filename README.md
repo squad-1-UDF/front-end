@@ -146,6 +146,8 @@ Para voltar à demonstração: `localStorage.setItem('labtech_api_modo', 'mock')
 
 ### Execução local na mesma origem
 
+Para a checagem da interface antes do merge, siga o [roteiro de validação visual](docs/ROTEIRO_VALIDACAO_MVP.md).
+
 Use o Back-end em `http://127.0.0.1:8000` com banco PostgreSQL **local isolado** e `DJANGO_DEBUG=true`. No diretório do Back-end, siga as instruções de banco local do README e execute `python manage.py runserver 127.0.0.1:8000`. Crie um usuário de teste no banco local antes de entrar. Em outro terminal, neste repositório:
 
 ```bash
