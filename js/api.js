@@ -7,12 +7,10 @@
    Dois modos:
    - "mock" (padrão): dados de data/seed.js salvos no localStorage.
      Serve para apresentar e testar sem back-end.
-   - "api": chama o Django em /api/v1/ (ver back-end/docs/API_CONTRATOS_MVP.md).
+   - "api": chama o Django em /api/v1/ (ver back-end/docs/GUIA_FRONTEND_MVP.md).
      Ative com  localStorage.setItem('labtech_api_modo', 'api')  ou mudando
-     CONFIG.modo abaixo. A autenticação segue o contrato implementado
-     (CSRF + sessão). Os demais endpoints ainda são PROPOSTAS no back-end:
-     os nomes de campos são traduzidos nas funções de/para (deApi*) e
-     podem precisar de ajuste quando o contrato for aprovado.
+     CONFIG.modo abaixo. Sessão, espaços e reservas seguem o contrato integrado.
+     Chaves e administração continuam disponíveis apenas na demonstração.
 
    Erros: sempre LABTECH.ApiError { status, code, message }.
    Códigos usados (iguais aos do contrato): BOOKING_CONFLICT,
@@ -322,19 +320,14 @@
     return json;
   }
   const qs = (o) => { const p = new URLSearchParams(); Object.entries(o || {}).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== "" && v !== false) p.set(k, v); }); const s = p.toString(); return s ? "?" + s : ""; };
-  const tz = () => { const o = -new Date().getTimezoneOffset(); return (o >= 0 ? "+" : "-") + pad(Math.floor(Math.abs(o) / 60)) + ":" + pad(Math.abs(o) % 60); };
-  const isoHora = (data, hhmm) => `${data}T${hhmm}:00${tz()}`;
+  const tz = (data) => { const o = -new Date(`${data}T12:00:00`).getTimezoneOffset(); return (o >= 0 ? "+" : "-") + pad(Math.floor(Math.abs(o) / 60)) + ":" + pad(Math.abs(o) % 60); };
+  const isoHora = (data, hhmm) => `${data}T${hhmm}:00${tz(data)}`;
   const separar = (iso) => { const d = new Date(iso); return { data: isoDia(d), hora: `${pad(d.getHours())}:${pad(d.getMinutes())}` }; };
 
-  // Tradução API (inglês, contrato) -> modelo do front (português). Ajustar aqui quando o contrato fechar.
-  const deApiSala = (s) => ({ id: s.id, codigo: s.code, nome: s.name || s.code, tipo: s.kind === "laboratory" ? "laboratorio" : (s.kind || "sala"), bloco: s.block || "", andar: s.floor ?? 0,
-    capacidade: s.capacity ?? 0, manutencao: s.status === "maintenance", status: s.status || "available", recursos: s.resources || [], qtd: {}, softwares: s.softwares || [],
-    responsavel: s.responsible || "", descricao: s.description || "", regras: s.rules || [], proximoLivre: s.next_free || "", chave: { local: s.key_location || "", status: "disponivel" }, ativo: s.active !== false });
-  const paraApiSala = (s) => ({ code: s.codigo, name: s.nome, kind: s.tipo === "laboratorio" ? "laboratory" : s.tipo, block: s.bloco, floor: s.andar, capacity: s.capacidade,
-    status: s.manutencao ? "maintenance" : "available", resources: s.recursos, description: s.descricao, rules: s.regras, responsible: s.responsavel, active: s.ativo });
-  const deApiReserva = (b) => { const i = separar(b.start_at), f = separar(b.end_at); return { id: b.id, sala_id: b.space_id, usuario_id: b.user_id, data: i.data, inicio: i.hora, fim: f.hora,
-    finalidade: b.purpose || "", participantes: b.attendees || 1, criada_em: b.created_at || null, cancelada_em: b.cancelled_at || null, status: b.status === "cancelled" ? "cancelada" : "confirmada", situacao: b.status === "cancelled" ? "cancelada" : "confirmada",
-    sala: b.space ? deApiSala(b.space) : null, usuario: b.user ? { id: b.user.id, nome: b.user.name } : null }; };
+  const deApiSala = (s) => ({ id: s.id, codigo: s.code, nome: s.code, tipo: s.kind === "laboratory" ? "laboratorio" : s.kind });
+  const paraApiSala = (s) => ({ code: s.codigo, kind: s.tipo === "laboratorio" ? "laboratory" : s.tipo });
+  const deApiReserva = (b) => { const i = separar(b.start_at), f = separar(b.end_at); return { id: b.id, sala_id: b.space_id, data: i.data, inicio: i.hora, fim: f.hora, inicio_em: b.start_at, fim_em: b.end_at,
+    criada_em: b.created_at || null, cancelada_em: b.cancelled_at || null, status: b.status === "cancelled" ? "cancelada" : "confirmada", situacao: b.status === "cancelled" ? "cancelada" : "confirmada" }; };
   const deApiChave = (k) => ({ id: k.id, codigo: k.code || String(k.id), sala_id: k.space_id, local: k.location || "", ativo: k.active !== false, observacao: k.notes || "",
     status: k.active === false ? "inativa" : k.has_active_loan ? "emprestada" : "disponivel", sala: k.space ? { id: k.space.id, codigo: k.space.code, nome: k.space.name } : null, emprestimo: null });
   const deApiEmprestimo = (l) => ({ id: l.id, chave_id: l.key_id, usuario_id: l.responsible_user_id, retirada_em: l.checked_out_at, devolvida_em: l.returned_at || null, chave: null, sala: null, usuario: null });
@@ -345,12 +338,11 @@
       async login({ identifier, password }) {
         await http("GET", "/auth/csrf/");
         const r = await http("POST", "/auth/login/", { identifier, password });
-        // o contrato atual devolve só {user:{id}}; nome/perfil virão quando o banco existir
-        const s = { id: r.user.id, nome: identifier, email: identifier, perfil: r.user.role || "student", ...r.user };
-        localStorage.setItem(SESSAO_KEY, JSON.stringify(s)); return { user: s };
+        // O login renova o CSRF; a próxima escrita relê o cookie atualizado.
+        return { user: { id: r.user.id } };
       },
-      async logout() { try { await http("POST", "/auth/logout/", {}); } finally { localStorage.removeItem(SESSAO_KEY); } return { status: "signed_out" }; },
-      async me() { const r = await http("GET", "/auth/me/"); return { ...(sessao() || {}), ...r }; }
+      async logout() { return http("POST", "/auth/logout/", {}); },
+      async me() { const r = await http("GET", "/auth/me/"); return { id: r.id, nome: `Usuário #${r.id}`, perfil: null }; }
     },
     users: {
       async list() { return (await http("GET", "/users/")).map(deApiUsuario); },
@@ -359,16 +351,41 @@
     },
     spaces: {
       async list() { return (await http("GET", "/spaces/")).map(deApiSala); },
-      async listAll() { return (await http("GET", "/spaces/?include_inactive=1")).map(deApiSala); },
+      async listAll() { return (await http("GET", "/spaces/")).map(deApiSala); },
       async get(id) { return deApiSala(await http("GET", `/spaces/${id}/`)); },
       async create(s) { return deApiSala(await http("POST", "/spaces/", paraApiSala(s))); },
       async update(id, s) { return deApiSala(await http("PATCH", `/spaces/${id}/`, paraApiSala(s))); },
       async availability(id, { data, inicio, fim }) { const r = await http("GET", `/spaces/${id}/booking-availability/` + qs({ start_at: isoHora(data, inicio), end_at: isoHora(data, fim) })); return { space_id: id, data, inicio, fim, available: r.available }; }
     },
     bookings: {
-      async list(f = {}) { return (await http("GET", "/bookings/" + qs({ space_id: f.sala_id, mine: f.mine ? 1 : "", include_cancelled: f.incluirCanceladas ? 1 : "", start_at: f.de ? isoHora(f.de, "00:00") : "", end_at: f.ate ? isoHora(f.ate, "23:59") : "" }))).map(deApiReserva); },
+      async list(f = {}) {
+        const todas = []; let offset = 0;
+        while (true) {
+          const pagina = await http("GET", "/bookings/" + qs({ space_id: f.sala_id, status: f.status, scope: "mine", limit: 100, offset }));
+          todas.push(...pagina);
+          if (pagina.length < 100) break;
+          offset += 100;
+        }
+        return todas.map(deApiReserva).filter((r) => (!f.de || r.data >= f.de) && (!f.ate || r.data <= f.ate) && (f.incluirCanceladas || r.status !== "cancelada"));
+      },
+      async agenda(id, { de, ate }) {
+        const r = await http("GET", `/spaces/${id}/booking-agenda/` + qs({ start_at: isoHora(de, "00:00"), end_at: isoHora(ate, "23:59") }));
+        return r.occupied.flatMap((x) => {
+          const partes = [];
+          let inicio = new Date(Math.max(new Date(x.start_at), new Date(`${de}T00:00:00`)));
+          const fim = new Date(Math.min(new Date(x.end_at), new Date(`${ate}T23:59:00`)));
+          while (inicio < fim) {
+            const data = isoDia(inicio);
+            const proximoDia = new Date(inicio); proximoDia.setHours(24, 0, 0, 0);
+            const fimParte = new Date(Math.min(fim, proximoDia));
+            partes.push({ sala_id: id, data, inicio: separar(inicio).hora, fim: fimParte.getTime() === proximoDia.getTime() ? "24:00" : separar(fimParte).hora, status: "confirmada", situacao: "confirmada" });
+            inicio = fimParte;
+          }
+          return partes;
+        });
+      },
       async get(id) { return deApiReserva(await http("GET", `/bookings/${id}/`)); },
-      async create(p) { return deApiReserva(await http("POST", "/bookings/", { space_id: p.sala_id, start_at: isoHora(p.data, p.inicio), end_at: isoHora(p.data, p.fim), purpose: p.finalidade, attendees: p.participantes })); },
+      async create(p) { return deApiReserva(await http("POST", "/bookings/", { space_id: p.sala_id, start_at: isoHora(p.data, p.inicio), end_at: isoHora(p.data, p.fim) })); },
       async cancel(id) { return http("POST", `/bookings/${id}/cancel/`, {}); }
     },
     keys: {
@@ -387,5 +404,5 @@
   };
 
   L.api = CONFIG.modo === "api" ? api : mock;
-  L.sessaoAtual = sessao;
+  L.sessaoAtual = CONFIG.modo === "api" ? () => null : sessao;
 })();

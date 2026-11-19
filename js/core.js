@@ -177,7 +177,7 @@
         <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><i class="fa-regular fa-moon"></i><span class="label">Tema escuro</span><span class="switch"></span></button>
         <div class="sidebar-user">
           <div class="avatar">${L.esc(L.iniciais(u.nome))}</div>
-          <div class="sidebar-user-info"><b>${L.esc(u.nome)}</b><span>${L.esc((L.PERFIS && L.PERFIS[u.perfil]) || u.perfil)}</span></div>
+          <div class="sidebar-user-info"><b>${L.esc(u.nome)}</b><span>${L.esc(u.perfil ? ((L.PERFIS && L.PERFIS[u.perfil]) || u.perfil) : "Sessão autenticada")}</span></div>
           <button class="icon-btn" type="button" id="btnSair" title="Sair" aria-label="Sair do sistema"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
         </div>`;
     }
@@ -204,15 +204,21 @@
     L.applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
     document.querySelectorAll("[data-theme-toggle]").forEach((b) => b.addEventListener("click", L.toggleTheme));
     const sair = document.getElementById("btnSair");
-    if (sair) sair.addEventListener("click", async () => { try { await L.api.auth.logout(); } catch (e) { /* segue */ } location.href = "login.html"; });
+    if (sair) sair.addEventListener("click", async () => {
+      try { await L.api.auth.logout(); location.href = "login.html"; }
+      catch (e) { if (L.CONFIG.modo === "api") L.erro(e); else location.href = "login.html"; }
+    });
   }
 
   /* ---------- proteção da página ---------- */
   // L.pronto: Promise resolvida com o usuário logado depois que o shell estiver montado.
   // As telas fazem:  LABTECH.pronto.then(async (usuario) => { ... });
   L.pronto = new Promise((resolve) => {
-    const iniciar = () => {
-      const s = L.sessaoAtual ? L.sessaoAtual() : null;
+    const iniciar = async () => {
+      let s = null;
+      if (L.CONFIG.modo === "api") {
+        try { s = await L.api.auth.me(); } catch (e) { if (e.status !== 403 && e.status !== 401) console.error(e); }
+      } else s = L.sessaoAtual ? L.sessaoAtual() : null;
       if (!s) { location.replace("login.html?voltar=" + encodeURIComponent(location.pathname.split("/").pop() + location.search)); return; }
       L.usuario = s;
       const perfis = (document.body.dataset.roles || "").split(",").map((x) => x.trim()).filter(Boolean);

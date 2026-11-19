@@ -6,6 +6,8 @@
    Específicos de cada página ficam em css/<pagina>.css
    ============================================================ */
 
+[hidden] { display: none !important; }
+
 :root {
   /* marca */
   --udf-navy: #12284b;

@@ -1,9 +1,45 @@
 /* Detalhes da Sala - cabeçalho, recursos, grade de disponibilidade, reservas, chaves */
 LABTECH.pronto.then(async () => {
   const L = window.LABTECH;
-  const id = parseInt(L.qs("id"), 10) || 1;
+  const real = L.CONFIG.modo === "api";
+  const id = parseInt(L.qs("id"), 10) || (real ? 0 : 1);
   const root = document.getElementById("detail");
   root.innerHTML = '<div class="loading">Carregando sala...</div>';
+  if (real) {
+    let s;
+    try { s = await L.api.spaces.get(id); }
+    catch (e) {
+      root.innerHTML = `<div class="empty-state"><i class="fa-solid fa-door-closed"></i><b>${e.status === 404 ? "Sala não encontrada." : "Não foi possível carregar a sala."}</b><br><a class="btn btn-primary" href="salas.html">Voltar para a lista</a></div>`;
+      return;
+    }
+    document.title = `${s.codigo} · LabReserva UDF`;
+    document.getElementById("breadcrumbAtual").textContent = s.codigo;
+    const cover = L.tipoCover(s.tipo);
+    root.innerHTML = `<div class="detail-layout"><div class="detail-main">
+      <article class="panel room-hero"><div class="info"><span class="code">${L.esc(s.codigo)}</span><h1>${L.esc(s.codigo)}</h1>
+      <div class="type"><i class="fa-solid fa-layer-group"></i> ${L.esc(L.tipoLabel(s.tipo))}</div>
+      <div class="cta"><a class="btn btn-gold" href="reservar-sala.html?sala=${s.id}">Reservar esta sala</a>
+      <a class="btn btn-secondary" href="agenda.html?sala=${s.id}">Ver agenda</a><a class="btn btn-ghost" href="salas.html">Voltar</a></div></div>
+      <div class="visual ${cover.cls}"><div class="placeholder"><i class="${cover.icon}"></i></div><small>${L.esc(s.codigo)}</small></div></article>
+      <article class="panel"><div class="panel-head"><h3><span class="panel-icon"><i class="fa-regular fa-calendar-check"></i></span> Disponibilidade</h3></div>
+      <div class="form-grid" style="padding:16px"><div class="form-field"><label for="detData">Data</label><input id="detData" type="date"></div>
+      <div class="form-field"><label for="detInicio">Início</label><input id="detInicio" type="time" value="10:00"></div>
+      <div class="form-field"><label for="detFim">Fim</label><input id="detFim" type="time" value="11:00"></div>
+      <button class="btn btn-primary" type="button" id="detConsultar">Consultar</button></div><p class="muted" id="detResultado" style="padding:0 16px 16px"></p></article>
+      </div><aside class="detail-side"><article class="panel side-card"><h3>Ações rápidas</h3><div class="side-actions">
+      <a class="btn btn-primary btn-sm" href="reservar-sala.html?sala=${s.id}">Nova reserva</a>
+      <a class="btn btn-secondary btn-sm" href="minhas-reservas.html">Minhas reservas</a></div></article></aside></div>`;
+    const data = document.getElementById("detData"); data.value = L.hojeISO();
+    document.getElementById("detConsultar").addEventListener("click", async () => {
+      const resultado = document.getElementById("detResultado");
+      resultado.textContent = "Consultando...";
+      try {
+        const r = await L.api.spaces.availability(s.id, { data: data.value, inicio: document.getElementById("detInicio").value, fim: document.getElementById("detFim").value });
+        resultado.textContent = r.available ? "Horário disponível para reserva." : "Horário ocupado. Escolha outro intervalo.";
+      } catch (e) { resultado.textContent = e.message || "Falha ao consultar disponibilidade."; }
+    });
+    return;
+  }
   let sala = null, chaves = [], proximas = [];
   try {
     sala = await L.api.spaces.get(id);

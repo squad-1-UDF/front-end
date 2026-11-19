@@ -8,6 +8,32 @@ LABTECH.pronto.then(async (usuario) => {
   const L = LABTECH;
   const api = L.api;
   const $ = (id) => document.getElementById(id);
+  if (L.CONFIG.modo === "api") {
+    $("saudacao").textContent = "Olá!";
+    document.querySelector(".subtitle").textContent = "Consulte espaços, agenda e suas reservas.";
+    $("agendaHoje").textContent = "Hoje, " + new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long" });
+    $("acoesRapidas").innerHTML = `<a class="btn btn-gold" href="reservar-sala.html">Nova reserva</a><a class="btn btn-secondary" href="agenda.html">Agenda completa</a><a class="btn btn-secondary" href="salas.html">Laboratórios e salas</a>`;
+    $("verTodas").href = "minhas-reservas.html";
+    document.querySelector("#labsConteudo").closest("article").querySelector("h2").textContent = "Laboratórios e salas";
+    document.querySelector("#notificacoesConteudo").closest("article").querySelector("h2").textContent = "Resumo da conta";
+    try {
+      const [salas, reservas] = await Promise.all([api.spaces.list(), api.bookings.list({ incluirCanceladas: true })]);
+      const porId = new Map(salas.map((s) => [s.id, s]));
+      const futuras = reservas.filter((r) => r.status !== "cancelada" && new Date(r.fim_em || `${r.data}T${r.fim}`) > new Date())
+        .sort((a, b) => (a.data + a.inicio).localeCompare(b.data + b.inicio));
+      $("labsConteudo").innerHTML = salas.length ? `<div class="labs-map-grid">${salas.map((s) => `<a class="lab-seat" href="sala-detalhes.html?id=${s.id}" title="${L.esc(s.codigo)}" aria-label="${L.esc(s.codigo)}"><i class="${L.tipoCover(s.tipo).icon}"></i><small>${L.esc(s.codigo)}</small></a>`).join("")}</div>` : `<p class="muted">Nenhum espaço cadastrado.</p>`;
+      $("qtdReservas").textContent = futuras.length;
+      $("qtdReservasTxt").textContent = futuras.length === 1 ? "reserva ativa ou futura" : "reservas ativas ou futuras";
+      const proxima = futuras[0];
+      $("cardChaves").innerHTML = `<h2><span class="panel-icon"><i class="fa-regular fa-clock"></i></span> Próxima reserva</h2>${proxima ? `<div class="proxima-sala">${L.esc(porId.get(proxima.sala_id)?.codigo || `Espaço #${proxima.sala_id}`)}</div><div class="proxima-quando">${L.esc(L.fmtData(proxima.data))} · ${L.esc(proxima.inicio)}–${L.esc(proxima.fim)}</div>` : `<p class="proxima-vazia">Você não tem reservas futuras.</p>`}<a class="btn btn-link" href="minhas-reservas.html">Ver minhas reservas</a>`;
+      $("agendaConteudo").innerHTML = futuras.length ? `<div class="list">${futuras.slice(0, 6).map((r) => `<a class="list-item" href="sala-detalhes.html?id=${r.sala_id}"><span class="list-icon"><i class="fa-regular fa-calendar"></i></span><span class="list-main"><b>${L.esc(porId.get(r.sala_id)?.codigo || `Espaço #${r.sala_id}`)}</b><span>${L.esc(L.fmtData(r.data))}</span></span><span class="list-hora">${L.esc(r.inicio)}–${L.esc(r.fim)}</span></a>`).join("")}</div>` : `<p class="muted">Nenhuma reserva futura.</p>`;
+      $("notificacoesConteudo").innerHTML = reservas.length ? `<p class="muted">${reservas.length} ${reservas.length === 1 ? "reserva registrada" : "reservas registradas"} na sua conta.</p>` : `<p class="muted">Sem atividade recente.</p>`;
+    } catch (e) {
+      L.erro(e);
+      ["labsConteudo", "agendaConteudo", "notificacoesConteudo"].forEach((id) => { $(id).innerHTML = `<p class="muted">Não foi possível carregar os dados.</p>`; });
+    }
+    return;
+  }
   const gestao = L.pode("employee", "admin");
   const agora = new Date();
 
