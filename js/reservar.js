@@ -24,6 +24,10 @@ LABTECH.pronto.then(async () => {
     el.cap.closest(".field").hidden = true;
     [el.finalidade, el.part].forEach((x) => { x.closest(".form-field").hidden = true; x.required = false; });
     el.busca.placeholder = "Código do espaço";
+    if (el.topo) {
+      el.topo.placeholder = "Buscar código do espaço";
+      el.topo.setAttribute("aria-label", "Buscar código do espaço");
+    }
     el.form.querySelector(".modal-body > .form-hint").textContent = "Escolha um horário futuro. A disponibilidade é confirmada pela API no envio.";
   }
 
@@ -173,7 +177,7 @@ LABTECH.pronto.then(async () => {
     el.form.reset();
     el.erro.textContent = "";
     el.titulo.textContent = sala.nome;
-    el.desc.textContent = real ? `${sala.codigo} · ${L.tipoLabel(sala.tipo)}` : `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
+    el.desc.textContent = real ? L.tipoLabel(sala.tipo) : `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
     if (!real) el.part.max = sala.capacidade;
     el.data.min = L.hojeISO();
     el.data.value = pre.data && /^\d{4}-\d{2}-\d{2}$/.test(pre.data) ? pre.data : L.hojeISO();

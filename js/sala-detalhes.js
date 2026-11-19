@@ -6,6 +6,14 @@ LABTECH.pronto.then(async () => {
   const root = document.getElementById("detail");
   root.innerHTML = '<div class="loading">Carregando sala...</div>';
   if (real) {
+    const topSearch = document.getElementById("topSearch");
+    if (topSearch) {
+      topSearch.placeholder = "Buscar código do espaço";
+      topSearch.setAttribute("aria-label", "Buscar código do espaço");
+      topSearch.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") location.href = `salas.html?q=${encodeURIComponent(e.target.value)}`;
+      });
+    }
     let s;
     try { s = await L.api.spaces.get(id); }
     catch (e) {

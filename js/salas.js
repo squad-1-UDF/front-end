@@ -28,6 +28,11 @@ LABTECH.pronto.then(async () => {
     document.querySelectorAll(".hero-stat").forEach((x, i) => { if (i > 0) x.hidden = true; });
     document.querySelector(".results-bar .legend").hidden = true;
     el.busca.placeholder = "Código do espaço";
+    if (el.topSearch) {
+      el.topSearch.placeholder = "Buscar código do espaço";
+      el.topSearch.setAttribute("aria-label", "Buscar código do espaço");
+    }
+    document.querySelector(".page-head .subtitle").textContent = "Consulte os espaços cadastrados e verifique a disponibilidade para reservar.";
     el.sort.querySelectorAll('option[value="status"], option[value="capacidade"]').forEach((x) => x.remove());
     el.sort.value = "codigo";
     const hero = document.querySelector(".hero p");

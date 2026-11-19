@@ -12,7 +12,7 @@ No console do navegador, execute `localStorage.setItem('labtech_api_modo', 'api'
 | 4 | No detalhe, consulte um período futuro. | `GET /spaces/{id}/booking-availability/` retorna 200 e a indicação visual corresponde ao campo `available`. |
 | 5 | Abra a **Agenda**, alterne semana/dia e escolha um espaço. | `GET /spaces/{id}/booking-agenda/` retorna 200. A grade mostra ocupação sem exibir dados pessoais ou finalidade inexistentes. |
 | 6 | Abra **Reservar sala**, selecione o espaço, data e horário livres; confirme. | Modal fecha; `POST /bookings/` retorna 201; mensagem de confirmação aparece. O corpo contém somente `space_id`, `start_at`, `end_at`, com cookie de sessão e CSRF renovado após o login. |
-| 7 | Repita a reserva para o mesmo espaço e intervalo. | `POST /bookings/` retorna 409 `BOOKING_CONFLICT`; o modal permanece utilizável e mostra o erro. |
+| 7 | Repita a reserva para o mesmo espaço e intervalo. | O modal indica "Horário ocupado" e impede o envio enquanto a consulta de disponibilidade aponta conflito. Se o conflito surgir entre a consulta e o envio, `POST /bookings/` retorna 409 `BOOKING_CONFLICT`, mantendo o modal utilizável. |
 | 8 | Abra **Minhas reservas** e cancele a reserva criada. | `GET /bookings/` usa apenas `space_id`, `status`, `scope`, `limit` e `offset` quando necessários. O cancelamento usa `POST /bookings/{id}/cancel/` com CSRF; a reserva passa para Canceladas. |
 | 9 | Consulte novamente a disponibilidade do mesmo intervalo. | `available:true`; a agenda já não mostra a ocupação. |
 | 10 | Use **Sair** e abra diretamente `http://127.0.0.1:5173/salas.html`. | Logout retorna 200; `/auth/me/` retorna 403 e a página protegida redireciona para login. |
