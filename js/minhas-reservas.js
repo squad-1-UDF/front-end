@@ -3,6 +3,7 @@
 LABTECH.pronto.then(async () => {
   const L = LABTECH;
   const api = L.api;
+  const real = L.CONFIG.modo === "api";
   const $ = (id) => document.getElementById(id);
   const paraMin = (hhmm) => { const [h, m] = String(hhmm).split(":").map(Number); return h * 60 + m; };
 
@@ -14,7 +15,7 @@ LABTECH.pronto.then(async () => {
   function situacao(r) {
     const s = r.situacao || r.status;
     if (s === "cancelada" || s === "recusada") return "cancelada";
-    if (s === "concluida" || new Date(`${r.data}T${r.fim}`) <= new Date()) return "concluida";
+    if (s === "concluida" || new Date(r.fim_em || `${r.data}T${r.fim}`) <= new Date()) return "concluida";
     return s || "confirmada";
   }
   const grupo = (r) => { const s = situacao(r); return s === "cancelada" ? "canceladas" : s === "concluida" ? "historico" : "proximas"; };
@@ -58,13 +59,13 @@ LABTECH.pronto.then(async () => {
     return `<article class="reserva-item${s === "cancelada" ? " cancelada" : ""}">
       <div class="date-box" aria-hidden="true">${L.esc(d.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""))}<strong>${d.getDate()}</strong></div>
       <div class="reserva-detalhe">
-        <h3>${L.esc(sala.nome || "Sala removida")}</h3>
-        <p>${L.esc(r.finalidade)}</p>
+        <h3>${L.esc(sala.nome || (real ? `Espaço #${r.sala_id}` : "Sala removida"))}</h3>
+        ${real ? "" : `<p>${L.esc(r.finalidade)}</p>`}
         <div class="meta">
           <span><i class="fa-regular fa-calendar"></i>${L.esc(L.fmtDataLonga(r.data))} · ${L.esc(L.fmtData(r.data))}</span>
-          <span><i class="fa-regular fa-clock"></i>${L.esc(r.inicio)} – ${L.esc(r.fim)}</span>
+          <span><i class="fa-regular fa-clock"></i>${L.esc(r.inicio)} – ${L.esc(r.fim)}${real && r.fim_em && new Date(r.fim_em).toLocaleDateString("sv-SE") !== r.data ? " (dia seguinte)" : ""}</span>
           ${sala.bloco ? `<span><i class="fa-solid fa-location-dot"></i>${L.esc(sala.codigo || "")} · Bloco ${L.esc(sala.bloco)}</span>` : ""}
-          <span><i class="fa-solid fa-users"></i>${Number(r.participantes) || 1} ${Number(r.participantes) === 1 ? "pessoa" : "pessoas"}</span>
+          ${real ? "" : `<span><i class="fa-solid fa-users"></i>${Number(r.participantes) || 1} ${Number(r.participantes) === 1 ? "pessoa" : "pessoas"}</span>`}
         </div>
       </div>
       <div class="reserva-acoes">${L.badgeReserva(s)}${acoes}</div>
@@ -85,6 +86,11 @@ LABTECH.pronto.then(async () => {
   async function carregar() {
     try {
       reservas = await api.bookings.list({ mine: true, incluirCanceladas: true });
+      if (real) {
+        const salas = await api.spaces.list();
+        const porId = new Map(salas.map((s) => [s.id, s]));
+        reservas.forEach((r) => { r.sala = porId.get(r.sala_id) || null; });
+      }
       resumo();
       render();
     } catch (e) {

@@ -7,6 +7,7 @@
 LABTECH.pronto.then(async (usuario) => {
   const L = LABTECH;
   const api = L.api;
+  const real = L.CONFIG.modo === "api";
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, "0");
   const paraMin = (hhmm) => { const [h, m] = String(hhmm).split(":").map(Number); return h * 60 + m; };
@@ -20,6 +21,12 @@ LABTECH.pronto.then(async (usuario) => {
     ant: $("btnAnterior"), hoje: $("btnHoje"), prox: $("btnProximo"), periodo: $("periodo"),
     info: $("salaInfo"), grade: $("gradeAgenda")
   };
+  if (real) {
+    const legenda = document.querySelectorAll(".agenda-topo .legend-item");
+    legenda[3].hidden = true; // manutenção não consta no contrato de espaços
+    legenda[5].hidden = true; // a API aceita reservas aos domingos
+    document.querySelector(".agenda-nota").textContent = "A grade exibe intervalos de 7h às 22h. A disponibilidade e o horário são confirmados pela API ao reservar.";
+  }
 
   /* ---------- datas ---------- */
   const isoDe = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -27,7 +34,7 @@ LABTECH.pronto.then(async (usuario) => {
   const somaDias = (iso, n) => { const d = dataDe(iso); d.setDate(d.getDate() + n); return isoDe(d); };
   const diaSemana = (iso) => dataDe(iso).getDay();
   // segunda-feira da semana; domingo pula para a semana seguinte (domingo é fechado)
-  const segundaDe = (iso) => { const w = diaSemana(iso); return w === 0 ? somaDias(iso, 1) : somaDias(iso, 1 - w); };
+  const segundaDe = (iso) => { const w = diaSemana(iso); return w === 0 ? somaDias(iso, real ? -6 : 1) : somaDias(iso, 1 - w); };
   const validaISO = (v) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(dataDe(v))) ? v : null;
   const fmtCurta = (iso) => dataDe(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   const nomeDia = (iso) => dataDe(iso).toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "");
@@ -57,10 +64,10 @@ LABTECH.pronto.then(async (usuario) => {
       const r = sobre[0];
       const comeca = paraMin(r.inicio) >= ini || h === H_INI;
       const minha = sobre.some((x) => x.usuario_id === usuario.id);
-      const titulo = sobre.map((x) => `${x.inicio}–${x.fim} · ${x.finalidade}${x.usuario_id === usuario.id ? " (sua reserva)" : ""}`).join("\n");
+      const titulo = sobre.map((x) => `${x.inicio}–${x.fim}${x.finalidade ? " · " + x.finalidade : ""}${x.usuario_id === usuario.id ? " (sua reserva)" : ""}`).join("\n");
       const cls = `slot ocupado${minha ? " minha" : ""}${comeca ? "" : " cont"}${passado ? " passado" : ""}`;
       const corpo = comeca
-        ? `<b>${L.esc(r.finalidade)}</b><span>${L.esc(r.inicio)}–${L.esc(r.fim)}${sobre.length > 1 ? ` +${sobre.length - 1}` : ""}</span>`
+        ? `<b>${L.esc(r.finalidade || "Ocupado")}</b><span>${L.esc(r.inicio)}–${L.esc(r.fim)}${sobre.length > 1 ? ` +${sobre.length - 1}` : ""}</span>`
         : `<span aria-hidden="true">↳</span><span class="sr-only">continuação</span>`;
       return `<td><div class="${cls}" title="${L.esc(titulo)}"><span class="sr-only">Ocupado, ${faixa}: </span>${corpo}</div></td>`;
     }
@@ -80,17 +87,17 @@ LABTECH.pronto.then(async (usuario) => {
     const sala = salas.find((s) => s.id === salaId);
     if (!sala) { el.grade.innerHTML = `<div class="empty-state"><i class="fa-solid fa-door-closed"></i><b>Nenhuma sala disponível</b></div>`; el.info.innerHTML = ""; return; }
     const seg = segundaDe(dataRef);
-    const dias = Array.from({ length: 6 }, (_, i) => somaDias(seg, i));
-    el.periodo.textContent = `${fmtCurta(dias[0])} a ${fmtCurta(dias[5])}`;
-    el.info.innerHTML = `<b>${L.esc(sala.nome)}</b> ${L.badge(sala.status)}
-      <span>${L.esc(sala.codigo)} · Bloco ${L.esc(sala.bloco)} · até ${Number(sala.capacidade) || 0} pessoas</span>
+    const dias = Array.from({ length: real ? 7 : 6 }, (_, i) => somaDias(seg, i));
+    el.periodo.textContent = `${fmtCurta(dias[0])} a ${fmtCurta(dias.at(-1))}`;
+    el.info.innerHTML = `<b>${L.esc(sala.nome)}</b> ${real ? "" : L.badge(sala.status)}
+      ${real ? "" : `<span>${L.esc(sala.codigo)} · Bloco ${L.esc(sala.bloco)} · até ${Number(sala.capacidade) || 0} pessoas</span>`}
       <a class="btn btn-link" href="sala-detalhes.html?id=${sala.id}">Ver detalhes</a>`;
-    const reservas = await api.bookings.list({ sala_id: sala.id, de: dias[0], ate: dias[5] });
+    const reservas = real ? await api.bookings.agenda(sala.id, { de: dias[0], ate: dias.at(-1) }) : await api.bookings.list({ sala_id: sala.id, de: dias[0], ate: dias.at(-1) });
     if (minhaSeq !== seq) return;
     const doDia = porSalaEDia(reservas);
     const hoje = L.hojeISO();
     el.grade.innerHTML = `<table class="agenda-grid semana">
-      <caption class="sr-only">Ocupação de ${L.esc(sala.nome)} de ${fmtCurta(dias[0])} a ${fmtCurta(dias[5])}</caption>
+      <caption class="sr-only">Ocupação de ${L.esc(sala.nome)} de ${fmtCurta(dias[0])} a ${fmtCurta(dias.at(-1))}</caption>
       <colgroup><col class="col-hora">${dias.map(() => "<col>").join("")}</colgroup>
       <thead><tr><th scope="col">Hora</th>${dias.map((d) => `<th scope="col" class="${d === hoje ? "hoje" : ""}">${L.esc(nomeDia(d))}<small>${fmtCurta(d)}</small></th>`).join("")}</tr></thead>
       <tbody>${HORAS.map((h) => `<tr><th scope="row" class="hora">${pad(h)}:00</th>${dias.map((d) => celula(sala, d, h, doDia(sala.id, d))).join("")}</tr>`).join("")}</tbody>
@@ -102,14 +109,14 @@ LABTECH.pronto.then(async (usuario) => {
     const data = dataRef;
     el.periodo.textContent = L.fmtDataLonga(data) + " · " + L.fmtData(data);
     el.info.innerHTML = `<b>Todas as salas</b><span>${L.esc(L.fmtDataLonga(data))}</span>`;
-    if (diaSemana(data) === 0) {
+    if (!real && diaSemana(data) === 0) {
       el.grade.innerHTML = `<div class="empty-state"><i class="fa-solid fa-ban"></i><b>Domingo: campus fechado</b><p>Escolha outro dia para ver a ocupação.</p></div>`;
       return;
     }
     const tipo = el.tipo.value;
     const lista = salas.filter((s) => !tipo || s.tipo === tipo);
     if (!lista.length) { el.grade.innerHTML = `<div class="empty-state"><i class="fa-solid fa-filter"></i><b>Nenhuma sala deste tipo</b></div>`; return; }
-    const reservas = await api.bookings.list({ de: data, ate: data });
+    const reservas = real ? (await Promise.all(lista.map((s) => api.bookings.agenda(s.id, { de: data, ate: data })))).flat() : await api.bookings.list({ de: data, ate: data });
     if (minhaSeq !== seq) return;
     const doDia = porSalaEDia(reservas);
     el.grade.innerHTML = `<table class="agenda-grid dia">
@@ -117,7 +124,7 @@ LABTECH.pronto.then(async (usuario) => {
       <colgroup><col class="col-sala">${HORAS.map(() => "<col>").join("")}</colgroup>
       <thead><tr><th scope="col" class="sala-nome">Sala</th>${HORAS.map((h) => `<th scope="col" class="hora">${pad(h)}h</th>`).join("")}</tr></thead>
       <tbody>${lista.map((s) => `<tr>
-        <th scope="row" class="sala-nome"><a href="agenda.html?sala=${s.id}&data=${data}" title="Ver semana de ${L.esc(s.nome)}">${L.esc(s.codigo)}</a><small>${L.esc(s.nome)}</small></th>
+        <th scope="row" class="sala-nome"><a href="agenda.html?sala=${s.id}&data=${data}" title="Ver semana de ${L.esc(s.nome)}">${L.esc(s.codigo)}</a>${real ? "" : `<small>${L.esc(s.nome)}</small>`}</th>
         ${HORAS.map((h) => celula(s, data, h, doDia(s.id, data))).join("")}</tr>`).join("")}</tbody>
     </table>`;
   }
@@ -143,7 +150,7 @@ LABTECH.pronto.then(async (usuario) => {
   /* ---------- navegação ---------- */
   function mover(direcao) {
     if (modo === "semana") dataRef = somaDias(segundaDe(dataRef), 7 * direcao);
-    else { dataRef = somaDias(dataRef, direcao); if (diaSemana(dataRef) === 0) dataRef = somaDias(dataRef, direcao); }
+    else { dataRef = somaDias(dataRef, direcao); if (!real && diaSemana(dataRef) === 0) dataRef = somaDias(dataRef, direcao); }
     render();
   }
   el.ant.addEventListener("click", () => mover(-1));
@@ -156,7 +163,7 @@ LABTECH.pronto.then(async (usuario) => {
     if (modo === b.dataset.modo) return;
     modo = b.dataset.modo;
     // no modo dia, domingo vira segunda
-    if (modo === "dia" && diaSemana(dataRef) === 0) dataRef = somaDias(dataRef, 1);
+    if (!real && modo === "dia" && diaSemana(dataRef) === 0) dataRef = somaDias(dataRef, 1);
     render();
   }));
 
@@ -176,7 +183,7 @@ LABTECH.pronto.then(async (usuario) => {
   el.sala.innerHTML = ordemTipos.map((t) => {
     const doTipo = salas.filter((s) => s.tipo === t);
     if (!doTipo.length) return "";
-    return `<optgroup label="${L.esc(L.tipoLabel(t))}">${doTipo.map((s) => `<option value="${s.id}">${L.esc(s.codigo)} · ${L.esc(s.nome)}${s.manutencao ? " (manutenção)" : ""}</option>`).join("")}</optgroup>`;
+    return `<optgroup label="${L.esc(L.tipoLabel(t))}">${doTipo.map((s) => `<option value="${s.id}">${L.esc(s.codigo)}${real ? "" : ` · ${L.esc(s.nome)}${s.manutencao ? " (manutenção)" : ""}`}</option>`).join("")}</optgroup>`;
   }).join("");
 
   // prioridade: ?sala= > sala lembrada > primeira da lista

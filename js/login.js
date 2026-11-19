@@ -19,8 +19,10 @@
     return "index.html";
   }
 
-  // Já logado: vai direto
-  if (L.sessaoAtual && L.sessaoAtual()) { location.replace(destino()); return; }
+  // No modo API, somente /auth/me/ confirma uma sessão existente.
+  if (L.CONFIG.modo === "api") {
+    L.api.auth.me().then(() => location.replace(destino())).catch(() => {});
+  } else if (L.sessaoAtual && L.sessaoAtual()) { location.replace(destino()); return; }
 
   /* ---------- tema ---------- */
   const btnTema = $("btnTema");
@@ -45,6 +47,13 @@
   const chkLembrar = $("lembrar");
   const erroEl = $("loginErro");
   const btnEntrar = $("btnEntrar");
+  if (L.CONFIG.modo === "api") {
+    selPerfil.closest(".field").hidden = true;
+    selPerfil.required = false;
+    inpId.closest(".field").querySelector("label").textContent = "Usuário Django";
+    inpId.placeholder = "nome de usuário";
+    $("btnEsqueci").hidden = true;
+  }
 
   // Opções de perfil com os rótulos oficiais
   Object.entries(L.PERFIS || {}).forEach(([valor, rotulo]) => {
@@ -116,8 +125,8 @@
     const password = inpSenha.value;
 
     // validação simples antes de chamar a api
-    if (!perfil) { erroEl.textContent = "Selecione o seu perfil."; selPerfil.focus(); return; }
-    if (!identifier) { erroEl.textContent = "Informe seu e-mail institucional ou matrícula."; inpId.focus(); return; }
+    if (L.CONFIG.modo === "mock" && !perfil) { erroEl.textContent = "Selecione o seu perfil."; selPerfil.focus(); return; }
+    if (!identifier) { erroEl.textContent = "Informe o usuário."; inpId.focus(); return; }
     if (!password) { erroEl.textContent = "Informe a senha."; inpSenha.focus(); return; }
 
     carregando(true);

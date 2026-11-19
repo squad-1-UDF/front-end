@@ -4,6 +4,7 @@
 LABTECH.pronto.then(async () => {
   const L = LABTECH;
   const api = L.api;
+  const real = L.CONFIG.modo === "api";
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, "0");
   const paraMin = (hhmm) => { const [h, m] = String(hhmm).split(":").map(Number); return h * 60 + m; };
@@ -19,6 +20,16 @@ LABTECH.pronto.then(async () => {
     finalidade: $("rFinalidade"), data: $("rData"), part: $("rParticipantes"), ini: $("rInicio"), fim: $("rFim"),
     status: $("dispStatus"), ocupados: $("ocupadosLista"), erro: $("rErro"), confirmar: $("rConfirmar")
   };
+  if (real) {
+    el.cap.closest(".field").hidden = true;
+    [el.finalidade, el.part].forEach((x) => { x.closest(".form-field").hidden = true; x.required = false; });
+    el.busca.placeholder = "Código do espaço";
+    if (el.topo) {
+      el.topo.placeholder = "Buscar código do espaço";
+      el.topo.setAttribute("aria-label", "Buscar código do espaço");
+    }
+    el.form.querySelector(".modal-body > .form-hint").textContent = "Escolha um horário futuro. A disponibilidade é confirmada pela API no envio.";
+  }
 
   let salas = [];
   let salaSel = null;
@@ -39,6 +50,13 @@ LABTECH.pronto.then(async () => {
   const norm = (s) => String(s || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[̀-ͯ]/g, "");
 
   function cardHTML(s) {
+    if (real) {
+      const capa = L.tipoCover(s.tipo);
+      return `<article class="panel hover sala-card"><div class="sala-capa ${capa.cls}"><i class="${capa.icon}" aria-hidden="true"></i><span class="sala-codigo">${L.esc(s.codigo)}</span></div>
+        <div class="sala-corpo"><span class="sala-tipo">${L.esc(L.tipoLabel(s.tipo))}</span><h3>${L.esc(s.codigo)}</h3><div class="sala-acoes">
+        <button type="button" class="btn btn-primary btn-sm" data-reservar="${s.id}">Reservar</button>
+        <a class="btn btn-secondary btn-sm" href="agenda.html?sala=${s.id}">Agenda</a></div></div></article>`;
+    }
     const capa = L.tipoCover(s.tipo);
     const recursos = (s.recursos || []).slice(0, 4).map(L.recursoChip).join("");
     const extra = (s.recursos || []).length > 4 ? `<span class="chip">+${s.recursos.length - 4}</span>` : "";
@@ -74,7 +92,7 @@ LABTECH.pronto.then(async () => {
     const lista = salas.filter((s) =>
       (!q || norm(`${s.nome} ${s.codigo} bloco ${s.bloco}`).includes(q)) &&
       (!tipo || s.tipo === tipo) &&
-      (Number(s.capacidade) || 0) >= cap);
+      (real || (Number(s.capacidade) || 0) >= cap));
     el.contagem.textContent = `${lista.length} ${lista.length === 1 ? "espaço encontrado" : "espaços encontrados"} no campus`;
     el.grade.innerHTML = lista.length ? lista.map(cardHTML).join("") :
       `<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><b>Nenhum espaço encontrado</b><p>Tente outro nome ou ajuste os filtros.</p></div>`;
@@ -111,7 +129,7 @@ LABTECH.pronto.then(async () => {
     const data = el.data.value, inicio = el.ini.value, fim = el.fim.value;
     if (!salaSel) return;
     if (!data) return mostrarStatus("", "fa-regular fa-calendar", "Escolha a data para verificar o horário.");
-    if (ehDomingo(data)) return mostrarStatus("ocupado", "fa-solid fa-ban", "Domingo: o campus está fechado.");
+    if (!real && ehDomingo(data)) return mostrarStatus("ocupado", "fa-solid fa-ban", "Domingo: o campus está fechado.");
     if (paraMin(inicio) >= paraMin(fim)) return mostrarStatus("ocupado", "fa-solid fa-circle-exclamation", "O término deve ser após o início.");
     if (new Date(`${data}T${inicio}`) < new Date()) return mostrarStatus("ocupado", "fa-solid fa-clock-rotate-left", "Escolha um horário futuro.");
     mostrarStatus("", "fa-solid fa-spinner fa-spin", "Verificando disponibilidade...");
@@ -132,7 +150,7 @@ LABTECH.pronto.then(async () => {
     if (!salaSel || !data) { el.ocupados.innerHTML = ""; return; }
     el.ocupados.innerHTML = `<span class="muted">Carregando...</span>`;
     try {
-      const lista = await api.bookings.list({ sala_id: salaSel.id, de: data, ate: data });
+      const lista = real ? await api.bookings.agenda(salaSel.id, { de: data, ate: data }) : await api.bookings.list({ sala_id: salaSel.id, de: data, ate: data });
       if (seq !== seqOcup) return;
       const ativas = lista.filter((r) => r.situacao !== "cancelada" && r.status !== "cancelada");
       el.ocupados.innerHTML = ativas.length
@@ -159,8 +177,8 @@ LABTECH.pronto.then(async () => {
     el.form.reset();
     el.erro.textContent = "";
     el.titulo.textContent = sala.nome;
-    el.desc.textContent = `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
-    el.part.max = sala.capacidade;
+    el.desc.textContent = real ? L.tipoLabel(sala.tipo) : `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
+    if (!real) el.part.max = sala.capacidade;
     el.data.min = L.hojeISO();
     el.data.value = pre.data && /^\d{4}-\d{2}-\d{2}$/.test(pre.data) ? pre.data : L.hojeISO();
     // horário padrão: próxima meia hora cheia (dentro do funcionamento)
@@ -170,7 +188,7 @@ LABTECH.pronto.then(async () => {
     definirHora(el.ini, pre.inicio || deMin(padrao));
     definirHora(el.fim, pre.fim || deMin(Math.min(paraMin(el.ini.value) + 60, FECHA)));
     if (!el.dlg.open) el.dlg.showModal();
-    el.finalidade.focus();
+    (real ? el.data : el.finalidade).focus();
     verificar();
     carregarOcupados();
   }
@@ -201,10 +219,10 @@ LABTECH.pronto.then(async () => {
       finalidade: el.finalidade.value.trim(), participantes: Number(el.part.value)
     };
     // validações rápidas antes de chamar a api
-    if (!dados.finalidade) { el.erro.textContent = "Informe a finalidade da reserva."; el.finalidade.focus(); return; }
+    if (!real && !dados.finalidade) { el.erro.textContent = "Informe a finalidade da reserva."; el.finalidade.focus(); return; }
     if (!dados.data) { el.erro.textContent = "Informe a data."; el.data.focus(); return; }
-    if (ehDomingo(dados.data)) { el.erro.textContent = "Domingo o campus está fechado. Escolha outro dia."; el.data.focus(); return; }
-    if (!Number.isInteger(dados.participantes) || dados.participantes < 1 || dados.participantes > salaSel.capacidade) {
+    if (!real && ehDomingo(dados.data)) { el.erro.textContent = "Domingo o campus está fechado. Escolha outro dia."; el.data.focus(); return; }
+    if (!real && (!Number.isInteger(dados.participantes) || dados.participantes < 1 || dados.participantes > salaSel.capacidade)) {
       el.erro.textContent = `Confira a quantidade de participantes (1 a ${salaSel.capacidade}).`; el.part.focus(); return;
     }
     el.confirmar.disabled = true;
@@ -236,7 +254,7 @@ LABTECH.pronto.then(async () => {
   if (pSala && salas.length) {
     const sala = salas.find((s) => String(s.id) === pSala || String(s.codigo).toLowerCase() === pSala.toLowerCase());
     if (!sala) L.toast("Sala não encontrada ou inativa.", "info");
-    else if (sala.manutencao || sala.status === "maintenance") L.toast(`${sala.nome} está em manutenção e não aceita reservas.`, "info");
+    else if (!real && (sala.manutencao || sala.status === "maintenance")) L.toast(`${sala.nome} está em manutenção e não aceita reservas.`, "info");
     else abrirDialog(sala, { data: L.qs("data"), inicio: L.qs("inicio"), fim: L.qs("fim") });
     // limpa a URL para não reabrir ao recarregar
     try { history.replaceState(null, "", location.pathname); } catch (e) { /* segue */ }

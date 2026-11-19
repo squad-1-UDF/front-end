@@ -130,23 +130,44 @@ O padrão segue o guia definido na reunião de 24/10:
   - só se retira chave sem empréstimo ativo
   - a devolução corresponde à retirada
   - nada é apagado: usuários, salas e chaves são desativados
-- **`api`:** chama `/api/v1/` seguindo `back-end/docs/API_CONTRATOS_MVP.md`. O login já segue o contrato implementado:
+- **`api`:** chama `/api/v1/` seguindo `back-end/docs/GUIA_FRONTEND_MVP.md`. Login, leitura de espaços, agenda, disponibilidade e reservas usam os endpoints integrados:
   1. `GET /auth/csrf/`
   2. `POST /auth/login/` com `X-CSRFToken`
-  3. sessão Django
+  3. releitura do cookie CSRF renovado e validação da sessão em `GET /auth/me/`
 
 Para ativar o modo `api`, rode no console do navegador:
 
 ```js
 localStorage.setItem('labtech_api_modo', 'api')
+location.reload()
 ```
 
-Os demais endpoints ainda são **propostas** no back. Os nomes de campos são traduzidos nas funções `deApi*` e `paraApi*` de `js/api.js`; é só ajustar ali quando o contrato fechar.
+Para voltar à demonstração: `localStorage.setItem('labtech_api_modo', 'mock'); location.reload()`.
+
+### Execução local na mesma origem
+
+Para a checagem da interface antes do merge, siga o [roteiro de validação visual](docs/ROTEIRO_VALIDACAO_MVP.md).
+
+Use o Back-end em `http://127.0.0.1:8000` com banco PostgreSQL **local isolado** e `DJANGO_DEBUG=true`. No diretório do Back-end, siga as instruções de banco local do README e execute `python manage.py runserver 127.0.0.1:8000`. Crie um usuário de teste no banco local antes de entrar. Em outro terminal, neste repositório:
+
+```bash
+python dev_server.py
+```
+
+Abra `http://127.0.0.1:5173/login.html`, ative o modo API no console e recarregue. `dev_server.py` serve os arquivos e encaminha **somente** `/api/v1/` para o Django. Para o navegador, páginas e API têm a mesma origem. O proxy preserva `Host`, `Origin`, `Cookie` e `Set-Cookie`; assim, sessão e CSRF funcionam sem CORS ou desativação de CSRF. Use sempre `127.0.0.1` e a porta indicada; `localhost` é outro host. O servidor de desenvolvimento escuta apenas na interface local.
+
+Em origens distintas, o Back-end atual não habilita CORS com credenciais. Esse uso exige configurar origens exatas, `CORS_ALLOW_CREDENTIALS`, `CSRF_TRUSTED_ORIGINS`, política de cookies e HTTPS de forma coordenada; este projeto não ativa essa configuração.
+
+No modo API, o login usa o **nome de usuário Django**, sem escolha de perfil. `/auth/me/` devolve apenas `id`, portanto o Front-end valida a sessão por esse endpoint e não usa o `localStorage` como prova de autenticação ou autorização. As telas de gestão permanecem fechadas no modo API. Para habilitá-las futuramente, é necessária uma PR separada no Back-end com uma extensão mínima de `/auth/me/` que informe `is_staff` (e, se necessário, os atributos de apresentação), seguida do mapeamento explícito das permissões no Front-end.
+
+O contrato de espaços fornece `id`, `code` e `kind`. Por isso o modo API não mostra capacidade, localização, manutenção, responsáveis, recursos, finalidade nem participantes. Listagem, detalhes, agenda, disponibilidade, criação, conflito `409`, minhas reservas e cancelamento usam dados reais. Cadastro de chaves, empréstimos, administração de usuários e salas e outras operações da UC004 continuam apenas no modo demonstração. A API integrada tem endpoints de empréstimo e histórico, mas este Front-end ainda não os conecta.
+
+Erros da API são exibidos pela mensagem do contrato: `400` para entrada ou intervalo inválido, `403` para ausência de sessão, falta de permissão ou CSRF, `404` para recurso inexistente e `409` para conflito de reserva ou código duplicado. O conflito de reserva mantém o diálogo aberto para escolher outro horário. Os erros de domínio usam `error.code` e `error.message`; login inválido e CSRF usam `error` como texto.
 
 Com Django Templates, cada `.html` vira um template e os arquivos de `css/`, `js/` e `assets/` vão para `static/`. O front e a API ficam na mesma origem, o que já resolve o CSRF e os cookies de sessão.
 
 ## Pendências conhecidas
 
-- Os modelos do banco ainda não existem, por isso os nomes de campos do modo `api` são provisórios.
+- `/auth/me/` ainda não informa permissões de staff; a extensão deve ser tratada em PR separada no Back-end.
 - A recuperação de senha depende do back; hoje a tela orienta a procurar a secretaria.
 - Não há fotos das salas; a tela usa uma capa por tipo de espaço.
