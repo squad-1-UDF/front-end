@@ -123,17 +123,14 @@ O padrão segue o guia definido na reunião de 24/10:
 
 ## Integração com o back-end (Django)
 
-`js/api.js` tem dois modos com as mesmas funções:
+`js/api.js` tem dois modos com as **mesmas funções públicas** (`LABTECH.api.<recurso>.<ação>()`). Só a implementação muda:
 
 - **`mock` (padrão):** usa `data/seed.js` e o `localStorage`. As regras de negócio são as mesmas do back:
   - intervalos de reserva `[início, fim)`, então reservas consecutivas não conflitam
-  - só se retira chave sem empréstimo ativo
+  - só se retira chave **disponível** (estado `available`) e sem empréstimo ativo; senão, `KEY_UNAVAILABLE`
   - a devolução corresponde à retirada
   - nada é apagado: usuários, salas e chaves são desativados
-- **`api`:** chama `/api/v1/` seguindo `back-end/docs/GUIA_FRONTEND_MVP.md`. Login, leitura de espaços, agenda, disponibilidade e reservas usam os endpoints integrados:
-  1. `GET /auth/csrf/`
-  2. `POST /auth/login/` com `X-CSRFToken`
-  3. releitura do cookie CSRF renovado e validação da sessão em `GET /auth/me/`
+- **`api`:** chama `/api/v1/` com sessão Django e CSRF, seguindo o contrato combinado da etapa final (perfis, usuários, espaços, chaves e empréstimos) e `back-end/docs/GUIA_FRONTEND_MVP.md`. As funções `deApi*` convertem as respostas da API para os campos em português que as telas usam, e as `paraApi*` fazem o caminho inverso, enviando só os campos do contrato (o `PATCH` é parcial).
 
 Para ativar o modo `api`, rode no console do navegador:
 
@@ -144,11 +141,58 @@ location.reload()
 
 Para voltar à demonstração: `localStorage.setItem('labtech_api_modo', 'mock'); location.reload()`.
 
+### Perfis (papel do usuário)
+
+No modo API, o papel vem **sempre** de `GET /auth/me/` (`role`: `admin`, `employee` ou `student`), junto com `name` e `email`. Nada no `localStorage` serve como prova de autenticação ou de perfil. O menu (`LABTECH.MENU`) e a proteção por `data-roles` de cada página usam esse papel:
+
+| Papel | Menu e telas |
+|---|---|
+| `student` | Início, salas, agenda, reservar e minhas reservas |
+| `employee` | Tudo do estudante, mais retirada/devolução e histórico de chaves |
+| `admin` | Tudo, mais painel administrativo, usuários e salas e chaves |
+
+Quem abre uma tela sem permissão volta para o início com um aviso. Se o back ainda não mandar `role` (versão antiga), `is_staff: true` vale como `employee`; sem nenhum dos dois, o usuário fica sem as áreas de gestão.
+
+### O que cada tela chama no modo API
+
+| Tela | Endpoints |
+|---|---|
+| Login e todas as telas | `GET /auth/csrf/`, `POST /auth/login/`, `GET /auth/me/`, `POST /auth/logout/` |
+| Início | `GET /spaces/?is_active=true`, `GET /bookings/?scope=mine`; gestão: `GET /key-loans/?status=active` |
+| Salas, detalhes, agenda, reservar | `GET /spaces/`, `GET /spaces/{id}/`, `booking-availability`, `booking-agenda`, `POST /bookings/`; detalhes (gestão): `GET /keys/?space_id=` |
+| Minhas reservas | `GET /bookings/?scope=mine`, `POST /bookings/{id}/cancel/` |
+| Retirada e devolução | `GET /keys/`, `GET /key-loans/?status=active`, `GET /users/?q=&is_active=true&limit=30`, `POST /key-loans/`, `POST /key-loans/{id}/return/` |
+| Histórico de chaves | `GET /key-loans/?responsible_user_id=`, `GET /keys/{id}/movements/` (+ `GET /key-loans/?key_id=` para mostrar o responsável), `GET /users/` |
+| Painel administrativo | `GET /users/`, `GET /spaces/`, `GET /bookings/?scope=all`, `GET /keys/`, `GET /key-loans/` |
+| Usuários | `GET /users/`, `POST /users/`, `PATCH /users/{id}/` |
+| Salas e chaves | `GET/POST /spaces/`, `PATCH /spaces/{id}/`, `GET/POST /keys/`, `PATCH /keys/{id}/` |
+
+Todo `POST`/`PATCH` leva `X-CSRFToken` com o cookie `csrftoken` relido na hora (o login renova o token). Não existe `DELETE`: salas, chaves e usuários são desativados.
+
+### Campos que podem vir vazios
+
+- **Espaço** (`name`, `capacity`, `location`, `is_active`): sem `name`, as telas mostram o código; capacidade e localização só aparecem quando preenchidas. A API só tem os tipos `laboratory` e `room` (no front, "Laboratório" e "Sala de aula"); "manutenção de sala" não existe no contrato, então o modo API mostra salas ativas e inativas.
+- **Chave** (`label`, `status`): `status` é o estado administrativo (`available`, `maintenance`, `lost`, `inactive`). A situação mostrada na tela junta o estado com o empréstimo ativo: "Emprestada" tem prioridade; depois "Disponível", "Manutenção", "Extraviada" ou "Inativa". A localização da chave usa a localização da sala.
+- **Usuário**: o login é o `username` do Django (definido no cadastro e não muda depois). A senha inicial é obrigatória no cadastro e passa pelos validadores do Django; na edição, senha em branco mantém a atual. Não há matrícula no contrato, então a coluna mostra o login.
+- **Reserva**: a API não informa finalidade, participantes nem titular; essas informações não aparecem no modo API.
+
+### Erros
+
+Os erros da API são exibidos pela mensagem do contrato (`error.message`). Alguns códigos têm texto próprio:
+
+- `409 KEY_UNAVAILABLE` (retirada de chave já emprestada ou fora de circulação): o modal de retirada continua aberto, tira a chave da lista e explica o motivo
+- `409 LOAN_ALREADY_RETURNED`: avisa que a devolução já existia e atualiza a lista
+- `409` ao trocar a sala de uma chave com histórico: orienta a cadastrar outra chave
+- `400` de usuários (por exemplo, o admin tentando se desativar): mostra a mensagem do back
+- `403`: sem sessão, sem permissão ou CSRF inválido
+
+O conflito de reserva mantém o diálogo aberto para escolher outro horário. Login inválido e CSRF usam `error` como texto.
+
 ### Execução local na mesma origem
 
 Para a checagem da interface antes do merge, siga o [roteiro de validação visual](docs/ROTEIRO_VALIDACAO_MVP.md).
 
-Use o Back-end em `http://127.0.0.1:8000` com banco PostgreSQL **local isolado** e `DJANGO_DEBUG=true`. No diretório do Back-end, siga as instruções de banco local do README e execute `python manage.py runserver 127.0.0.1:8000`. Crie um usuário de teste no banco local antes de entrar. Em outro terminal, neste repositório:
+Use o Back-end em `http://127.0.0.1:8000` com banco PostgreSQL **local isolado** e `DJANGO_DEBUG=true`. No diretório do Back-end, siga as instruções de banco local do README e execute `python manage.py runserver 127.0.0.1:8000`. Crie usuários de teste no banco local antes de entrar: pelo menos um administrador (superusuário ou grupo `admin`), um funcionário (`is_staff`) e um estudante. Em outro terminal, neste repositório:
 
 ```bash
 python dev_server.py
@@ -158,16 +202,18 @@ Abra `http://127.0.0.1:5173/login.html`, ative o modo API no console e recarregu
 
 Em origens distintas, o Back-end atual não habilita CORS com credenciais. Esse uso exige configurar origens exatas, `CORS_ALLOW_CREDENTIALS`, `CSRF_TRUSTED_ORIGINS`, política de cookies e HTTPS de forma coordenada; este projeto não ativa essa configuração.
 
-No modo API, o login usa o **nome de usuário Django**, sem escolha de perfil. `/auth/me/` devolve apenas `id`, portanto o Front-end valida a sessão por esse endpoint e não usa o `localStorage` como prova de autenticação ou autorização. As telas de gestão permanecem fechadas no modo API. Para habilitá-las futuramente, é necessária uma PR separada no Back-end com uma extensão mínima de `/auth/me/` que informe `is_staff` (e, se necessário, os atributos de apresentação), seguida do mapeamento explícito das permissões no Front-end.
-
-O contrato de espaços fornece `id`, `code` e `kind`. Por isso o modo API não mostra capacidade, localização, manutenção, responsáveis, recursos, finalidade nem participantes. Listagem, detalhes, agenda, disponibilidade, criação, conflito `409`, minhas reservas e cancelamento usam dados reais. Cadastro de chaves, empréstimos, administração de usuários e salas e outras operações da UC004 continuam apenas no modo demonstração. A API integrada tem endpoints de empréstimo e histórico, mas este Front-end ainda não os conecta.
-
-Erros da API são exibidos pela mensagem do contrato: `400` para entrada ou intervalo inválido, `403` para ausência de sessão, falta de permissão ou CSRF, `404` para recurso inexistente e `409` para conflito de reserva ou código duplicado. O conflito de reserva mantém o diálogo aberto para escolher outro horário. Os erros de domínio usam `error.code` e `error.message`; login inválido e CSRF usam `error` como texto.
-
 Com Django Templates, cada `.html` vira um template e os arquivos de `css/`, `js/` e `assets/` vão para `static/`. O front e a API ficam na mesma origem, o que já resolve o CSRF e os cookies de sessão.
+
+## Testes
+
+```bash
+node --test tests/api-contract.test.cjs
+```
+
+Sem dependências. Os testes rodam `js/api.js` num `vm` do Node com um `fetch` falso e conferem, no modo API, os mapeamentos (`/auth/me/` com `role`, espaços, `KeyOut`, `LoanOut`, usuários), os filtros enviados, a paginação `limit`/`offset`, o corpo dos `POST`/`PATCH` e o cabeçalho `X-CSRFToken`. No modo demonstração, conferem login, usuários, estados de chave e a regra de `KEY_UNAVAILABLE`. A CI (`.github/workflows/ci.yml`) roda esses testes e um `node --check` em cada arquivo de `js/`.
 
 ## Pendências conhecidas
 
-- `/auth/me/` ainda não informa permissões de staff; a extensão deve ser tratada em PR separada no Back-end.
 - A recuperação de senha depende do back; hoje a tela orienta a procurar a secretaria.
 - Não há fotos das salas; a tela usa uma capa por tipo de espaço.
+- O contrato não traz o titular das reservas nem o nome do operador do empréstimo (só o id); o histórico resolve o nome do operador pela lista de usuários.

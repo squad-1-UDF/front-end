@@ -7,6 +7,7 @@ LABTECH.pronto.then(async (usuario) => {
   const L = LABTECH;
   const api = L.api;
   const $ = (id) => document.getElementById(id);
+  const real = L.CONFIG.modo === "api";
 
   /* ---------- utilidades da tela ---------- */
   const primeiroNome = (nome) => String(nome || "").replace(/^(Prof\.|Téc\.)\s*/i, "").split(/\s+/)[0] || "";
@@ -42,18 +43,20 @@ LABTECH.pronto.then(async (usuario) => {
       }],
       ["qtdSalas", "footSalas", async () => {
         const ss = await api.spaces.listAll();
+        // a API não tem manutenção de sala: mostra as inativas
+        if (real) return [ss.length, `${ss.filter((s) => s.ativo === false).length} inativas · Ver todos`];
         const manut = ss.filter((s) => s.manutencao || s.status === "maintenance").length;
         return [ss.length, `${manut} em manutenção · Ver todos`];
       }],
       ["qtdHoje", "footHoje", async () => {
-        const rs = await api.bookings.list({ de: L.hojeISO(), ate: L.hojeISO() });
+        const rs = await api.bookings.list({ de: L.hojeISO(), ate: L.hojeISO(), todas: true });
         const agora = new Date();
         const andamento = rs.filter((r) => ["confirmada", "pendente"].includes(situacao(r)) && new Date(`${r.data}T${r.inicio}`) <= agora && agora < new Date(`${r.data}T${r.fim}`)).length;
         return [rs.length, `${andamento} em andamento · Ver agenda`];
       }],
       ["qtdChaves", "footChaves", async () => {
         const [ativos, chaves] = await Promise.all([api.loans.list({ ativos: true }), api.keys.list()]);
-        return [ativos.length, `de ${chaves.filter((c) => c.ativo).length} chaves ativas · Ver todas`];
+        return [ativos.length, `de ${chaves.filter((c) => c.ativo !== false).length} chaves ativas · Ver todas`];
       }]
     ];
     await Promise.all(tarefas.map(async ([idValor, idFoot, fn]) => {
@@ -71,7 +74,14 @@ LABTECH.pronto.then(async (usuario) => {
     const alvoAtv = $("atividadesConteudo");
     let reservas;
     try {
-      reservas = await api.bookings.list({ de: L.hojeISO(-14), incluirCanceladas: true });
+      // todas: no modo API pede scope=all (o administrador é staff)
+      const [lista, salas] = await Promise.all([
+        api.bookings.list({ de: L.hojeISO(-14), incluirCanceladas: true, todas: true }),
+        real ? api.spaces.listAll().catch(() => []) : Promise.resolve([])
+      ]);
+      // a reserva da API traz só space_id: completa código e nome da sala
+      const porId = new Map(salas.map((s) => [s.id, s]));
+      reservas = lista.map((r) => (r.sala || !porId.has(r.sala_id) ? r : { ...r, sala: porId.get(r.sala_id) }));
     } catch (e) {
       alvoTab.innerHTML = falhou(); alvoAtv.innerHTML = falhou(); L.erro(e); return;
     }
@@ -86,7 +96,7 @@ LABTECH.pronto.then(async (usuario) => {
       <div class="table-wrap"><table class="table">
         <thead><tr><th scope="col">Solicitante</th><th scope="col">Espaço</th><th scope="col">Data e horário</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
         <tbody>${recentes.map((r) => {
-          const quem = (r.usuario && r.usuario.nome) || "Usuário";
+          const quem = (r.usuario && r.usuario.nome) || (real ? "Não informado" : "Usuário");
           const sala = r.sala || {};
           return `<tr>
             <td><span class="solicitante"><span class="avatar" aria-hidden="true">${L.esc(L.iniciais(quem))}</span>${L.esc(quem)}</span></td>

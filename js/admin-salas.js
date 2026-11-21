@@ -9,7 +9,9 @@
 LABTECH.pronto.then(async () => {
   const L = LABTECH;
   const api = L.api;
-  const TIPOS = L.TIPOS || {};
+  const real = L.CONFIG.modo === "api";
+  // a API só conhece laboratory e room; na demonstração há mais tipos
+  const TIPOS = real ? { laboratorio: (L.TIPOS || {}).laboratorio || "Laboratório", sala: (L.TIPOS || {}).sala || "Sala" } : (L.TIPOS || {});
   const RECURSOS = L.RECURSOS || {};
 
   let salas = [];
@@ -20,6 +22,13 @@ LABTECH.pronto.then(async () => {
     buscaSala: L.$("#buscaSala"), tipo: L.$("#filtroTipo"), sitSala: L.$("#filtroSituacaoSala"),
     buscaChave: L.$("#buscaChave"), sitChave: L.$("#filtroSituacaoChave")
   };
+  if (real) {
+    // espaços da API não têm manutenção: o filtro e o indicador passam a tratar de inativas
+    el.sitSala.querySelector('option[value="manutencao"]').remove();
+    L.$("#stManut").closest(".stat").querySelector(".stat-label").innerHTML = '<i class="fa-solid fa-ban"></i> Salas inativas';
+    L.$("#stManut").closest(".stat").querySelector(".stat-foot").textContent = "não recebem reservas";
+    el.buscaSala.placeholder = "Código, nome ou localização";
+  }
   el.tipo.insertAdjacentHTML("beforeend", Object.entries(TIPOS).map(([k, v]) => `<option value="${k}">${L.esc(v)}</option>`).join(""));
 
   const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -33,7 +42,8 @@ LABTECH.pronto.then(async () => {
   const chavesDaSala = (id) => chaves.filter((c) => c.sala_id === id);
 
   function mensagemErro(e, tipo) {
-    if (e && e.code === "DUPLICATE") return tipo === "chave" ? "Já existe uma chave com este código. Use outro código." : "Já existe uma sala com este código. Use outro código.";
+    if (e && /^DUPLICATE/.test(e.code || "")) return tipo === "chave" ? "Já existe uma chave com este código. Use outro código." : "Já existe uma sala com este código. Use outro código.";
+    if (e && tipo === "chave" && e.status === 409 && !/^(DUPLICATE|KEY_UNAVAILABLE)/.test(e.code || "")) return e.message || "Esta chave já tem histórico de empréstimos e não pode mudar de sala. Cadastre uma chave nova para a outra sala.";
     if (e && e.code === "KEY_UNAVAILABLE") return "Esta chave está emprestada agora. Registre a devolução em Retirada e devolução antes de desativá-la.";
     return (e && e.message) || "Não foi possível salvar.";
   }
@@ -56,7 +66,7 @@ LABTECH.pronto.then(async () => {
     const ativas = salas.filter((s) => s.ativo !== false);
     L.$("#stSalas").textContent = ativas.length;
     L.$("#stSalasFoot").textContent = `${salas.length - ativas.length} inativas`;
-    L.$("#stManut").textContent = ativas.filter((s) => s.manutencao).length;
+    L.$("#stManut").textContent = real ? salas.length - ativas.length : ativas.filter((s) => s.manutencao).length;
     const chAtivas = chaves.filter((c) => c.ativo !== false);
     L.$("#stChaves").textContent = chAtivas.length;
     L.$("#stChavesFoot").textContent = `${chaves.length - chAtivas.length} inativas`;
@@ -71,21 +81,21 @@ LABTECH.pronto.then(async () => {
     const lista = salas.filter((s) => {
       if (el.tipo.value && s.tipo !== el.tipo.value) return false;
       if (el.sitSala.value && situacaoSala(s) !== el.sitSala.value) return false;
-      return !termo || norm([s.codigo, s.nome, "bloco " + s.bloco].join(" ")).includes(termo);
+      return !termo || norm([s.codigo, s.nome, s.bloco ? "bloco " + s.bloco : "", s.localizacao].join(" ")).includes(termo);
     });
     if (!lista.length) {
       el.listaSalas.innerHTML = `<div class="empty-state"><i class="fa-solid fa-building-circle-xmark"></i><b>Nenhuma sala encontrada.</b><p>Ajuste a busca ou os filtros, ou cadastre uma nova sala.</p></div>`;
       return;
     }
     el.listaSalas.innerHTML = `<div class="table-wrap"><table class="table">
-      <thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th>Bloco / andar</th><th>Capacidade</th><th>Situação</th><th>Chaves</th><th><span class="sr-only">Ações</span></th></tr></thead>
+      <thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th>${real ? "Localização" : "Bloco / andar"}</th><th>Capacidade</th><th>Situação</th><th>Chaves</th><th><span class="sr-only">Ações</span></th></tr></thead>
       <tbody>${lista.map((s) => {
         const nCh = chavesDaSala(s.id).length;
         return `<tr class="${s.ativo === false ? "linha-inativa" : ""}">
           <td><b>${L.esc(s.codigo)}</b></td>
           <td><span class="cel-dupla"><b>${L.esc(s.nome)}</b>${s.manutencao && s.previsaoManutencao ? `<small>${L.esc(s.previsaoManutencao)}</small>` : ""}</span></td>
           <td>${L.esc(L.tipoLabel(s.tipo))}</td>
-          <td>Bloco ${L.esc(s.bloco || "-")} · ${L.esc(L.andarLabel(s.andar))}</td>
+          <td>${L.esc(L.localSala(s) || "-")}</td>
           <td>${L.esc(s.capacidade ?? "-")}</td>
           <td>${badgeSala(s)}</td>
           <td>${nCh ? `<button class="btn btn-link" type="button" data-ver-chaves="${L.esc(s.codigo)}">${nCh} chave${nCh > 1 ? "s" : ""}</button>` : `<span class="muted">nenhuma</span>`}</td>
@@ -96,7 +106,57 @@ LABTECH.pronto.then(async () => {
       }).join("")}</tbody></table></div>`;
   }
 
+  // Formulário do modo API: só os campos do contrato (code, kind, name, capacity, location, is_active)
+  function formSalaApi(s) {
+    const novo = !s;
+    s = s || { codigo: "", nome: "", tipo: "laboratorio", capacidade: null, localizacao: "", ativo: true };
+    const corpo = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="sCodigo">Código</label>
+          <input id="sCodigo" name="codigo" required maxlength="20" value="${L.esc(s.codigo)}" placeholder="Ex.: LAB-16" data-msg="Informe o código da sala." autocomplete="off">
+          <p class="form-hint">Único no sistema.</p>
+        </div>
+        <div class="form-field">
+          <label for="sTipo">Tipo</label>
+          <select id="sTipo" name="tipo" required>${Object.entries(TIPOS).map(([k, v]) => `<option value="${k}"${k === s.tipo ? " selected" : ""}>${L.esc(v)}</option>`).join("")}</select>
+        </div>
+        <div class="form-field full">
+          <label for="sNome">Nome</label>
+          <input id="sNome" name="nome" maxlength="120" value="${L.esc(s.nome === s.codigo ? "" : s.nome)}" placeholder="Ex.: Laboratório de Informática 16" autocomplete="off">
+          <p class="form-hint">Opcional. Sem nome, as telas mostram o código.</p>
+        </div>
+        <div class="form-field">
+          <label for="sCapacidade">Capacidade (pessoas)</label>
+          <input id="sCapacidade" name="capacidade" type="number" min="1" max="10000" step="1" value="${L.esc(s.capacidade ?? "")}" data-msg="A capacidade deve ser um número inteiro positivo.">
+          <p class="form-hint">Opcional.</p>
+        </div>
+        <div class="form-field">
+          <label for="sLocal">Localização</label>
+          <input id="sLocal" name="localizacao" maxlength="120" value="${L.esc(s.localizacao)}" placeholder="Ex.: Bloco A, 1º andar">
+        </div>
+        <div class="form-field full">
+          <label class="form-inline" for="sAtivo"><input id="sAtivo" name="ativo" type="checkbox"${s.ativo !== false ? " checked" : ""}> Sala ativa</label>
+          <p class="form-hint">Salas não são excluídas. Uma sala inativa some das buscas e das reservas, mas o histórico é preservado.</p>
+        </div>
+      </div>`;
+    L.modal({
+      titulo: novo ? "Nova sala" : `Editar ${s.codigo}`, eyebrow: "UC003 · Salas e laboratórios", corpo,
+      confirmar: novo ? "Cadastrar sala" : "Salvar alterações",
+      aoConfirmar: async (dlg) => {
+        const d = L.lerForm(dlg);
+        d.codigo = d.codigo.toUpperCase();
+        try {
+          if (novo) await api.spaces.create(d); else await api.spaces.update(s.id, d);
+        } catch (e) { throw new Error(mensagemErro(e, "sala")); }
+        L.toast(novo ? `Sala ${d.codigo} cadastrada.` : `Sala ${d.codigo} atualizada.`);
+        return true;
+      }
+    }).then((ok) => { if (ok) carregar(); });
+  }
+
   function formSala(s) {
+    if (real) return formSalaApi(s);
     const novo = !s;
     s = s || { codigo: "", nome: "", tipo: "laboratorio", bloco: "", andar: 0, capacidade: null, responsavel: "", localChave: "", recursos: [], descricao: "", regras: [], manutencao: false, previsaoManutencao: "", ativo: true };
     const corpo = `
@@ -210,13 +270,13 @@ LABTECH.pronto.then(async () => {
       return;
     }
     el.listaChaves.innerHTML = `<div class="table-wrap"><table class="table">
-      <thead><tr><th>Código</th><th>Sala</th><th>Local</th><th>Situação</th><th>Observação</th><th><span class="sr-only">Ações</span></th></tr></thead>
+      <thead><tr><th>Código</th><th>Sala</th><th>Local</th><th>Situação</th><th>${real ? "Estado" : "Observação"}</th><th><span class="sr-only">Ações</span></th></tr></thead>
       <tbody>${lista.map((c) => `<tr class="${c.ativo === false ? "linha-inativa" : ""}">
         <td><b>${L.esc(c.codigo)}</b></td>
         <td>${c.sala ? `<span class="cel-dupla"><b>${L.esc(c.sala.codigo)}</b><small>${L.esc(c.sala.nome || "")}</small></span>` : "-"}</td>
-        <td>${L.esc(c.local || "-")}</td>
+        <td>${L.esc(c.local || L.localSala(salaPorId(c.sala_id)) || "-")}</td>
         <td>${L.badgeChave(c.status)}${c.emprestimo && c.emprestimo.usuario ? `<small class="cel-obs">com ${L.esc(c.emprestimo.usuario.nome)}</small>` : ""}</td>
-        <td>${c.observacao ? L.esc(c.observacao) : '<span class="muted">-</span>'}</td>
+        <td>${real ? L.esc(L.ESTADOS_CHAVE[c.estado] || c.estado || "-") : c.observacao ? L.esc(c.observacao) : '<span class="muted">-</span>'}</td>
         <td class="cel-acoes">
           <a class="btn btn-ghost btn-sm" href="chave-historico.html?chave=${c.id}">Histórico</a>
           <button class="btn btn-secondary btn-sm" type="button" data-editar-chave="${c.id}"><i class="fa-solid fa-pen"></i> Editar</button>
@@ -226,21 +286,22 @@ LABTECH.pronto.then(async () => {
 
   function formChave(c, salaIdInicial) {
     const novo = !c;
-    c = c || { codigo: "", sala_id: salaIdInicial || "", local: "", observacao: "", ativo: true };
+    c = c || { codigo: "", sala_id: salaIdInicial || "", local: "", observacao: "", ativo: true, estado: "available" };
+    const estado = c.estado || (c.ativo === false ? "inactive" : "available");
     const emprestada = c.status === "emprestada";
     const opcoes = salas.map((s) => `<option value="${s.id}"${s.id === Number(c.sala_id) ? " selected" : ""}>${L.esc(s.codigo)} · ${L.esc(s.nome)}${s.ativo === false ? " (inativa)" : ""}</option>`).join("");
     const corpo = `
       <div class="form-grid">
         <div class="form-field">
           <label for="kCodigo">Código da chave</label>
-          <input id="kCodigo" name="codigo" required maxlength="30" value="${L.esc(c.codigo)}" placeholder="Ex.: CH-LAB-16" data-msg="Informe o código da chave." autocomplete="off">
-          <p class="form-hint">Único no sistema.</p>
+          <input id="kCodigo" name="codigo" required maxlength="${real ? 40 : 30}" value="${L.esc(c.codigo)}" placeholder="Ex.: CH-LAB-16" data-msg="Informe o código da chave." autocomplete="off">
+          <p class="form-hint">Único no sistema (sem diferenciar maiúsculas).</p>
         </div>
         <div class="form-field">
           <label for="kSala">Sala</label>
           <select id="kSala" name="sala_id" required data-msg="Toda chave pertence a uma sala: escolha a sala."><option value="">Selecione...</option>${opcoes}</select>
         </div>
-        <div class="form-field full">
+        ${real ? "" : `<div class="form-field full">
           <label for="kLocal">Local onde a chave fica</label>
           <input id="kLocal" name="local" maxlength="120" value="${L.esc(c.local)}" placeholder="Ex.: Balcão bloco A">
           <p class="form-hint">Ao escolher a sala, usamos o local de chave da sala se este campo estiver vazio.</p>
@@ -248,12 +309,13 @@ LABTECH.pronto.then(async () => {
         <div class="form-field full">
           <label for="kObs">Observação</label>
           <input id="kObs" name="observacao" maxlength="200" value="${L.esc(c.observacao)}" placeholder="Ex.: Cópia reserva">
-        </div>
+        </div>`}
         <div class="form-field full">
-          <label class="form-inline" for="kAtivo"><input id="kAtivo" name="ativo" type="checkbox"${c.ativo !== false ? " checked" : ""}> Chave ativa</label>
+          <label for="kEstado">Estado da chave</label>
+          <select id="kEstado" name="estado" required>${Object.entries(L.ESTADOS_CHAVE).map(([k, v]) => `<option value="${k}"${k === estado ? " selected" : ""}>${L.esc(v)}</option>`).join("")}</select>
           <p class="form-hint">${emprestada
-            ? "Esta chave está emprestada agora: registre a devolução antes de desativá-la."
-            : "Chaves não são excluídas. Uma chave inativa não pode ser retirada, mas o histórico de empréstimos é preservado."}</p>
+            ? "Esta chave está emprestada agora: registre a devolução antes de tirá-la de circulação."
+            : "Só chaves disponíveis podem ser retiradas. Chaves não são excluídas: o histórico de empréstimos é preservado."}</p>
         </div>
       </div>`;
     const promessa = L.modal({
@@ -263,6 +325,8 @@ LABTECH.pronto.then(async () => {
         const d = L.lerForm(dlg);
         d.codigo = d.codigo.toUpperCase();
         d.sala_id = Number(d.sala_id);
+        // PATCH parcial: só envia a sala se ela mudou (a API recusa trocar a sala de chave com histórico)
+        if (!novo && d.sala_id === Number(c.sala_id)) delete d.sala_id;
         try {
           if (novo) await api.keys.create(d); else await api.keys.update(c.id, d);
         } catch (e) { throw new Error(mensagemErro(e, "chave")); }
@@ -273,7 +337,7 @@ LABTECH.pronto.then(async () => {
     // sugere o local de chave da sala escolhida
     const dlg = document.querySelector("dialog.modal:last-of-type");
     const sel = dlg.querySelector("#kSala"), local = dlg.querySelector("#kLocal");
-    const sugerir = () => { const s = salaPorId(sel.value); if (s && !local.value.trim() && s.localChave) local.value = s.localChave; };
+    const sugerir = () => { const s = salaPorId(sel.value); if (local && s && !local.value.trim() && s.localChave) local.value = s.localChave; };
     sel.addEventListener("change", sugerir);
     if (novo) sugerir();
     promessa.then((ok) => { if (ok) carregar(); });
@@ -288,7 +352,7 @@ LABTECH.pronto.then(async () => {
         : "A chave volta a ficar disponível para retirada.",
       desativar ? "Desativar" : "Ativar", desativar);
     if (!ok) return;
-    try { await api.keys.update(c.id, { ativo: !desativar }); L.toast(desativar ? `${c.codigo} desativada.` : `${c.codigo} ativada.`); }
+    try { await api.keys.update(c.id, { estado: desativar ? "inactive" : "available" }); L.toast(desativar ? `${c.codigo} desativada.` : `${c.codigo} ativada.`); }
     catch (e) { L.toast(mensagemErro(e, "chave"), "erro"); }
     carregar();
   }

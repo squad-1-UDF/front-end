@@ -14,7 +14,7 @@ LABTECH.pronto.then(async () => {
   // Estado da tela
   let chaves = [];
   let emprestimosAtivos = [];
-  let usuarios = [];
+  let usuarios = []; // responsáveis encontrados na busca do modal (GET /users/?q=)
 
   const el = {
     stDisp: L.$("#stDisp"), stEmp: L.$("#stEmp"), stInat: L.$("#stInat"), stAtencao: L.$("#stAtencao"),
@@ -31,7 +31,7 @@ LABTECH.pronto.then(async () => {
   // Mensagens claras para os erros de regra de negócio
   function mensagemErro(e) {
     const msgs = {
-      KEY_UNAVAILABLE: "Esta chave não está disponível: já foi entregue a outra pessoa ou está inativa. A lista foi atualizada; escolha outra chave.",
+      KEY_UNAVAILABLE: "Esta chave não está disponível: já foi entregue a outra pessoa ou está inativa, em manutenção ou extraviada. A lista foi atualizada; escolha outra chave.",
       USER_INACTIVE: "Este usuário está inativo e não pode retirar chaves. Procure o administrador para reativá-lo.",
       LOAN_ALREADY_RETURNED: "Esta devolução já tinha sido registrada. A lista foi atualizada."
     };
@@ -41,17 +41,17 @@ LABTECH.pronto.then(async () => {
   /* ---------- carga de dados ---------- */
   async function carregar() {
     try {
-      const [ks, ls, us] = await Promise.all([api.keys.list(), api.loans.list({ ativos: true }), api.users.list()]);
-      chaves = ks; usuarios = us;
-      // Completa os empréstimos com chave/sala/usuário quando a API não trouxer (modo api)
+      const [ks, ls] = await Promise.all([api.keys.list(), api.loans.list({ ativos: true })]);
+      chaves = ks;
+      // Completa os empréstimos com chave/sala quando a API não trouxer; o responsável vem no próprio empréstimo
       emprestimosAtivos = ls.map((e) => {
-        const c = e.chave ? null : chavePorId(e.chave_id);
+        const c = chavePorId(e.chave_id);
         const u = e.usuario ? null : usuarioPorId(e.usuario_id);
         return {
           ...e,
           chave: e.chave || (c ? { id: c.id, codigo: c.codigo } : { id: e.chave_id, codigo: "#" + e.chave_id }),
-          sala: e.sala || (c && c.sala) || null,
-          usuario: e.usuario || (u ? { id: u.id, nome: u.nome, matricula: u.matricula } : null)
+          sala: (c && c.sala && c.sala.nome ? c.sala : null) || e.sala || (c && c.sala) || null,
+          usuario: e.usuario || (u ? { id: u.id, nome: u.nome, matricula: u.matricula } : { id: e.usuario_id, nome: "Usuário #" + e.usuario_id })
         };
       }).sort((a, b) => a.retirada_em.localeCompare(b.retirada_em)); // mais antigos primeiro
       renderTudo();
@@ -68,7 +68,7 @@ LABTECH.pronto.then(async () => {
     const conta = (s) => chaves.filter((c) => c.status === s).length;
     el.stDisp.textContent = conta("disponivel");
     el.stEmp.textContent = emprestimosAtivos.length;
-    el.stInat.textContent = conta("inativa");
+    el.stInat.textContent = conta("inativa") + conta("manutencao") + conta("perdida");
     const atencao = emprestimosAtivos.filter(passouLimite).length;
     el.stAtencao.textContent = atencao;
     el.stAtencao.closest(".stat").classList.toggle("tem-atencao", atencao > 0);
@@ -121,7 +121,7 @@ LABTECH.pronto.then(async () => {
           <td><b>${L.esc(c.codigo)}</b>${c.observacao ? `<small class="cel-obs">${L.esc(c.observacao)}</small>` : ""}</td>
           <td>${c.sala ? `<span class="cel-dupla"><b>${L.esc(c.sala.codigo)}</b><small>${L.esc(c.sala.nome || "")}</small></span>` : "-"}</td>
           <td>${L.esc(c.sala && c.sala.bloco ? c.sala.bloco : "-")}</td>
-          <td>${L.esc(c.local || "-")}</td>
+          <td>${L.esc(c.local || L.localSala(c.sala) || "-")}</td>
           <td>${L.badgeChave(c.status)}${emp && emp.usuario ? `<small class="cel-obs">com ${L.esc(emp.usuario.nome)}</small>` : ""}</td>
           <td class="cel-acoes">
             <a class="btn btn-ghost btn-sm" href="chave-historico.html?chave=${c.id}">Ver histórico</a>
@@ -166,11 +166,32 @@ LABTECH.pronto.then(async () => {
     montar();
   }
 
+  // Responsável: busca no servidor (GET /users/?q=&is_active=true) conforme o texto digitado
+  function selectUsuarios(input, select) {
+    let seq = 0, timer = null;
+    const montar = async () => {
+      const minhaSeq = ++seq;
+      const termo = input.value.trim();
+      select.innerHTML = '<option value="">Buscando...</option>';
+      let lista = [];
+      try { lista = (await api.users.list({ q: termo, ativo: true, limite: 30 })).filter((u) => u.ativo); }
+      catch (e) { if (minhaSeq === seq) select.innerHTML = '<option value="">Não foi possível buscar usuários</option>'; L.erro(e); return; }
+      if (minhaSeq !== seq) return; // resposta antiga: o usuário já digitou outra coisa
+      lista.forEach((u) => { if (!usuarioPorId(u.id)) usuarios.push(u); });
+      const atual = select.value;
+      select.innerHTML = `<option value="">${lista.length ? "Selecione..." : "Nenhum usuário encontrado"}</option>` +
+        lista.map((u) => `<option value="${u.id}">${L.esc(u.nome)}${(u.matricula || u.usuario) && (u.matricula || u.usuario) !== u.nome ? " · " + L.esc(u.matricula || u.usuario) : ""}</option>`).join("");
+      if (lista.some((u) => String(u.id) === atual)) select.value = atual;
+      else if (lista.length === 1) select.value = String(lista[0].id);
+    };
+    input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(montar, 250); });
+    montar();
+  }
+
   async function abrirRetirada(chaveIdInicial) {
     // Sempre parte de dados atualizados para não oferecer chave já entregue
     await carregar();
     const disponiveis = chaves.filter((c) => c.status === "disponivel").sort((a, b) => a.codigo.localeCompare(b.codigo));
-    const ativos = usuarios.filter((u) => u.ativo).sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (chaveIdInicial) {
       const c = chavePorId(chaveIdInicial);
@@ -189,7 +210,7 @@ LABTECH.pronto.then(async () => {
       </div>
       <div class="form-field">
         <label for="rtBuscaUsuario">Responsável pela retirada</label>
-        <input id="rtBuscaUsuario" type="search" placeholder="Filtrar por nome, matrícula ou e-mail" autocomplete="off">
+        <input id="rtBuscaUsuario" type="search" placeholder="Buscar por nome, usuário ou e-mail" autocomplete="off">
         <label for="rtUsuario" class="sr-only">Selecione o responsável</label>
         <select id="rtUsuario" name="usuario_id" required data-msg="Escolha quem está retirando a chave."></select>
         <p class="form-hint">Somente usuários ativos podem retirar chaves.</p>
@@ -230,16 +251,13 @@ LABTECH.pronto.then(async () => {
     const info = dlg.querySelector("#rtChaveInfo");
     selChave.addEventListener("change", () => {
       const c = chavePorId(selChave.value);
-      info.textContent = c ? `${c.sala ? c.sala.nome + " · " : ""}Local: ${c.local || "não informado"}` : "";
+      info.textContent = c ? `${c.sala && c.sala.nome ? c.sala.nome + " · " : ""}Local: ${c.local || "não informado"}` : "";
     });
     selectFiltravel(dlg.querySelector("#rtBuscaChave"), selChave, disponiveis,
       (c) => `${c.codigo} · ${c.sala ? c.sala.codigo : ""}${c.sala && c.sala.bloco ? " (bloco " + c.sala.bloco + ")" : ""}`,
       (c) => [c.codigo, c.sala && c.sala.codigo, c.sala && c.sala.nome, c.sala && c.sala.bloco && "bloco " + c.sala.bloco].join(" "),
       "Nenhuma chave encontrada");
-    selectFiltravel(dlg.querySelector("#rtBuscaUsuario"), dlg.querySelector("#rtUsuario"), ativos,
-      (u) => `${u.nome}${u.matricula ? " · " + u.matricula : ""}`,
-      (u) => [u.nome, u.matricula, u.email].join(" "),
-      "Nenhum usuário encontrado");
+    selectUsuarios(dlg.querySelector("#rtBuscaUsuario"), dlg.querySelector("#rtUsuario"));
     if (chaveIdInicial) { selChave.value = String(chaveIdInicial); selChave.dispatchEvent(new Event("change")); dlg.querySelector("#rtBuscaUsuario").focus(); }
     relogio = setInterval(() => { const a = dlg.querySelector("#rtAgora"); if (a) a.textContent = L.fmtDataHora(new Date().toISOString()); }, 15000);
 

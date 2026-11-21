@@ -24,16 +24,17 @@ LABTECH.pronto.then(async () => {
     results: $("results"), pagination: $("pagination"), count: $("countLabel"), topSearch: $("topSearch")
   };
   if (real) {
-    [el.bloco, el.status, el.cap].forEach((x) => x.closest(".field").hidden = true);
+    // bloco e situação não existem no contrato; capacidade é opcional (filtra só quem informou)
+    [el.bloco, el.status].forEach((x) => x.closest(".field").hidden = true);
     document.querySelectorAll(".hero-stat").forEach((x, i) => { if (i > 0) x.hidden = true; });
     document.querySelector(".results-bar .legend").hidden = true;
-    el.busca.placeholder = "Código do espaço";
+    el.busca.placeholder = "Código, nome ou localização";
     if (el.topSearch) {
-      el.topSearch.placeholder = "Buscar código do espaço";
-      el.topSearch.setAttribute("aria-label", "Buscar código do espaço");
+      el.topSearch.placeholder = "Buscar espaço";
+      el.topSearch.setAttribute("aria-label", "Buscar espaço por código, nome ou localização");
     }
     document.querySelector(".page-head .subtitle").textContent = "Consulte os espaços cadastrados e verifique a disponibilidade para reservar.";
-    el.sort.querySelectorAll('option[value="status"], option[value="capacidade"]').forEach((x) => x.remove());
+    el.sort.querySelectorAll('option[value="status"]').forEach((x) => x.remove());
     el.sort.value = "codigo";
     const hero = document.querySelector(".hero p");
     if (hero) hero.textContent = "Consulte os espaços cadastrados e verifique a disponibilidade para o período desejado.";
@@ -73,13 +74,13 @@ LABTECH.pronto.then(async () => {
     const cap = parseInt(el.cap.value, 10) || 0;
     return SALAS.filter((s) => {
       if (q) {
-        const alvo = [s.codigo, s.nome, ...(s.softwares || []), ...(s.recursos || []).map((r) => L.RECURSOS[r]?.label || r)].join(" ").toLowerCase();
+        const alvo = [s.codigo, s.nome, s.localizacao || "", ...(s.softwares || []), ...(s.recursos || []).map((r) => L.RECURSOS[r]?.label || r)].join(" ").toLowerCase();
         if (!alvo.includes(q)) return false;
       }
       if (tipo && s.tipo !== tipo) return false;
       if (bloco && s.bloco !== bloco) return false;
       if (status && s.status !== status) return false;
-      if (cap && s.capacidade < cap) return false;
+      if (cap && !(Number(s.capacidade) >= cap)) return false;
       if (!livreNoPeriodo(s, el.data.value, el.ini.value, el.fim.value)) return false;
       return true;
     });
@@ -90,7 +91,7 @@ LABTECH.pronto.then(async () => {
     const rank = { available: 0, occupied: 1, maintenance: 2 };
     return [...lista].sort((a, b) => {
       if (by === "status") return (rank[a.status] - rank[b.status]) || a.codigo.localeCompare(b.codigo);
-      if (by === "capacidade") return b.capacidade - a.capacidade;
+      if (by === "capacidade") return (b.capacidade ?? -1) - (a.capacidade ?? -1);
       return String(a[by]).localeCompare(String(b[by]), "pt-BR", { numeric: true });
     });
   }
@@ -108,8 +109,14 @@ LABTECH.pronto.then(async () => {
   function cardHTML(s) {
     if (real) {
       const cover = L.tipoCover(s.tipo);
+      // campos novos do espaço aparecem só quando vierem preenchidos
+      const meta = [
+        s.localizacao ? `<span><i class="fa-solid fa-location-dot"></i> ${L.esc(s.localizacao)}</span>` : "",
+        s.capacidade != null ? `<span><i class="fa-solid fa-user"></i> Até ${L.esc(s.capacidade)}</span>` : ""
+      ].join("");
       return `<article class="panel hover room-card"><div class="cover ${cover.cls}"><i class="${cover.icon}"></i><small>${L.esc(s.codigo)}</small></div>
-        <div class="body"><div class="ey">${L.esc(L.tipoLabel(s.tipo))}</div><h3>${L.esc(s.codigo)}</h3>
+        <div class="body"><div class="ey">${L.esc(L.tipoLabel(s.tipo))}</div><h3>${L.esc(s.nome)}</h3>
+        ${meta ? `<div class="meta">${meta}</div>` : ""}
         <div class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Ver detalhes</a>
         <a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a></div></div></article>`;
     }
@@ -142,8 +149,8 @@ LABTECH.pronto.then(async () => {
   }
 
   function tableHTML(lista) {
-    if (real) return `<div class="table-wrap rooms-table"><table class="table"><thead><tr><th>Código</th><th>Tipo</th><th></th></tr></thead><tbody>${lista.map((s) =>
-      `<tr><td class="code">${L.esc(s.codigo)}</td><td>${L.esc(L.tipoLabel(s.tipo))}</td><td class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a> <a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a></td></tr>`).join("")}</tbody></table></div>`;
+    if (real) return `<div class="table-wrap rooms-table"><table class="table"><thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th>Local</th><th>Cap.</th><th></th></tr></thead><tbody>${lista.map((s) =>
+      `<tr><td class="code">${L.esc(s.codigo)}</td><td class="name"><a href="sala-detalhes.html?id=${s.id}">${L.esc(s.nome)}</a></td><td>${L.esc(L.tipoLabel(s.tipo))}</td><td>${L.esc(s.localizacao || "-")}</td><td>${L.esc(s.capacidade ?? "-")}</td><td class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a> <a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a></td></tr>`).join("")}</tbody></table></div>`;
     const rows = lista.map((s) => `
       <tr>
         <td class="code">${L.esc(s.codigo)}</td>

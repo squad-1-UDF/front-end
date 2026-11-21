@@ -53,7 +53,8 @@ LABTECH.pronto.then(async () => {
     if (real) {
       const capa = L.tipoCover(s.tipo);
       return `<article class="panel hover sala-card"><div class="sala-capa ${capa.cls}"><i class="${capa.icon}" aria-hidden="true"></i><span class="sala-codigo">${L.esc(s.codigo)}</span></div>
-        <div class="sala-corpo"><span class="sala-tipo">${L.esc(L.tipoLabel(s.tipo))}</span><h3>${L.esc(s.codigo)}</h3><div class="sala-acoes">
+        <div class="sala-corpo"><span class="sala-tipo">${L.esc(L.tipoLabel(s.tipo))}</span><h3>${L.esc(s.nome)}</h3>
+        ${s.localizacao || s.capacidade != null ? `<div class="meta">${s.localizacao ? `<span><i class="fa-solid fa-location-dot"></i>${L.esc(s.localizacao)}</span>` : ""}${s.capacidade != null ? `<span><i class="fa-solid fa-users"></i>Até ${L.esc(s.capacidade)} pessoas</span>` : ""}</div>` : ""}<div class="sala-acoes">
         <button type="button" class="btn btn-primary btn-sm" data-reservar="${s.id}">Reservar</button>
         <a class="btn btn-secondary btn-sm" href="agenda.html?sala=${s.id}">Agenda</a></div></div></article>`;
     }
@@ -90,7 +91,7 @@ LABTECH.pronto.then(async () => {
     const tipo = el.tipo.value;
     const cap = Number(el.cap.value) || 0;
     const lista = salas.filter((s) =>
-      (!q || norm(`${s.nome} ${s.codigo} bloco ${s.bloco}`).includes(q)) &&
+      (!q || norm(real ? `${s.nome} ${s.codigo} ${s.localizacao || ""}` : `${s.nome} ${s.codigo} bloco ${s.bloco}`).includes(q)) &&
       (!tipo || s.tipo === tipo) &&
       (real || (Number(s.capacidade) || 0) >= cap));
     el.contagem.textContent = `${lista.length} ${lista.length === 1 ? "espaço encontrado" : "espaços encontrados"} no campus`;
@@ -177,7 +178,7 @@ LABTECH.pronto.then(async () => {
     el.form.reset();
     el.erro.textContent = "";
     el.titulo.textContent = sala.nome;
-    el.desc.textContent = real ? L.tipoLabel(sala.tipo) : `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
+    el.desc.textContent = real ? [L.tipoLabel(sala.tipo), sala.nome !== sala.codigo ? sala.codigo : "", sala.localizacao, sala.capacidade != null ? `Até ${sala.capacidade} pessoas` : ""].filter(Boolean).join(" · ") : `${sala.codigo} · Bloco ${sala.bloco} · Até ${sala.capacidade} pessoas`;
     if (!real) el.part.max = sala.capacidade;
     el.data.min = L.hojeISO();
     el.data.value = pre.data && /^\d{4}-\d{2}-\d{2}$/.test(pre.data) ? pre.data : L.hojeISO();
