@@ -6,6 +6,8 @@
 LABTECH.pronto.then(async (eu) => {
   const L = LABTECH;
   const api = L.api;
+  // modo API: login pelo nome de usuário Django, senha definida no cadastro e sem matrícula
+  const real = L.CONFIG.modo === "api";
   const PERFIS = L.PERFIS || { student: "Estudante", employee: "Funcionário", admin: "Administrador" };
   // rótulo curto do perfil para a tabela
   const PERFIL_CURTO = { student: "Estudante", employee: "Funcionário", admin: "Administrador" };
@@ -20,7 +22,7 @@ LABTECH.pronto.then(async (eu) => {
 
   // Mensagens claras para os erros da API
   function mensagemErro(e) {
-    if (e && e.code === "DUPLICATE") return "Já existe um usuário com este e-mail. Use outro e-mail ou edite o cadastro existente.";
+    if (e && e.code === "DUPLICATE" && !real) return "Já existe um usuário com este e-mail. Use outro e-mail ou edite o cadastro existente.";
     if (e && e.code === "SELF_LOCK") return "Você não pode desativar nem retirar o perfil de administrador do seu próprio usuário.";
     return (e && e.message) || "Não foi possível salvar.";
   }
@@ -48,7 +50,7 @@ LABTECH.pronto.then(async (eu) => {
       if (el.perfil.value && u.perfil !== el.perfil.value) return false;
       if (el.situacao.value === "ativo" && !u.ativo) return false;
       if (el.situacao.value === "inativo" && u.ativo) return false;
-      return !termo || norm([u.nome, u.email, u.matricula].join(" ")).includes(termo);
+      return !termo || norm([u.nome, u.email, u.matricula, u.usuario].join(" ")).includes(termo);
     }).sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (!lista.length) {
@@ -56,11 +58,11 @@ LABTECH.pronto.then(async (eu) => {
       return;
     }
     el.lista.innerHTML = `<div class="table-wrap"><table class="table">
-      <thead><tr><th>Usuário</th><th>Matrícula</th><th>Perfil</th><th>Situação</th><th><span class="sr-only">Ações</span></th></tr></thead>
+      <thead><tr><th>Usuário</th><th>${real ? "Login" : "Matrícula"}</th><th>Perfil</th><th>Situação</th><th><span class="sr-only">Ações</span></th></tr></thead>
       <tbody>${lista.map((u) => `<tr class="${u.ativo ? "" : "linha-inativa"}">
         <td><div class="cel-usuario"><span class="avatar" aria-hidden="true">${L.esc(L.iniciais(u.nome))}</span>
           <span class="cel-dupla"><b>${L.esc(u.nome)}${u.id === eu.id ? ' <span class="chip">você</span>' : ""}</b><small>${L.esc(u.email)}</small></span></div></td>
-        <td>${L.esc(u.matricula || "-")}</td>
+        <td>${L.esc((real ? u.usuario : u.matricula) || "-")}</td>
         <td><span class="perfil-tag perfil-${L.esc(u.perfil)}">${L.esc(PERFIL_CURTO[u.perfil] || u.perfil)}</span></td>
         <td>${u.ativo ? L.badge("available", "Ativo") : L.badge("neutral", "Inativo")}</td>
         <td class="cel-acoes">
@@ -82,15 +84,24 @@ LABTECH.pronto.then(async (eu) => {
           <label for="uNome">Nome completo</label>
           <input id="uNome" name="nome" required maxlength="120" value="${L.esc(u.nome)}" data-msg="Informe o nome do usuário." autocomplete="off">
         </div>
+        ${real ? `<div class="form-field full">
+          <label for="uLogin">Nome de usuário (login)</label>
+          <input id="uLogin" name="usuario" ${novo ? "required" : "disabled"} maxlength="150" value="${L.esc(u.usuario || "")}" data-msg="Informe o nome de usuário." autocomplete="off" placeholder="ex.: ana.costa">
+          <p class="form-hint">${novo ? "Usado para entrar no sistema. Não pode repetir nem ser alterado depois." : "O nome de usuário não pode ser alterado."}</p>
+        </div>` : ""}
         <div class="form-field full">
-          <label for="uEmail">E-mail institucional</label>
-          <input id="uEmail" name="email" type="email" required maxlength="160" value="${L.esc(u.email)}" pattern="[^@\\s]+@udf\\.edu\\.br" data-msg="Use um e-mail institucional válido (terminado em @udf.edu.br)." autocomplete="off" placeholder="nome.sobrenome@udf.edu.br">
-          <p class="form-hint">É o login do usuário. Não pode repetir.</p>
+          <label for="uEmail">E-mail${real ? "" : " institucional"}</label>
+          <input id="uEmail" name="email" type="email" required maxlength="160" value="${L.esc(u.email)}"${real ? "" : ` pattern="[^@\\s]+@udf\\.edu\\.br"`} data-msg="${real ? "Informe um e-mail válido." : "Use um e-mail institucional válido (terminado em @udf.edu.br)."}" autocomplete="off" placeholder="nome.sobrenome@udf.edu.br">
+          <p class="form-hint">${real ? "Obrigatório e único (sem diferenciar maiúsculas)." : "É o login do usuário. Não pode repetir."}</p>
         </div>
-        <div class="form-field">
+        ${real ? `<div class="form-field">
+          <label for="uSenha">${novo ? "Senha inicial" : "Nova senha"}</label>
+          <input id="uSenha" name="senha" type="password" ${novo ? "required" : ""} minlength="8" maxlength="128" autocomplete="new-password" data-msg="A senha precisa ter pelo menos 8 caracteres.">
+          <p class="form-hint">${novo ? "Validada pelas regras de senha do Django." : "Deixe em branco para manter a senha atual."}</p>
+        </div>` : `<div class="form-field">
           <label for="uMatricula">Matrícula</label>
           <input id="uMatricula" name="matricula" maxlength="30" value="${L.esc(u.matricula)}" autocomplete="off">
-        </div>
+        </div>`}
         <div class="form-field">
           <label for="uPerfil">Perfil</label>
           <select id="uPerfil" name="perfil" required ${proprio ? "disabled" : ""}>
@@ -109,9 +120,15 @@ LABTECH.pronto.then(async (eu) => {
       aoConfirmar: async (dlg) => {
         const dados = L.lerForm(dlg);
         dados.email = dados.email.toLowerCase();
+        if (!novo) delete dados.usuario; // o login não muda depois do cadastro
+        if (!dados.senha) delete dados.senha;
         if (proprio) { delete dados.perfil; delete dados.ativo; } // campos travados não vão para a API
         try {
-          if (novo) await api.users.create(dados); else await api.users.update(u.id, dados);
+          if (novo) {
+            const criado = await api.users.create(dados);
+            // POST /users/ do contrato não recebe is_active: desativa logo depois, se pedido
+            if (real && dados.ativo === false && criado.ativo) await api.users.update(criado.id, { ativo: false });
+          } else await api.users.update(u.id, dados);
         } catch (e) { throw new Error(mensagemErro(e)); }
         L.toast(novo ? `Usuário ${dados.nome} cadastrado.` : "Cadastro atualizado.");
         return true;

@@ -20,12 +20,20 @@ LABTECH.pronto.then(async () => {
       root.innerHTML = `<div class="empty-state"><i class="fa-solid fa-door-closed"></i><b>${e.status === 404 ? "Sala não encontrada." : "Não foi possível carregar a sala."}</b><br><a class="btn btn-primary" href="salas.html">Voltar para a lista</a></div>`;
       return;
     }
-    document.title = `${s.codigo} · LabReserva UDF`;
+    document.title = `${s.codigo}${s.nome !== s.codigo ? " · " + s.nome : ""} - LabReserva UDF`;
     document.getElementById("breadcrumbAtual").textContent = s.codigo;
     const cover = L.tipoCover(s.tipo);
+    const gestao = L.pode("employee", "admin");
+    // campos novos do espaço: só aparecem quando vierem preenchidos
+    const fatos = [
+      s.localizacao ? `<span><i class="fa-solid fa-location-dot"></i> ${L.esc(s.localizacao)}</span>` : "",
+      s.capacidade != null ? `<span><i class="fa-solid fa-users"></i> Até ${L.esc(s.capacidade)} pessoas</span>` : "",
+      s.ativo === false ? L.badge("neutral", "Inativa") : ""
+    ].filter(Boolean).join(" ");
     root.innerHTML = `<div class="detail-layout"><div class="detail-main">
-      <article class="panel room-hero"><div class="info"><span class="code">${L.esc(s.codigo)}</span><h1>${L.esc(s.codigo)}</h1>
+      <article class="panel room-hero"><div class="info"><span class="code">${L.esc(s.codigo)}</span><h1>${L.esc(s.nome)}</h1>
       <div class="type"><i class="fa-solid fa-layer-group"></i> ${L.esc(L.tipoLabel(s.tipo))}</div>
+      ${fatos ? `<div class="type detalhe-fatos">${fatos}</div>` : ""}
       <div class="cta"><a class="btn btn-gold" href="reservar-sala.html?sala=${s.id}">Reservar esta sala</a>
       <a class="btn btn-secondary" href="agenda.html?sala=${s.id}">Ver agenda</a><a class="btn btn-ghost" href="salas.html">Voltar</a></div></div>
       <div class="visual ${cover.cls}"><div class="placeholder"><i class="${cover.icon}"></i></div><small>${L.esc(s.codigo)}</small></div></article>
@@ -36,7 +44,17 @@ LABTECH.pronto.then(async () => {
       <button class="btn btn-primary" type="button" id="detConsultar">Consultar</button></div><p class="muted" id="detResultado" style="padding:0 16px 16px"></p></article>
       </div><aside class="detail-side"><article class="panel side-card"><h3>Ações rápidas</h3><div class="side-actions">
       <a class="btn btn-primary btn-sm" href="reservar-sala.html?sala=${s.id}">Nova reserva</a>
-      <a class="btn btn-secondary btn-sm" href="minhas-reservas.html">Minhas reservas</a></div></article></aside></div>`;
+      <a class="btn btn-secondary btn-sm" href="minhas-reservas.html">Minhas reservas</a></div></article>
+      ${gestao ? `<article class="panel side-card"><h3>Chaves da sala</h3><div id="detChaves"><p class="muted">Carregando chaves...</p></div></article>` : ""}</aside></div>`;
+    // Gestão: chaves do espaço (GET /keys/?space_id=) com situação e atalho para retirada
+    if (gestao) {
+      const alvo = document.getElementById("detChaves");
+      L.api.keys.list({ sala_id: s.id }).then((ks) => {
+        alvo.innerHTML = ks.length ? `<ul class="list">${ks.map((k) => `<li class="list-item"><span class="list-main"><b>${L.esc(k.codigo)}</b><span>${L.badgeChave(k.status)}${k.emprestimo && k.emprestimo.usuario ? ` com ${L.esc(k.emprestimo.usuario.nome)}` : ""}</span></span>
+          ${k.status === "disponivel" ? `<a class="btn btn-primary btn-sm" href="chaves.html?chave=${k.id}">Entregar</a>` : `<a class="btn btn-ghost btn-sm" href="chave-historico.html?chave=${k.id}">Histórico</a>`}</li>`).join("")}</ul>`
+          : `<p class="muted">Nenhuma chave cadastrada para esta sala.</p>`;
+      }).catch((e) => { alvo.innerHTML = `<p class="muted">Não foi possível carregar as chaves.</p>`; L.erro(e); });
+    }
     const data = document.getElementById("detData"); data.value = L.hojeISO();
     document.getElementById("detConsultar").addEventListener("click", async () => {
       const resultado = document.getElementById("detResultado");

@@ -45,7 +45,11 @@
   L.TIPOS = L.TIPOS || {};
   L.STATUS = { available: "Livre", occupied: "Ocupado", maintenance: "Manutenção", reserved: "Reservado" };
   L.STATUS_RESERVA = { confirmada: ["Confirmada", "available"], pendente: ["Pendente", "reserved"], cancelada: ["Cancelada", "neutral"], concluida: ["Concluída", "occupied"], recusada: ["Recusada", "maintenance"] };
-  L.STATUS_CHAVE = { disponivel: ["Disponível", "available"], emprestada: ["Emprestada", "reserved"], inativa: ["Inativa", "neutral"], retirada: ["Retirada", "reserved"], nao_aplica: ["Sem chave", "neutral"] };
+  L.STATUS_CHAVE = { disponivel: ["Disponível", "available"], emprestada: ["Emprestada", "reserved"], inativa: ["Inativa", "neutral"], manutencao: ["Manutenção", "maintenance"], perdida: ["Extraviada", "maintenance"], retirada: ["Retirada", "reserved"], nao_aplica: ["Sem chave", "neutral"] };
+  // estado administrativo da chave (campo status do contrato), usado no cadastro
+  L.ESTADOS_CHAVE = { available: "Disponível para retirada", maintenance: "Em manutenção", lost: "Extraviada", inactive: "Inativa" };
+  // texto curto de local de uma sala: bloco/andar (demonstração) ou localização (API)
+  L.localSala = (s) => (!s ? "" : s.localizacao ? s.localizacao : s.bloco ? `Bloco ${s.bloco} · ${L.andarLabel(s.andar)}` : "");
   L.statusLabel = (s) => L.STATUS[s] || s;
   L.tipoLabel = (t) => L.TIPOS[t] || t;
   L.badge = (status, texto) => `<span class="badge ${status}">${L.esc(texto || L.statusLabel(status))}</span>`;

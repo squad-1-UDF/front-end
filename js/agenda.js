@@ -90,7 +90,7 @@ LABTECH.pronto.then(async (usuario) => {
     const dias = Array.from({ length: real ? 7 : 6 }, (_, i) => somaDias(seg, i));
     el.periodo.textContent = `${fmtCurta(dias[0])} a ${fmtCurta(dias.at(-1))}`;
     el.info.innerHTML = `<b>${L.esc(sala.nome)}</b> ${real ? "" : L.badge(sala.status)}
-      ${real ? "" : `<span>${L.esc(sala.codigo)} · Bloco ${L.esc(sala.bloco)} · até ${Number(sala.capacidade) || 0} pessoas</span>`}
+      ${real ? `<span>${[sala.nome !== sala.codigo ? sala.codigo : "", sala.localizacao, sala.capacidade != null ? `até ${sala.capacidade} pessoas` : ""].filter(Boolean).map(L.esc).join(" · ")}</span>` : `<span>${L.esc(sala.codigo)} · Bloco ${L.esc(sala.bloco)} · até ${Number(sala.capacidade) || 0} pessoas</span>`}
       <a class="btn btn-link" href="sala-detalhes.html?id=${sala.id}">Ver detalhes</a>`;
     const reservas = real ? await api.bookings.agenda(sala.id, { de: dias[0], ate: dias.at(-1) }) : await api.bookings.list({ sala_id: sala.id, de: dias[0], ate: dias.at(-1) });
     if (minhaSeq !== seq) return;
@@ -124,7 +124,7 @@ LABTECH.pronto.then(async (usuario) => {
       <colgroup><col class="col-sala">${HORAS.map(() => "<col>").join("")}</colgroup>
       <thead><tr><th scope="col" class="sala-nome">Sala</th>${HORAS.map((h) => `<th scope="col" class="hora">${pad(h)}h</th>`).join("")}</tr></thead>
       <tbody>${lista.map((s) => `<tr>
-        <th scope="row" class="sala-nome"><a href="agenda.html?sala=${s.id}&data=${data}" title="Ver semana de ${L.esc(s.nome)}">${L.esc(s.codigo)}</a>${real ? "" : `<small>${L.esc(s.nome)}</small>`}</th>
+        <th scope="row" class="sala-nome"><a href="agenda.html?sala=${s.id}&data=${data}" title="Ver semana de ${L.esc(s.nome)}">${L.esc(s.codigo)}</a>${real && s.nome === s.codigo ? "" : `<small>${L.esc(s.nome)}</small>`}</th>
         ${HORAS.map((h) => celula(s, data, h, doDia(s.id, data))).join("")}</tr>`).join("")}</tbody>
     </table>`;
   }
@@ -183,7 +183,7 @@ LABTECH.pronto.then(async (usuario) => {
   el.sala.innerHTML = ordemTipos.map((t) => {
     const doTipo = salas.filter((s) => s.tipo === t);
     if (!doTipo.length) return "";
-    return `<optgroup label="${L.esc(L.tipoLabel(t))}">${doTipo.map((s) => `<option value="${s.id}">${L.esc(s.codigo)}${real ? "" : ` · ${L.esc(s.nome)}${s.manutencao ? " (manutenção)" : ""}`}</option>`).join("")}</optgroup>`;
+    return `<optgroup label="${L.esc(L.tipoLabel(t))}">${doTipo.map((s) => `<option value="${s.id}">${L.esc(s.codigo)}${real ? (s.nome !== s.codigo ? ` · ${L.esc(s.nome)}` : "") : ` · ${L.esc(s.nome)}${s.manutencao ? " (manutenção)" : ""}`}</option>`).join("")}</optgroup>`;
   }).join("");
 
   // prioridade: ?sala= > sala lembrada > primeira da lista

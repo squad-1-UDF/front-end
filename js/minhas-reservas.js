@@ -87,7 +87,8 @@ LABTECH.pronto.then(async () => {
     try {
       reservas = await api.bookings.list({ mine: true, incluirCanceladas: true });
       if (real) {
-        const salas = await api.spaces.list();
+        // listAll: reservas antigas podem ser de um espaço já desativado
+        const salas = await api.spaces.listAll();
         const porId = new Map(salas.map((s) => [s.id, s]));
         reservas.forEach((r) => { r.sala = porId.get(r.sala_id) || null; });
       }

@@ -1,7 +1,8 @@
 /* ============================================================
    Tela: Histórico de chaves
    UC008 (consultar movimentações) e UC009 (emitir histórico).
-   Uma chave: api.keys.movements(id). Todas: api.loans.list().
+   Uma chave: api.keys.movements(id) (GET /keys/{id}/movements/).
+   Todas: api.loans.list({ usuario_id }) (GET /key-loans/ com filtros).
    O histórico nunca é apagado: só é filtrado aqui.
    ============================================================ */
 LABTECH.pronto.then(async (usuario) => {
@@ -26,6 +27,8 @@ LABTECH.pronto.then(async (usuario) => {
   const fmtIntervalo = (ms) => { const min = Math.max(0, Math.round(ms / 60000)); return min < 60 ? `${min} min` : `${Math.floor(min / 60)}h${pad(min % 60)}`; };
   const chavePorId = (id) => chaves.find((c) => c.id === Number(id));
   const usuarioPorId = (id) => usuarios.find((u) => u.id === Number(id));
+  // nome do operador que registrou (o contrato traz só o id do operador)
+  const nomeOperador = (ev) => ev.registrado_por_nome || (usuarioPorId(ev.registrado_por) || {}).nome || "";
 
   /* ---------- carga inicial: chaves e usuários para os filtros ---------- */
   try {
@@ -39,7 +42,7 @@ LABTECH.pronto.then(async (usuario) => {
   el.chave.insertAdjacentHTML("beforeend", chaves.map((c) =>
     `<option value="${c.id}">${L.esc(c.codigo)}${c.sala ? " · " + L.esc(c.sala.nome || c.sala.codigo) : ""}${c.ativo === false ? " (inativa)" : ""}</option>`).join(""));
   usuarios.slice().sort((a, b) => a.nome.localeCompare(b.nome)).forEach((u) =>
-    el.resp.insertAdjacentHTML("beforeend", `<option value="${u.id}">${L.esc(u.nome)}${u.matricula ? " · " + L.esc(u.matricula) : ""}</option>`));
+    el.resp.insertAdjacentHTML("beforeend", `<option value="${u.id}">${L.esc(u.nome)}${(u.matricula || u.usuario) && (u.matricula || u.usuario) !== u.nome ? " · " + L.esc(u.matricula || u.usuario) : ""}</option>`));
 
   const chaveUrl = L.qs("chave");
   if (chaveUrl && chavePorId(chaveUrl)) el.chave.value = String(Number(chaveUrl));
@@ -59,22 +62,24 @@ LABTECH.pronto.then(async (usuario) => {
         eventos = r.eventos.map((ev) => ({
           ...ev,
           usuario: ev.usuario || null,
+          registrado_por_nome: nomeOperador(ev),
           chave: c ? { id: c.id, codigo: c.codigo } : { id: Number(id), codigo: "#" + id },
           sala: c ? c.sala : null,
           retirada_em: porEmp[ev.emprestimo_id].retirada || null,
           devolvida_em: porEmp[ev.emprestimo_id].devolucao || null
-        }));
+        })).sort((a, b) => new Date(b.ocorrido_em) - new Date(a.ocorrido_em)); // mais recentes primeiro, nos dois modos
       } else {
-        const emprestimos = await api.loans.list();
+        // o filtro de responsável também vai para o servidor (responsible_user_id)
+        const emprestimos = await api.loans.list({ usuario_id: el.resp.value || undefined });
         eventos = [];
         emprestimos.forEach((e) => {
           const c = chavePorId(e.chave_id); const u = usuarioPorId(e.usuario_id);
           const base = {
             emprestimo_id: e.id, retirada_em: e.retirada_em, devolvida_em: e.devolvida_em,
             chave: e.chave || (c ? { id: c.id, codigo: c.codigo } : { id: e.chave_id, codigo: "#" + e.chave_id }),
-            sala: e.sala || (c && c.sala) || null,
+            sala: (c && c.sala && c.sala.nome ? c.sala : null) || e.sala || (c && c.sala) || null,
             usuario: e.usuario || (u ? { id: u.id, nome: u.nome, matricula: u.matricula } : null),
-            registrado_por_nome: e.registrado_por_nome || ""
+            registrado_por_nome: nomeOperador(e)
           };
           eventos.push({ ...base, tipo: "retirada", ocorrido_em: e.retirada_em });
           if (e.devolvida_em) eventos.push({ ...base, tipo: "devolucao", ocorrido_em: e.devolvida_em });
@@ -202,8 +207,14 @@ LABTECH.pronto.then(async (usuario) => {
     history.replaceState(null, "", url);
     buscar();
   });
-  [el.de, el.ate, el.resp].forEach((i) => i.addEventListener("change", aplicarFiltros));
-  L.$("#btnLimpar").addEventListener("click", () => { el.de.value = ""; el.ate.value = ""; el.resp.value = ""; aplicarFiltros(); });
+  [el.de, el.ate].forEach((i) => i.addEventListener("change", aplicarFiltros));
+  // sem chave escolhida, o responsável é filtrado no servidor; com chave, no próprio recorte
+  el.resp.addEventListener("change", () => (el.chave.value ? aplicarFiltros() : buscar()));
+  L.$("#btnLimpar").addEventListener("click", () => {
+    const tinhaResp = !!el.resp.value;
+    el.de.value = ""; el.ate.value = ""; el.resp.value = "";
+    if (tinhaResp && !el.chave.value) buscar(); else aplicarFiltros();
+  });
   L.$("#btnEmitir").addEventListener("click", emitir);
   L.$("#btnCsv").addEventListener("click", exportarCsv);
 

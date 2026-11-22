@@ -9,25 +9,64 @@ LABTECH.pronto.then(async (usuario) => {
   const api = L.api;
   const $ = (id) => document.getElementById(id);
   if (L.CONFIG.modo === "api") {
-    $("saudacao").textContent = "Olá!";
-    document.querySelector(".subtitle").textContent = "Consulte espaços, agenda e suas reservas.";
+    // Modo API: números reais de /spaces/, /bookings/ (scope=mine) e, para a gestão, /key-loans/.
+    // Reservas da API não trazem finalidade nem titular; espaços podem vir sem nome/capacidade.
+    const gestao = L.pode("employee", "admin");
+    const nome = L.primeiroNome(usuario.nome);
+    $("saudacao").textContent = nome ? `Olá, ${nome}!` : "Olá!";
+    document.querySelector(".subtitle").textContent = gestao ? "Consulte espaços, agenda, reservas e chaves." : "Consulte espaços, agenda e suas reservas.";
     $("agendaHoje").textContent = "Hoje, " + new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long" });
-    $("acoesRapidas").innerHTML = `<a class="btn btn-gold" href="reservar-sala.html">Nova reserva</a><a class="btn btn-secondary" href="agenda.html">Agenda completa</a><a class="btn btn-secondary" href="salas.html">Laboratórios e salas</a>`;
+    $("acoesRapidas").innerHTML = `<a class="btn btn-gold" href="reservar-sala.html"><i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Nova reserva</a><a class="btn btn-secondary" href="agenda.html"><i class="fa-regular fa-calendar-days" aria-hidden="true"></i>Agenda completa</a>` +
+      (gestao ? `<a class="btn btn-secondary" href="chaves.html"><i class="fa-solid fa-key" aria-hidden="true"></i>Retirada de chaves</a>` : `<a class="btn btn-secondary" href="salas.html"><i class="fa-solid fa-flask" aria-hidden="true"></i>Laboratórios e salas</a>`);
     $("verTodas").href = "minhas-reservas.html";
     document.querySelector("#labsConteudo").closest("article").querySelector("h2").textContent = "Laboratórios e salas";
     document.querySelector("#notificacoesConteudo").closest("article").querySelector("h2").textContent = "Resumo da conta";
     try {
-      const [salas, reservas] = await Promise.all([api.spaces.list(), api.bookings.list({ incluirCanceladas: true })]);
+      const [salas, reservas, ativos] = await Promise.all([
+        api.spaces.list(), api.bookings.list({ incluirCanceladas: true }),
+        gestao ? api.loans.list({ ativos: true }).catch((e) => { L.erro(e); return null; }) : Promise.resolve(null)
+      ]);
       const porId = new Map(salas.map((s) => [s.id, s]));
+      const nomeSala = (id) => { const s = porId.get(id); return s ? s.nome : `Espaço #${id}`; };
       const futuras = reservas.filter((r) => r.status !== "cancelada" && new Date(r.fim_em || `${r.data}T${r.fim}`) > new Date())
         .sort((a, b) => (a.data + a.inicio).localeCompare(b.data + b.inicio));
-      $("labsConteudo").innerHTML = salas.length ? `<div class="labs-map-grid">${salas.map((s) => `<a class="lab-seat" href="sala-detalhes.html?id=${s.id}" title="${L.esc(s.codigo)}" aria-label="${L.esc(s.codigo)}"><i class="${L.tipoCover(s.tipo).icon}"></i><small>${L.esc(s.codigo)}</small></a>`).join("")}</div>` : `<p class="muted">Nenhum espaço cadastrado.</p>`;
+      // Card 1: espaços ativos (capacidade somada só quando informada)
+      const comCap = salas.filter((s) => s.capacidade != null);
+      const lugares = comCap.reduce((t, s) => t + s.capacidade, 0);
+      $("labsConteudo").innerHTML = salas.length ? `
+        <div class="lab-stats-top"><div class="lab-count-info"><strong>${salas.length}</strong><span>${salas.length === 1 ? "espaço ativo" : "espaços ativos"}${comCap.length ? ` · ${lugares} lugares em ${comCap.length} com capacidade informada` : ""}</span></div></div>
+        <div class="labs-map-grid">${salas.map((s) => {
+          const titulo = [s.codigo, s.nome !== s.codigo ? s.nome : "", s.capacidade != null ? `até ${s.capacidade} pessoas` : "", s.localizacao].filter(Boolean).join(" · ");
+          return `<a class="lab-seat" href="sala-detalhes.html?id=${s.id}" title="${L.esc(titulo)}" aria-label="${L.esc(titulo)}"><i class="${L.tipoCover(s.tipo).icon}" aria-hidden="true"></i><small>${L.esc(s.codigo)}</small></a>`;
+        }).join("")}</div>` : `<p class="muted">Nenhum espaço cadastrado.</p>`;
       $("qtdReservas").textContent = futuras.length;
       $("qtdReservasTxt").textContent = futuras.length === 1 ? "reserva ativa ou futura" : "reservas ativas ou futuras";
+      // Card 3: chaves emprestadas (gestão) ou próxima reserva
       const proxima = futuras[0];
-      $("cardChaves").innerHTML = `<h2><span class="panel-icon"><i class="fa-regular fa-clock"></i></span> Próxima reserva</h2>${proxima ? `<div class="proxima-sala">${L.esc(porId.get(proxima.sala_id)?.codigo || `Espaço #${proxima.sala_id}`)}</div><div class="proxima-quando">${L.esc(L.fmtData(proxima.data))} · ${L.esc(proxima.inicio)}–${L.esc(proxima.fim)}</div>` : `<p class="proxima-vazia">Você não tem reservas futuras.</p>`}<a class="btn btn-link" href="minhas-reservas.html">Ver minhas reservas</a>`;
-      $("agendaConteudo").innerHTML = futuras.length ? `<div class="list">${futuras.slice(0, 6).map((r) => `<a class="list-item" href="sala-detalhes.html?id=${r.sala_id}"><span class="list-icon"><i class="fa-regular fa-calendar"></i></span><span class="list-main"><b>${L.esc(porId.get(r.sala_id)?.codigo || `Espaço #${r.sala_id}`)}</b><span>${L.esc(L.fmtData(r.data))}</span></span><span class="list-hora">${L.esc(r.inicio)}–${L.esc(r.fim)}</span></a>`).join("")}</div>` : `<p class="muted">Nenhuma reserva futura.</p>`;
-      $("notificacoesConteudo").innerHTML = reservas.length ? `<p class="muted">${reservas.length} ${reservas.length === 1 ? "reserva registrada" : "reservas registradas"} na sua conta.</p>` : `<p class="muted">Sem atividade recente.</p>`;
+      if (gestao && ativos) {
+        const n = ativos.length;
+        $("cardChaves").innerHTML = `<h2><span class="panel-icon"><i class="fa-solid fa-key"></i></span> Chaves emprestadas agora</h2>
+          <strong class="metric">${n}</strong><p>${n === 1 ? "chave com empréstimo ativo" : "chaves com empréstimo ativo"}</p>
+          ${n ? `<div class="key-icons" aria-hidden="true">${'<i class="fa-solid fa-key"></i>'.repeat(Math.min(n, 8))}</div>` : ""}
+          <a class="btn btn-link" href="chaves.html">Retirada e devolução <i class="fa-solid fa-arrow-right"></i></a>`;
+      } else {
+        $("cardChaves").innerHTML = `<h2><span class="panel-icon"><i class="fa-regular fa-clock"></i></span> Próxima reserva</h2>${proxima ? `<div class="proxima-sala">${L.esc(nomeSala(proxima.sala_id))}</div><div class="proxima-quando">${L.esc(L.fmtData(proxima.data))} · ${L.esc(proxima.inicio)}–${L.esc(proxima.fim)}</div>` : `<p class="proxima-vazia">Você não tem reservas futuras.</p>`}<a class="btn btn-link" href="minhas-reservas.html">Ver minhas reservas</a>`;
+      }
+      // Card 5: agenda (gestão vê também as chaves fora do balcão)
+      let html = "";
+      if (gestao && ativos && ativos.length) {
+        html += `<p class="agenda-dia">Chaves emprestadas agora</p><div class="list">${ativos.slice(0, 4).map((e) => `
+          <a class="list-item" href="chaves.html"><span class="list-icon warn"><i class="fa-solid fa-key"></i></span>
+          <span class="list-main"><b>${L.esc((e.chave && e.chave.codigo) || "Chave")}${e.sala ? " · " + L.esc(e.sala.codigo) : ""}</b><span>Com ${L.esc((e.usuario && e.usuario.nome) || "usuário")} há ${L.esc(L.duracao(e.retirada_em))}</span></span>
+          <span class="list-hora">${L.esc(L.fmtHora(e.retirada_em))}</span></a>`).join("")}</div>`;
+        if (ativos.length > 4) html += `<p class="form-hint">+ ${ativos.length - 4} chave(s) emprestada(s). <a href="chaves.html">Ver todas</a></p>`;
+      }
+      if (futuras.length) html += `<p class="agenda-dia">Minhas próximas reservas</p><div class="list">${futuras.slice(0, 6).map((r) => `<a class="list-item" href="sala-detalhes.html?id=${r.sala_id}"><span class="list-icon"><i class="fa-regular fa-calendar"></i></span><span class="list-main"><b>${L.esc(nomeSala(r.sala_id))}</b><span>${L.esc(L.fmtData(r.data))}</span></span><span class="list-hora">${L.esc(r.inicio)}–${L.esc(r.fim)}</span></a>`).join("")}</div>`;
+      $("agendaConteudo").innerHTML = html || `<p class="muted">Nenhuma reserva futura.</p>`;
+      const canceladas = reservas.filter((r) => r.status === "cancelada").length;
+      $("notificacoesConteudo").innerHTML = reservas.length
+        ? `<p class="muted">${reservas.length} ${reservas.length === 1 ? "reserva registrada" : "reservas registradas"} na sua conta${canceladas ? ` (${canceladas} cancelada${canceladas === 1 ? "" : "s"})` : ""}.</p>`
+        : `<p class="muted">Sem atividade recente.</p>`;
     } catch (e) {
       L.erro(e);
       ["labsConteudo", "agendaConteudo", "notificacoesConteudo"].forEach((id) => { $(id).innerHTML = `<p class="muted">Não foi possível carregar os dados.</p>`; });

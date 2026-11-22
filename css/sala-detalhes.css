@@ -97,3 +97,7 @@
   .room-hero .info { padding: 18px; }
   .schedule { grid-template-columns: 48px repeat(6, minmax(58px, 1fr)); }
 }
+
+/* campos opcionais do espaço no modo API (localização, capacidade) */
+.room-hero .detalhe-fatos { flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; }
+.side-card #detChaves .list-item { gap: 10px; }

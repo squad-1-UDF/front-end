@@ -37,7 +37,7 @@
         <section class="stats" id="stats" aria-label="Resumo das chaves">
           <div class="stat"><span class="stat-label"><i class="fa-solid fa-circle-check"></i> Disponíveis</span><span class="stat-value" id="stDisp">-</span><span class="stat-foot">prontas para entrega</span></div>
           <div class="stat"><span class="stat-label"><i class="fa-solid fa-key"></i> Emprestadas</span><span class="stat-value" id="stEmp">-</span><span class="stat-foot">com empréstimo ativo</span></div>
-          <div class="stat"><span class="stat-label"><i class="fa-solid fa-ban"></i> Inativas</span><span class="stat-value" id="stInat">-</span><span class="stat-foot">fora de circulação</span></div>
+          <div class="stat"><span class="stat-label"><i class="fa-solid fa-ban"></i> Fora de uso</span><span class="stat-value" id="stInat">-</span><span class="stat-foot">inativas, em manutenção ou extraviadas</span></div>
           <div class="stat stat-atencao"><span class="stat-label"><i class="fa-solid fa-triangle-exclamation"></i> Atenção</span><span class="stat-value" id="stAtencao">-</span><span class="stat-foot">empréstimos há mais de 4h</span></div>
         </section>
 
@@ -69,6 +69,8 @@
                 <option value="">Todas</option>
                 <option value="disponivel">Disponível</option>
                 <option value="emprestada">Emprestada</option>
+                <option value="manutencao">Em manutenção</option>
+                <option value="perdida">Extraviada</option>
                 <option value="inativa">Inativa</option>
               </select>
             </div>
