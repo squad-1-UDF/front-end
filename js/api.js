@@ -23,7 +23,13 @@
   const L = (window.LABTECH = window.LABTECH || {});
 
   const CONFIG = (L.CONFIG = {
-    modo: (function () { try { return localStorage.getItem("labtech_api_modo") || "mock"; } catch (e) { return "mock"; } })(),
+    // Publicado (fora do PC local) já abre ligado ao Django; localmente segue em demonstração.
+    // localStorage "labtech_api_modo" continua valendo para forçar um dos dois modos.
+    modo: (function () {
+      const local = /^(localhost|127\.0\.0\.1|\[::1\]|)$/.test(typeof location === "undefined" ? "" : location.hostname);
+      const padrao = local ? "mock" : "api";
+      try { return localStorage.getItem("labtech_api_modo") || padrao; } catch (e) { return padrao; }
+    })(),
     base: "/api/v1",
     senhaDemo: "labtech",
     horaAbertura: "07:00",
