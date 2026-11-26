@@ -210,7 +210,7 @@
     bookings: {
       // filtros: { sala_id, mine, de, ate, incluirCanceladas }
       async list(f = {}) {
-        const s = exigeSessao(); const d = db();
+        const s = exigeSessao(GESTAO); const d = db();
         let lista = d.reservas.slice();
         if (f.sala_id) lista = lista.filter((r) => r.sala_id === Number(f.sala_id));
         if (f.mine) lista = lista.filter((r) => r.usuario_id === s.id);
@@ -220,9 +220,14 @@
         lista.sort((a, b) => (a.data + a.inicio).localeCompare(b.data + b.inicio));
         return atraso(lista.map((r) => reservaCompleta(r, d)));
       },
-      async get(id) { exigeSessao(); const d = db(); const r = d.reservas.find((x) => x.id === Number(id)); if (!r) return falha(404, "NOT_FOUND", "Reserva não encontrada."); return atraso(reservaCompleta(r, d)); },
+      async agenda(id, { de, ate }) {
+        exigeSessao(); const d = db();
+        return atraso(d.reservas.filter((r) => r.sala_id === Number(id) && ativa(r) && r.data >= de && r.data <= ate)
+          .map((r) => ({ sala_id: r.sala_id, data: r.data, inicio: r.inicio, fim: r.fim, status: "confirmada", situacao: "confirmada" })));
+      },
+      async get(id) { exigeSessao(GESTAO); const d = db(); const r = d.reservas.find((x) => x.id === Number(id)); if (!r) return falha(404, "NOT_FOUND", "Reserva não encontrada."); return atraso(reservaCompleta(r, d)); },
       async create(p) {
-        const s = exigeSessao(); const d = db();
+        const s = exigeSessao(GESTAO); const d = db();
         validaIntervalo(p);
         const sala = d.salas.find((x) => x.id === Number(p.sala_id));
         if (!sala) return falha(404, "NOT_FOUND", "Sala não encontrada.");
@@ -237,7 +242,7 @@
         d.reservas.push(r); salvar(); return atraso(reservaCompleta(r, d));
       },
       async cancel(id) {
-        const s = exigeSessao(); const d = db(); const r = d.reservas.find((x) => x.id === Number(id));
+        const s = exigeSessao(GESTAO); const d = db(); const r = d.reservas.find((x) => x.id === Number(id));
         if (!r) return falha(404, "NOT_FOUND", "Reserva não encontrada.");
         if (r.usuario_id !== s.id && !GESTAO.includes(s.perfil)) return falha(403, "FORBIDDEN", "Só o titular ou a gestão podem cancelar.");
         if (r.status === "cancelada") return falha(409, "ALREADY_CANCELLED", "Reserva já cancelada.");
@@ -249,7 +254,7 @@
     keys: {
       // filtros: { sala_id }
       async list(f = {}) {
-        exigeSessao(); const d = db();
+        exigeSessao(GESTAO); const d = db();
         return atraso(d.chaves.filter((c) => !f.sala_id || c.sala_id === Number(f.sala_id)).map((c) => {
           const s = d.salas.find((x) => x.id === c.sala_id); const e = emprestimoAtivo(c.id, d);
           return { ...c, estado: estadoChave(c), status: statusChave(c, d), sala: s ? { id: s.id, codigo: s.codigo, nome: s.nome, bloco: s.bloco } : null, emprestimo: e ? emprestimoCompleto(e, d) : null };
@@ -276,7 +281,7 @@
         Object.assign(c, patch); salvar(); return atraso(c);
       },
       // UC007: só informa se há empréstimo ativo (igual ao contrato)
-      async loanAvailability(id) { exigeSessao(); const d = db(); const c = d.chaves.find((x) => x.id === Number(id)); if (!c) return falha(404, "NOT_FOUND", "Chave não encontrada."); return atraso({ key_id: c.id, has_active_loan: !!emprestimoAtivo(c.id, d) }); },
+      async loanAvailability(id) { exigeSessao(GESTAO); const d = db(); const c = d.chaves.find((x) => x.id === Number(id)); if (!c) return falha(404, "NOT_FOUND", "Chave não encontrada."); return atraso({ key_id: c.id, has_active_loan: !!emprestimoAtivo(c.id, d) }); },
       // UC008: movimentações (retiradas e devoluções) da chave
       async movements(id) {
         exigeSessao(GESTAO); const d = db(); const c = d.chaves.find((x) => x.id === Number(id));

@@ -24,7 +24,7 @@
           <div>
             <span class="eyebrow">LabTech | Laboratórios</span>
             <h1 id="saudacao">Olá!</h1>
-            <p class="subtitle">Seja bem-vindo(a)! Acompanhe laboratórios, reservas e chaves em um só lugar. Bons estudos :)</p>
+            <p class="subtitle">Consulte salas, laboratórios e a agenda de ocupação.</p>
           </div>
         </div>
 
@@ -36,14 +36,14 @@
             <div id="labsConteudo"><div class="loading">Carregando salas...</div></div>
           </article>
 
-          <!-- CARD 2: minhas reservas ativas -->
-          <a class="panel hover dash-metric dash-reservas" href="minhas-reservas.html">
-            <h2><span class="panel-icon"><i class="fa-regular fa-calendar-days"></i></span> Minhas reservas ativas <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i></h2>
+          <!-- CARD 2: espaços para estudante; reservas ativas para gestão -->
+          <a class="panel hover dash-metric dash-reservas" href="salas.html">
+            <h2><span class="panel-icon"><i class="fa-regular fa-calendar-days"></i></span> Espaços para consulta <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i></h2>
             <strong class="metric" id="qtdReservas">–</strong>
             <p id="qtdReservasTxt">carregando...</p>
           </a>
 
-          <!-- CARD 3: chaves emprestadas (gestão) ou próxima reserva (estudante) -->
+          <!-- CARD 3: agenda para estudante; chaves para gestão -->
           <article class="panel dash-metric dash-chaves" id="cardChaves">
             <div class="loading">Carregando...</div>
           </article>
@@ -67,7 +67,7 @@
           <article class="panel dash-notificacoes">
             <div class="panel-head">
               <h2><span class="panel-icon"><i class="fa-regular fa-bell"></i></span> Atividade recente</h2>
-              <a class="btn btn-link" id="verTodas" href="minhas-reservas.html">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="btn btn-link" id="verTodas" href="salas.html">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div id="notificacoesConteudo"><div class="loading">Carregando...</div></div>
           </article>

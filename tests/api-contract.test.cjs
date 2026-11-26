@@ -9,6 +9,9 @@ process.env.TZ = "America/Sao_Paulo";
 
 const source = fs.readFileSync(path.join(__dirname, "../js/api.js"), "utf8");
 const seedSource = fs.readFileSync(path.join(__dirname, "../data/seed.js"), "utf8");
+const coreSource = fs.readFileSync(path.join(__dirname, "../js/core.js"), "utf8");
+const dashboardSource = fs.readFileSync(path.join(__dirname, "../js/dashboard.js"), "utf8");
+const detailSource = fs.readFileSync(path.join(__dirname, "../js/sala-detalhes.js"), "utf8");
 
 // rotas: função opcional (url, opts) => resposta, consultada antes das rotas padrão
 function fixture(occupied = [{ start_at: "2026-11-23T10:00:00-03:00", end_at: "2026-11-23T11:00:00-03:00" }], rotas = () => null) {
@@ -315,4 +318,123 @@ test("demonstration mode keeps keys, loans and users rules", async () => {
   await L.api.keys.update(livre.id, { estado: "available" });
   const e = await L.api.loans.checkout({ chave_id: livre.id, usuario_id: 4 });
   assert.equal((await L.api.loans.list({ ativos: true, usuario_id: 4 })).some((x) => x.id === e.id), true);
+});
+
+test("student in demonstration mode can inspect occupancy but cannot access records or keys", async () => {
+  const storage = new Map();
+  const localStorage = { getItem: (k) => storage.get(k) || null, setItem: (k, v) => storage.set(k, v), removeItem: (k) => storage.delete(k) };
+  const context = { window: { LABTECH: {}, addEventListener() {} }, document: { cookie: "" }, localStorage, URLSearchParams, Date, console, setTimeout, clearTimeout };
+  vm.runInNewContext(seedSource, context);
+  vm.runInNewContext(source, context);
+  const api = context.window.LABTECH.api;
+  await api.auth.login({ identifier: "joao.silva@udf.edu.br", password: "labtech", perfil: "student" });
+  const salas = await api.spaces.list();
+  assert.ok(salas.length > 0);
+  assert.equal((await api.spaces.get(salas[0].id)).id, salas[0].id);
+  const date = new Date(); date.setDate(date.getDate() + 45);
+  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
+  const data = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  await api.spaces.availability(salas[0].id, { data, inicio: "10:00", fim: "11:00" });
+  const agenda = await api.bookings.agenda(salas[0].id, { de: data, ate: data });
+  assert.ok(agenda.every((row) => !("usuario_id" in row) && !("finalidade" in row)));
+  for (const request of [
+    () => api.bookings.list(), () => api.bookings.get(1), () => api.bookings.create({}), () => api.bookings.cancel(1),
+    () => api.keys.list(), () => api.keys.loanAvailability(1), () => api.keys.movements(1),
+    () => api.loans.list(), () => api.loans.checkout({}), () => api.loans.return(1), () => api.users.list()
+  ]) await assert.rejects(request, (e) => e.status === 403 && e.code === "FORBIDDEN");
+});
+
+test("employee and admin can still create and cancel bookings in demonstration mode", async () => {
+  const storage = new Map();
+  const localStorage = { getItem: (k) => storage.get(k) || null, setItem: (k, v) => storage.set(k, v), removeItem: (k) => storage.delete(k) };
+  const context = { window: { LABTECH: {}, addEventListener() {} }, document: { cookie: "" }, localStorage, URLSearchParams, Date, console, setTimeout, clearTimeout };
+  vm.runInNewContext(seedSource, context);
+  vm.runInNewContext(source, context);
+  const api = context.window.LABTECH.api;
+  const date = new Date(); date.setDate(date.getDate() + 45);
+  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
+  const data = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  for (const [identifier, perfil] of [["rafael.nunes@udf.edu.br", "employee"], ["ana.costa@udf.edu.br", "admin"]]) {
+    await api.auth.login({ identifier, password: "labtech", perfil });
+    const sala = (await api.spaces.list()).find((s) => s.status !== "maintenance" && s.capacidade > 0);
+    const reserva = await api.bookings.create({ sala_id: sala.id, data, inicio: perfil === "admin" ? "13:00" : "10:00", fim: perfil === "admin" ? "14:00" : "11:00", finalidade: "Atividade", participantes: 1 });
+    assert.equal((await api.bookings.get(reserva.id)).id, reserva.id);
+    assert.equal((await api.bookings.cancel(reserva.id)).status, "cancelada");
+    await api.auth.logout();
+  }
+});
+
+test("reservation pages reject the server-reported student role", async () => {
+  for (const page of ["reservar-sala.html", "minhas-reservas.html"]) {
+    const html = fs.readFileSync(path.join(__dirname, "..", page), "utf8");
+    assert.match(html, /data-roles="employee,admin"/);
+    const redirects = [];
+    const sessionStorage = { setItem() {}, getItem() { return null; }, removeItem() {} };
+    const document = { readyState: "complete", body: { dataset: { roles: "employee,admin" } } };
+    const location = { pathname: "/" + page, search: "", replace: (url) => redirects.push(url) };
+    const L = { CONFIG: { modo: "api" }, api: { auth: { me: async () => ({ id: 7, perfil: "student", nome: "Aluno" }) } } };
+    const context = { window: { LABTECH: L }, document, location, sessionStorage, localStorage: { getItem() { return null; } }, URLSearchParams, Date, console, setTimeout, clearTimeout };
+    vm.runInNewContext(coreSource, context);
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(redirects, ["index.html"]);
+    const principal = L.MENU.find((s) => s.secao === "Principal");
+    assert.ok(principal.itens.filter((i) => !i.perfis || i.perfis.includes("student")).every((i) => !["reservar", "minhas-reservas"].includes(i.id)));
+  }
+});
+
+test("student dashboard reads only spaces in API and demonstration modes", async () => {
+  for (const modo of ["api", "mock"]) {
+    const nodes = new Map();
+    const makeNode = () => ({ innerHTML: "", textContent: "", href: "", closest() { return this; }, querySelector() { return makeNode(); } });
+    const get = (id) => { if (!nodes.has(id)) nodes.set(id, makeNode()); return nodes.get(id); };
+    const document = { getElementById: get, querySelector: (sel) => sel.startsWith("#") ? get(sel.slice(1)) : makeNode() };
+    const calls = [];
+    const L = {
+      pronto: Promise.resolve({ perfil: "student", nome: "João" }), CONFIG: { modo },
+      pode: (...roles) => roles.includes("student"), primeiroNome: (name) => name.split(" ")[0],
+      esc: String, tipoCover: () => ({ icon: "fa-solid fa-flask" }),
+      api: { spaces: { list: async () => { calls.push("spaces"); return [{ id: 2, nome: "Laboratório", codigo: "LAB-02", tipo: "laboratorio" }]; } },
+        bookings: { list: () => { calls.push("bookings"); throw new Error("bookings forbidden"); } },
+        loans: { list: () => { calls.push("loans"); throw new Error("loans forbidden"); } } }
+    };
+    vm.runInNewContext(dashboardSource, { LABTECH: L, document, Date, console, encodeURIComponent });
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(calls, ["spaces"]);
+    assert.equal(get("qtdReservas").textContent, 1);
+    assert.equal(get("qtdReservas").href, "salas.html");
+    assert.doesNotMatch([...nodes.values()].map((n) => n.innerHTML).join(" "), /reservar-sala\.html|minhas-reservas\.html|chaves\.html/);
+  }
+});
+
+test("student room detail only reads the space and its availability", async () => {
+  for (const modo of ["api", "mock"]) {
+    const nodes = new Map();
+    const node = (id) => {
+      if (!nodes.has(id)) nodes.set(id, { innerHTML: "", textContent: "", value: "", addEventListener(type, listener) { this[type] = listener; }, setAttribute() {} });
+      return nodes.get(id);
+    };
+    const calls = [];
+    const sala = { id: 2, codigo: "LAB-02", nome: "Laboratório", tipo: "laboratorio", localizacao: "Bloco A", capacidade: 30 };
+    const L = {
+      pronto: Promise.resolve({ perfil: "student" }), CONFIG: { modo }, pode: (...roles) => roles.includes("student"), qs: () => "2",
+      api: {
+        spaces: {
+          get: async () => { calls.push("space"); return sala; },
+          availability: async () => { calls.push("availability"); return { available: true }; }
+        },
+        bookings: { list: () => { throw new Error("bookings forbidden"); } },
+        keys: { list: () => { throw new Error("keys forbidden"); } }
+      },
+      esc: String, tipoCover: () => ({ cls: "cover-lab", icon: "fa-solid fa-flask" }),
+      tipoLabel: () => "Laboratório", hojeISO: () => "2026-11-26"
+    };
+    const document = { getElementById: node, title: "" };
+    vm.runInNewContext(detailSource, { LABTECH: L, window: { LABTECH: L }, document, parseInt, encodeURIComponent });
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(calls, ["space"]);
+    assert.doesNotMatch(node("detail").innerHTML, /reservar-sala\.html|minhas-reservas\.html|chaves\.html/);
+    await node("detConsultar").click();
+    assert.deepEqual(calls, ["space", "availability"]);
+    assert.match(node("detResultado").textContent, /disponível/);
+  }
 });

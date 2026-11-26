@@ -2,10 +2,11 @@
 LABTECH.pronto.then(async () => {
   const L = window.LABTECH;
   const real = L.CONFIG.modo === "api";
+  const student = L.pode("student");
   const id = parseInt(L.qs("id"), 10) || (real ? 0 : 1);
   const root = document.getElementById("detail");
   root.innerHTML = '<div class="loading">Carregando sala...</div>';
-  if (real) {
+  if (real || student) {
     const topSearch = document.getElementById("topSearch");
     if (topSearch) {
       topSearch.placeholder = "Buscar código do espaço";
@@ -34,7 +35,7 @@ LABTECH.pronto.then(async () => {
       <article class="panel room-hero"><div class="info"><span class="code">${L.esc(s.codigo)}</span><h1>${L.esc(s.nome)}</h1>
       <div class="type"><i class="fa-solid fa-layer-group"></i> ${L.esc(L.tipoLabel(s.tipo))}</div>
       ${fatos ? `<div class="type detalhe-fatos">${fatos}</div>` : ""}
-      <div class="cta"><a class="btn btn-gold" href="reservar-sala.html?sala=${s.id}">Reservar esta sala</a>
+      <div class="cta">${gestao ? `<a class="btn btn-gold" href="reservar-sala.html?sala=${s.id}">Reservar esta sala</a>` : ""}
       <a class="btn btn-secondary" href="agenda.html?sala=${s.id}">Ver agenda</a><a class="btn btn-ghost" href="salas.html">Voltar</a></div></div>
       <div class="visual ${cover.cls}"><div class="placeholder"><i class="${cover.icon}"></i></div><small>${L.esc(s.codigo)}</small></div></article>
       <article class="panel"><div class="panel-head"><h3><span class="panel-icon"><i class="fa-regular fa-calendar-check"></i></span> Disponibilidade</h3></div>
@@ -43,8 +44,8 @@ LABTECH.pronto.then(async () => {
       <div class="form-field"><label for="detFim">Fim</label><input id="detFim" type="time" value="11:00"></div>
       <button class="btn btn-primary" type="button" id="detConsultar">Consultar</button></div><p class="muted" id="detResultado" style="padding:0 16px 16px"></p></article>
       </div><aside class="detail-side"><article class="panel side-card"><h3>Ações rápidas</h3><div class="side-actions">
-      <a class="btn btn-primary btn-sm" href="reservar-sala.html?sala=${s.id}">Nova reserva</a>
-      <a class="btn btn-secondary btn-sm" href="minhas-reservas.html">Minhas reservas</a></div></article>
+      ${gestao ? `<a class="btn btn-primary btn-sm" href="reservar-sala.html?sala=${s.id}">Nova reserva</a>
+      <a class="btn btn-secondary btn-sm" href="minhas-reservas.html">Minhas reservas</a>` : `<a class="btn btn-secondary btn-sm" href="agenda.html?sala=${s.id}">Ver ocupação</a>`}</div></article>
       ${gestao ? `<article class="panel side-card"><h3>Chaves da sala</h3><div id="detChaves"><p class="muted">Carregando chaves...</p></div></article>` : ""}</aside></div>`;
     // Gestão: chaves do espaço (GET /keys/?space_id=) com situação e atalho para retirada
     if (gestao) {
@@ -61,7 +62,7 @@ LABTECH.pronto.then(async () => {
       resultado.textContent = "Consultando...";
       try {
         const r = await L.api.spaces.availability(s.id, { data: data.value, inicio: document.getElementById("detInicio").value, fim: document.getElementById("detFim").value });
-        resultado.textContent = r.available ? "Horário disponível para reserva." : "Horário ocupado. Escolha outro intervalo.";
+        resultado.textContent = r.available ? "Horário disponível." : "Horário ocupado. Escolha outro intervalo.";
       } catch (e) { resultado.textContent = e.message || "Falha ao consultar disponibilidade."; }
     });
     return;
