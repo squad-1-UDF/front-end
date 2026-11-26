@@ -2,6 +2,8 @@
 LABTECH.pronto.then(async () => {
   const L = window.LABTECH;
   const real = L.CONFIG.modo === "api";
+  const student = L.pode("student");
+  if (!student) document.querySelector(".page-head .page-actions").insertAdjacentHTML("beforeend", '<a class="btn btn-gold" href="reservar-sala.html"><i class="fa-solid fa-plus"></i> Nova reserva</a>');
   const PAGE_SIZE = 9;
   const results = document.getElementById("results");
   results.innerHTML = '<div class="loading">Carregando espaços...</div>';
@@ -11,6 +13,7 @@ LABTECH.pronto.then(async () => {
   // reservas do dia escolhido no filtro de data/horário (carregadas sob demanda)
   const reservasPorData = {};
   async function carregarReservasDoDia(dataISO) {
+    if (student) return;
     if (!dataISO || reservasPorData[dataISO]) return;
     try { reservasPorData[dataISO] = await L.api.bookings.list({ de: dataISO, ate: dataISO }); } catch (e) { L.erro(e); reservasPorData[dataISO] = []; }
   }
@@ -33,7 +36,7 @@ LABTECH.pronto.then(async () => {
       el.topSearch.placeholder = "Buscar espaço";
       el.topSearch.setAttribute("aria-label", "Buscar espaço por código, nome ou localização");
     }
-    document.querySelector(".page-head .subtitle").textContent = "Consulte os espaços cadastrados e verifique a disponibilidade para reservar.";
+    document.querySelector(".page-head .subtitle").textContent = student ? "Consulte os espaços cadastrados e sua disponibilidade." : "Consulte os espaços cadastrados e verifique a disponibilidade para reservar.";
     el.sort.querySelectorAll('option[value="status"]').forEach((x) => x.remove());
     el.sort.value = "codigo";
     const hero = document.querySelector(".hero p");
@@ -58,7 +61,7 @@ LABTECH.pronto.then(async () => {
   /* ---------- filtro por data/horário (reservas reais da sala) ---------- */
   const paraMin = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
   function livreNoPeriodo(sala, dataISO, ini, fim) {
-    if (real) return !disponiveis || disponiveis.has(sala.id);
+    if (real || student) return !disponiveis || disponiveis.has(sala.id);
     if (!dataISO && !ini && !fim) return true;
     if (sala.status === "maintenance") return false;
     const data = dataISO || L.hojeISO();
@@ -118,7 +121,7 @@ LABTECH.pronto.then(async () => {
         <div class="body"><div class="ey">${L.esc(L.tipoLabel(s.tipo))}</div><h3>${L.esc(s.nome)}</h3>
         ${meta ? `<div class="meta">${meta}</div>` : ""}
         <div class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Ver detalhes</a>
-        <a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a></div></div></article>`;
+        ${student ? "" : `<a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a>`}</div></div></article>`;
     }
     const link = `sala-detalhes.html?id=${s.id}`;
     const podeReservar = s.status !== "maintenance";
@@ -142,7 +145,7 @@ LABTECH.pronto.then(async () => {
           <div class="next"><i class="fa-regular fa-clock"></i> Próximo horário livre: <b>${L.esc(s.proximoLivre)}</b></div>
           <div class="actions">
             <a class="btn btn-secondary btn-sm" href="${link}"><i class="fa-solid fa-circle-info"></i> Ver detalhes</a>
-            <a class="btn btn-primary btn-sm ${podeReservar ? "" : "is-disabled"}" href="${linkReserva(s)}"${podeReservar ? "" : ' aria-disabled="true" tabindex="-1"'}><i class="fa-regular fa-calendar-plus"></i> Reservar</a>
+            ${student ? "" : `<a class="btn btn-primary btn-sm ${podeReservar ? "" : "is-disabled"}" href="${linkReserva(s)}"${podeReservar ? "" : ' aria-disabled="true" tabindex="-1"'}><i class="fa-regular fa-calendar-plus"></i> Reservar</a>`}
           </div>
         </div>
       </article>`;
@@ -150,7 +153,7 @@ LABTECH.pronto.then(async () => {
 
   function tableHTML(lista) {
     if (real) return `<div class="table-wrap rooms-table"><table class="table"><thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th>Local</th><th>Cap.</th><th></th></tr></thead><tbody>${lista.map((s) =>
-      `<tr><td class="code">${L.esc(s.codigo)}</td><td class="name"><a href="sala-detalhes.html?id=${s.id}">${L.esc(s.nome)}</a></td><td>${L.esc(L.tipoLabel(s.tipo))}</td><td>${L.esc(s.localizacao || "-")}</td><td>${L.esc(s.capacidade ?? "-")}</td><td class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a> <a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a></td></tr>`).join("")}</tbody></table></div>`;
+      `<tr><td class="code">${L.esc(s.codigo)}</td><td class="name"><a href="sala-detalhes.html?id=${s.id}">${L.esc(s.nome)}</a></td><td>${L.esc(L.tipoLabel(s.tipo))}</td><td>${L.esc(s.localizacao || "-")}</td><td>${L.esc(s.capacidade ?? "-")}</td><td class="actions"><a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a> ${student ? "" : `<a class="btn btn-primary btn-sm" href="${linkReserva(s)}">Reservar</a>`}</td></tr>`).join("")}</tbody></table></div>`;
     const rows = lista.map((s) => `
       <tr>
         <td class="code">${L.esc(s.codigo)}</td>
@@ -163,7 +166,7 @@ LABTECH.pronto.then(async () => {
         <td>${L.esc(s.proximoLivre)}</td>
         <td class="actions">
           <a class="btn btn-secondary btn-sm" href="sala-detalhes.html?id=${s.id}">Detalhes</a>
-          <a class="btn btn-primary btn-sm ${s.status === "maintenance" ? "is-disabled" : ""}" href="${linkReserva(s)}">Reservar</a>
+          ${student ? "" : `<a class="btn btn-primary btn-sm ${s.status === "maintenance" ? "is-disabled" : ""}" href="${linkReserva(s)}">Reservar</a>`}
         </td>
       </tr>`).join("");
     return `
@@ -214,7 +217,7 @@ LABTECH.pronto.then(async () => {
 
   el.aplicar.addEventListener("click", async () => {
     state.page = 1;
-    if (real) {
+    if (real || student) {
       disponiveis = null;
       if ([el.data.value, el.ini.value, el.fim.value].some(Boolean) && ![el.data.value, el.ini.value, el.fim.value].every(Boolean)) {
         L.toast("Informe data, início e fim para filtrar por disponibilidade.", "info");
@@ -249,7 +252,7 @@ LABTECH.pronto.then(async () => {
   // filtros vindos pela URL (ex.: salas.html?status=available&tipo=laboratorio)
   ["tipo", "bloco", "status", "cap", "data", "ini", "fim"].forEach((k) => { const v = L.qs(k); if (v) el[k].value = v; });
   if (L.qs("q")) { el.busca.value = L.qs("q"); if (el.topSearch) el.topSearch.value = L.qs("q"); }
-  if (!real) await carregarReservasDoDia(el.data.value || ((el.ini.value || el.fim.value) ? L.hojeISO() : ""));
+  if (!real && !student) await carregarReservasDoDia(el.data.value || ((el.ini.value || el.fim.value) ? L.hojeISO() : ""));
 
   setView(state.view);
 });

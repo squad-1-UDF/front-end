@@ -55,7 +55,7 @@ No console do navegador, execute `localStorage.setItem('labtech_api_modo', 'api'
 | 24 | Edite o usuário criado: mude o perfil para Estudante e deixe a senha em branco. | `PATCH /users/{id}/` envia só os campos alterados (sem `username` e sem `password`). |
 | 25 | Desative e reative o usuário. | `PATCH` com `{"is_active":false}` e depois `true`. O próprio administrador não tem botão de desativar; se forçar pela API, o 400 aparece como mensagem. |
 | 26 | Saia e entre com o **funcionário**. | O menu mostra Principal e Chaves, sem Administração. Abrir `admin.html` direto volta para o início com o aviso "Seu perfil não tem acesso àquela tela". |
-| 27 | Saia e entre com o **estudante**. | O menu mostra só Principal. Abrir `chaves.html` direto volta para o início com o aviso. O dashboard mostra "Próxima reserva" no lugar das chaves. |
+| 27 | Saia e entre com o **estudante**. Navegue por início, salas, detalhes e agenda; consulte disponibilidade e ocupação. Tente abrir `reservar-sala.html`, `minhas-reservas.html` e `chaves.html` diretamente. | O menu mostra apenas Início, Laboratórios e salas e Agenda. O dashboard apresenta informações consultivas; não há botões ou links de reserva. As três URLs restritas voltam ao início com aviso. Em Network, só há `GET /spaces/`, `GET /spaces/{id}/`, `booking-availability` e `booking-agenda` nessas telas, todos com 200; não há `GET /bookings/`, `/keys/` ou `/key-loans/`, nem 403 inesperado. |
 | 28 | Use **Sair** e abra diretamente `http://127.0.0.1:5173/salas.html`. | Logout retorna 200; `/auth/me/` retorna 403 e a página protegida redireciona para login. |
 
 ## Responsividade e modo demonstração

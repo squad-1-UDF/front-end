@@ -29,7 +29,7 @@ Sem back-end, o sistema roda em **modo demonstração**. Os dados ficam no naveg
 |---|---|---|
 | Administrador | ana.costa@udf.edu.br | Tudo, inclusive usuários, salas e chaves |
 | Funcionário | rafael.nunes@udf.edu.br | Telas comuns, mais retirada, devolução e histórico de chaves |
-| Estudante | joao.silva@udf.edu.br | Salas, agenda, reservar e minhas reservas |
+| Estudante | joao.silva@udf.edu.br | Início, salas, detalhes e agenda; somente consultas |
 
 O botão "Restaurar dados de demonstração", no painel administrativo, volta tudo ao estado inicial.
 
@@ -42,8 +42,8 @@ O botão "Restaurar dados de demonstração", no painel administrativo, volta tu
 | Laboratórios e salas | `salas.html` | todos | João Gabriel Leal |
 | Detalhes da sala | `sala-detalhes.html?id=` | todos | João Gabriel Leal |
 | Agenda / disponibilidade | `agenda.html` | todos | nova na integração |
-| Reservar sala | `reservar-sala.html` | todos | Luiz Cláudio |
-| Minhas reservas | `minhas-reservas.html` | todos | Luiz Cláudio |
+| Reservar sala | `reservar-sala.html` | funcionário, admin | Luiz Cláudio |
+| Minhas reservas | `minhas-reservas.html` | funcionário, admin | Luiz Cláudio |
 | Retirada e devolução de chaves | `chaves.html` | funcionário, admin | nova na integração |
 | Histórico de chaves (com emissão e CSV) | `chave-historico.html` | funcionário, admin | nova na integração |
 | Painel administrativo | `admin.html` | admin | Raiane |
@@ -147,8 +147,8 @@ No modo API, o papel vem **sempre** de `GET /auth/me/` (`role`: `admin`, `employ
 
 | Papel | Menu e telas |
 |---|---|
-| `student` | Início, salas, agenda, reservar e minhas reservas |
-| `employee` | Tudo do estudante, mais retirada/devolução e histórico de chaves |
+| `student` | Início, salas, detalhes e agenda; consulta de disponibilidade e ocupação |
+| `employee` | Consultas do estudante, reservas, retirada/devolução e histórico de chaves |
 | `admin` | Tudo, mais painel administrativo, usuários e salas e chaves |
 
 Quem abre uma tela sem permissão volta para o início com um aviso. Se o back ainda não mandar `role` (versão antiga), `is_staff: true` vale como `employee`; sem nenhum dos dois, o usuário fica sem as áreas de gestão.
@@ -158,8 +158,9 @@ Quem abre uma tela sem permissão volta para o início com um aviso. Se o back a
 | Tela | Endpoints |
 |---|---|
 | Login e todas as telas | `GET /auth/csrf/`, `POST /auth/login/`, `GET /auth/me/`, `POST /auth/logout/` |
-| Início | `GET /spaces/?is_active=true`, `GET /bookings/?scope=mine`; gestão: `GET /key-loans/?status=active` |
-| Salas, detalhes, agenda, reservar | `GET /spaces/`, `GET /spaces/{id}/`, `booking-availability`, `booking-agenda`, `POST /bookings/`; detalhes (gestão): `GET /keys/?space_id=` |
+| Início | Estudante: `GET /spaces/?is_active=true`; gestão: também `GET /bookings/?scope=mine` e `GET /key-loans/?status=active` |
+| Salas, detalhes e agenda | `GET /spaces/`, `GET /spaces/{id}/`, `booking-availability`, `booking-agenda`; detalhes (gestão): `GET /keys/?space_id=` |
+| Reservar | Gestão: `POST /bookings/` |
 | Minhas reservas | `GET /bookings/?scope=mine`, `POST /bookings/{id}/cancel/` |
 | Retirada e devolução | `GET /keys/`, `GET /key-loans/?status=active`, `GET /users/?q=&is_active=true&limit=30`, `POST /key-loans/`, `POST /key-loans/{id}/return/` |
 | Histórico de chaves | `GET /key-loans/?responsible_user_id=`, `GET /keys/{id}/movements/` (+ `GET /key-loans/?key_id=` para mostrar o responsável), `GET /users/` |

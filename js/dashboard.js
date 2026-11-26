@@ -1,13 +1,45 @@
 /* ============================================================
    Início / dashboard (autoria original: Luanna Priscila, branch dashboard)
-   Cards com dados reais da api: salas livres, minhas reservas,
-   agenda, chaves emprestadas (gestão) ou próxima reserva (estudante),
-   atividade recente e ações rápidas.
+   Estudantes consultam espaços e agenda; funcionários e administradores
+   também consultam reservas e chaves.
    ============================================================ */
 LABTECH.pronto.then(async (usuario) => {
   const L = LABTECH;
   const api = L.api;
   const $ = (id) => document.getElementById(id);
+  if (L.pode("student")) {
+    const nome = L.primeiroNome(usuario.nome);
+    $("saudacao").textContent = nome ? `Olá, ${nome}!` : "Olá!";
+    document.querySelector(".subtitle").textContent = "Consulte salas, laboratórios e a agenda de ocupação.";
+    $("agendaHoje").textContent = "Hoje, " + new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long" });
+    $("acoesRapidas").innerHTML = `<a class="btn btn-gold" href="salas.html">Laboratórios e salas</a><a class="btn btn-secondary" href="agenda.html">Agenda completa</a>`;
+    const metric = $("qtdReservas").closest(".dash-reservas");
+    metric.href = "salas.html";
+    metric.querySelector("h2").textContent = "Espaços para consulta";
+    $("verTodas").href = "salas.html";
+    document.querySelector("#labsConteudo").closest("article").querySelector("h2").textContent = "Laboratórios e salas";
+    document.querySelector("#agendaConteudo").closest("article").querySelector("h2").textContent = "Explore os espaços";
+    document.querySelector("#notificacoesConteudo").closest("article").querySelector("h2").textContent = "Informações";
+    $("cardChaves").innerHTML = `<h2><span class="panel-icon"><i class="fa-regular fa-calendar-check"></i></span> Agenda de ocupação</h2><p>Veja os horários ocupados de cada sala e laboratório.</p><a class="btn btn-link" href="agenda.html">Consultar agenda</a>`;
+    $("notificacoesConteudo").innerHTML = `<p class="muted">Consulte os detalhes e a disponibilidade dos espaços antes de planejar sua visita.</p>`;
+    try {
+      const salas = await api.spaces.list();
+      $("qtdReservas").textContent = salas.length;
+      $("qtdReservasTxt").textContent = salas.length === 1 ? "espaço cadastrado" : "espaços cadastrados";
+      const links = salas.map((s) => `<a class="lab-seat" href="sala-detalhes.html?id=${encodeURIComponent(s.id)}" title="${L.esc(s.nome)}"><i class="${L.tipoCover(s.tipo).icon}"></i><small>${L.esc(s.codigo)}</small></a>`).join("");
+      $("labsConteudo").innerHTML = salas.length ? `<div class="labs-map-grid">${links}</div>` : `<p class="muted">Nenhum espaço cadastrado.</p>`;
+      $("agendaConteudo").innerHTML = salas.length ? `<div class="list">${salas.slice(0, 6).map((s) => `<a class="list-item" href="sala-detalhes.html?id=${encodeURIComponent(s.id)}"><span class="list-icon"><i class="${L.tipoCover(s.tipo).icon}"></i></span><span class="list-main"><b>${L.esc(s.nome)}</b><span>${L.esc(s.codigo)}</span></span></a>`).join("")}</div>` : `<p class="muted">Consulte a agenda para ver a ocupação.</p>`;
+    } catch (e) {
+      L.erro(e);
+      $("qtdReservas").textContent = "–";
+      $("qtdReservasTxt").textContent = "não foi possível carregar";
+      $("labsConteudo").innerHTML = `<p class="muted">Não foi possível carregar os espaços.</p>`;
+      $("agendaConteudo").innerHTML = `<p class="muted">Não foi possível carregar os espaços.</p>`;
+    }
+    return;
+  }
+  $("qtdReservas").closest(".dash-reservas").href = "minhas-reservas.html";
+  $("qtdReservas").closest(".dash-reservas").querySelector("h2").textContent = "Minhas reservas ativas";
   if (L.CONFIG.modo === "api") {
     // Modo API: números reais de /spaces/, /bookings/ (scope=mine) e, para a gestão, /key-loans/.
     // Reservas da API não trazem finalidade nem titular; espaços podem vir sem nome/capacidade.

@@ -140,8 +140,8 @@
       { id: "inicio", href: "index.html", icon: "fa-solid fa-house", label: "Início" },
       { id: "salas", href: "salas.html", icon: "fa-solid fa-flask", label: "Laboratórios e salas" },
       { id: "agenda", href: "agenda.html", icon: "fa-regular fa-calendar-check", label: "Agenda" },
-      { id: "reservar", href: "reservar-sala.html", icon: "fa-solid fa-table-cells", label: "Reservar sala" },
-      { id: "minhas-reservas", href: "minhas-reservas.html", icon: "fa-regular fa-rectangle-list", label: "Minhas reservas" }
+      { id: "reservar", href: "reservar-sala.html", icon: "fa-solid fa-table-cells", label: "Reservar sala", perfis: ["employee", "admin"] },
+      { id: "minhas-reservas", href: "minhas-reservas.html", icon: "fa-regular fa-rectangle-list", label: "Minhas reservas", perfis: ["employee", "admin"] }
     ] },
     { secao: "Chaves", perfis: ["employee", "admin"], itens: [
       { id: "chaves", href: "chaves.html", icon: "fa-solid fa-key", label: "Retirada e devolução" },
@@ -170,7 +170,7 @@
     if (side) {
       const secoes = L.MENU.filter((s) => !s.perfis || s.perfis.includes(u.perfil)).map((s) => `
         <div class="nav-section">${L.esc(s.secao)}</div>
-        <nav aria-label="${L.esc(s.secao)}">${s.itens.map((i) => `<a class="nav-item${i.id === ativo ? " active" : ""}" href="${i.href}"${i.id === ativo ? ' aria-current="page"' : ""}><i class="${i.icon}"></i><span class="label">${L.esc(i.label)}</span></a>`).join("")}</nav>`).join("");
+        <nav aria-label="${L.esc(s.secao)}">${s.itens.filter((i) => !i.perfis || i.perfis.includes(u.perfil)).map((i) => `<a class="nav-item${i.id === ativo ? " active" : ""}" href="${i.href}"${i.id === ativo ? ' aria-current="page"' : ""}><i class="${i.icon}"></i><span class="label">${L.esc(i.label)}</span></a>`).join("")}</nav>`).join("");
       side.innerHTML = `
         <a class="logo" href="index.html" aria-label="LabReserva UDF - início">
           <div class="logo-mark">L</div>
